@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.net.SocketAddress;
 
 public class UDPSender {
@@ -33,7 +34,8 @@ public class UDPSender {
 				multiSocket.send(packet);
 			} else {
 				// unicasting.
-				addr = new InetSocketAddress(intf.getInetAddress(), port);
+				// TODO : MODIFY THE BELOW LINES. intf.getInetAddresses().nextElement()
+				addr = new InetSocketAddress(intf.getInetAddresses().nextElement(), port);
 				socket = new DatagramSocket(port, targetAddr);
 				packet = new DatagramPacket(sendData, sendData.length, addr);
 				socket.send(packet);

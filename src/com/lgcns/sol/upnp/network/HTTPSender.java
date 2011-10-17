@@ -3,6 +3,7 @@ package com.lgcns.sol.upnp.network;
 import java.io.BufferedOutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;

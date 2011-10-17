@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.Socket;
 
 public class HTTPReader {
+	
 	Socket clientSocket = null;
 	InputStream is = null;
 	public HTTPReader(Socket clientSocket) {

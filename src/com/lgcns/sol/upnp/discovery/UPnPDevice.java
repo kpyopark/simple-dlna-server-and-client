@@ -1,8 +1,7 @@
 package com.lgcns.sol.upnp.discovery;
 
+import java.net.NetworkInterface;
 import java.util.Vector;
-
-import com.lgcns.sol.upnp.network.NetworkInterface;
 
 public class UPnPDevice {
 	

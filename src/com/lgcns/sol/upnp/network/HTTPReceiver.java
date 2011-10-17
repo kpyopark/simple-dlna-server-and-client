@@ -1,5 +1,6 @@
 package com.lgcns.sol.upnp.network;
 
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
