@@ -23,7 +23,6 @@ public class ServiceDescription implements ICommonDescription {
 	String controlUrl;
 	String eventsubUrl;
 	
-	@Override
 	public String getDescription() {
 		// TODO : Replace all replaceable parts.
 		return DEVICE_DESCRIPTION_SERVICE_TEMPLATE;
