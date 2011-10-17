@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 
 public class SSDPMessage {
 	String startLine = null;
