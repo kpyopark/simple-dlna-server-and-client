@@ -25,6 +25,7 @@ public class ServiceDescription implements ICommonDescription {
 	
 	public String getDescription() {
 		// TODO : Replace all replaceable parts.
+		// TODO : Or replace all structure to XML builder such as DOM parser.
 		return DEVICE_DESCRIPTION_SERVICE_TEMPLATE;
 	}
 	

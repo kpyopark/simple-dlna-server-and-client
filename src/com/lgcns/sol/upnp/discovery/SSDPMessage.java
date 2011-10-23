@@ -3,10 +3,13 @@ package com.lgcns.sol.upnp.discovery;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class SSDPMessage {
+import com.lgcns.sol.upnp.network.UDPReceiverHandler;
+
+public class SSDPMessage implements UDPReceiverHandler {
 	String startLine = null;
 	HashMap<String, String> headerList = new HashMap<String, String>();
 	boolean needValidation = false;
@@ -118,5 +121,10 @@ public class SSDPMessage {
 			} catch ( Exception e ) { e.printStackTrace(); }
 		}
 		return isValid;
+	}
+
+	public void process(DatagramPacket packet) {
+		// TODO Auto-generated method stub
+		
 	}
 }

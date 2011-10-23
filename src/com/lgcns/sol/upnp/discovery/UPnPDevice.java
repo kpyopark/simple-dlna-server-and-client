@@ -8,6 +8,8 @@ public class UPnPDevice {
 	//private int SEARCHPORT_UPNP_ORG = MulticastSocket.DEFAULT_UPNP_MULTICAST_PORT;
 	private Vector<NetworkInterface> interfaces = new Vector<NetworkInterface>();
 	
+	private Vector<UPnPService> services = new Vector<UPnPService>();
+	
 	//private UDPReceiver multicastReceiver;
 	String modelSerial;
 	String uuid;

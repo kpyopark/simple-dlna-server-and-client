@@ -41,10 +41,6 @@ public class DeviceDescription {
 	String modelUrl;
 	
 	// BELOW PART IS VARIALBES. SO YOU CAN SET THE VALUES INTO THAT BY USING CLASS CONSTRUCTORS.
-	String modelSerial;
-	String uuid;
-	String upc;
-	
 	UPnPDevice device;
 	
 	private boolean imageListUpdated = false;
@@ -140,9 +136,10 @@ public class DeviceDescription {
 		 this.modelName = modelName;
 		 this.modelNumber = modelNumber;
 		 this.modelUrl = modelUrl;
-		 this.modelSerial = modelSerial;
-		 this.uuid = uuid;
-		 this.upc = upc;	
+		 device = new UPnPDevice();
+		 this.device.setModelSerial(modelSerial);
+		 this.device.setUuid(uuid);
+		 this.device.setUpc(upc);	
 	}
 
 	public String getDeviceDescription() {
@@ -164,9 +161,9 @@ public class DeviceDescription {
 					this.serviceListDescription = buffer.toString();
 					this.serviceListUpdated = false;
 				}
-				deviceDescription = DEVICE_DESCRIPTION_TEMPLATE.replaceAll(DDS_REPLACEABLE_PART_MODEL_SERIAL, this.modelSerial)
-				.replaceAll(DDS_REPLACEABLE_PART_UUID, this.uuid)
-				.replaceAll(DDS_REPLACEABLE_PART_UPC, this.upc)
+				deviceDescription = DEVICE_DESCRIPTION_TEMPLATE.replaceAll(DDS_REPLACEABLE_PART_MODEL_SERIAL, this.device.getModelSerial())
+				.replaceAll(DDS_REPLACEABLE_PART_UUID, this.device.getUuid())
+				.replaceAll(DDS_REPLACEABLE_PART_UPC, this.device.getUpc())
 				.replaceAll(DDS_REPLACEABLE_SERVICE_LIST, this.serviceListDescription )
 				.replaceAll(DDS_REPLACEABLE_IMAGE_LIST, this.imageListDescription );
 			}
@@ -281,27 +278,27 @@ public class DeviceDescription {
 	}
 
 	public String getModelSerial() {
-		return modelSerial;
+		return this.device.getModelSerial();
 	}
 
 	public void setModelSerial(String modelSerial) {
-		this.modelSerial = modelSerial;
+		this.device.setModelSerial(modelSerial);
 	}
 
 	public String getUuid() {
-		return uuid;
+		return this.device.getUuid();
 	}
 
 	public void setUuid(String uuid) {
-		this.uuid = uuid;
+		this.device.setUuid(uuid);
 	}
 
 	public String getUpc() {
-		return upc;
+		return this.device.getUpc();
 	}
 
 	public void setUpc(String upc) {
-		this.upc = upc;
+		this.device.setUpc(upc);
 	}
 	
 	public static void main(String[] args0) {
@@ -314,9 +311,7 @@ public class DeviceDescription {
 
 	public void setDevice(UPnPDevice device) {
 		this.device = device;
-		this.setModelSerial(this.device.getModelSerial());
-		this.setUpc(this.device.getUpc());
-		this.setUuid(this.device.getUuid());
+
 		// Rest elements of device description is ought to be set DEFAULT values.
 		this.setConfigNumber(DEVICE_DESCRIPTION_CONFIG_NUMBER);
 		this.setSpecMajor(DEVICE_DESCRIPTION_SPECVER_MAJOR);

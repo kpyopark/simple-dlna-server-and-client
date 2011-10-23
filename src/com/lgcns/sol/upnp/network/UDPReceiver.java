@@ -7,7 +7,7 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.util.Vector;
 
-public class UDPReceiver {
+public class UDPReceiver extends CommonReceiver {
 	NetworkInterface intf;
 	int port;
 	InetAddress listenAddr = null;
@@ -19,14 +19,6 @@ public class UDPReceiver {
 		this.intf = intf;
 		this.listenAddr = listenAddr;
 		this.port = port;
-	}
-	
-	public void addUDPReceiveHandler(UDPReceiverHandler handler) {
-		this.handlerList.add(handler);
-	}
-	
-	public void clearHandler() {
-		this.handlerList.clear();
 	}
 	
 	public void listen() throws Exception {
