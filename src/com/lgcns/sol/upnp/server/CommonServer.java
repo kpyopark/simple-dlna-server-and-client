@@ -86,9 +86,9 @@ public class CommonServer {
 			InetAddress address = intf.getInetAddresses().nextElement();
 			
 			CommonReceiver receiver = new UDPReceiver(intf, address, 1900);
-			
 			CommonServer server = new CommonServer();
 			server.setReceiver(receiver);
+			
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}

@@ -7,9 +7,9 @@ import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.lgcns.sol.upnp.network.UDPReceiverHandler;
+import com.lgcns.sol.upnp.network.CommonHandler;
 
-public class SSDPMessage implements UDPReceiverHandler {
+public class SSDPMessage extends CommonHandler {
 	String startLine = null;
 	HashMap<String, String> headerList = new HashMap<String, String>();
 	boolean needValidation = false;
@@ -123,8 +123,18 @@ public class SSDPMessage implements UDPReceiverHandler {
 		return isValid;
 	}
 
-	public void process(DatagramPacket packet) {
-		// TODO Auto-generated method stub
-		
+	@Override
+	public void process(Object packet) {
+		DatagramPacket dgPacket = (DatagramPacket)packet;
+		SSDPMessage message = new SSDPMessage();
+		try {
+			message.parse(dgPacket.getData());
+			for( Iterator<String> keyIter = message.getHeaderKeyIterator() ; keyIter.hasNext() ; ) {
+				String key = keyIter.next();
+				System.out.println( "[" + key + "] :" + message.getHeaderValue(key)); 
+			}
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
 	}
 }

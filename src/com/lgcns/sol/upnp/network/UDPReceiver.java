@@ -5,7 +5,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
-import java.util.Vector;
 
 public class UDPReceiver extends CommonReceiver {
 	NetworkInterface intf;
@@ -13,7 +12,6 @@ public class UDPReceiver extends CommonReceiver {
 	InetAddress listenAddr = null;
 	DatagramSocket serverSocket = null;
 	DatagramPacket packet = null;
-	Vector<UDPReceiverHandler> handlerList = new Vector<UDPReceiverHandler>();
 	
 	public UDPReceiver(NetworkInterface intf, InetAddress listenAddr, int port) {
 		this.intf = intf;
@@ -39,9 +37,4 @@ public class UDPReceiver extends CommonReceiver {
 		process(packet);
 	}
 	
-	public void process(DatagramPacket packet) {
-		for ( UDPReceiverHandler handler : this.handlerList ) {
-			handler.process(packet);
-		}
-	}
 }
