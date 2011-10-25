@@ -9,22 +9,29 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.lgcns.sol.upnp.discovery.SSDPMessage;
+import com.lgcns.sol.upnp.discovery.UPnPDevice;
 import com.lgcns.sol.upnp.exception.AbnormalException;
-import com.lgcns.sol.upnp.exception.ProcessableException;
-import com.lgcns.sol.upnp.network.CommonHandler;
+import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonReceiver;
+import com.lgcns.sol.upnp.network.CommonSendHandler;
+import com.lgcns.sol.upnp.network.CommonSender;
 import com.lgcns.sol.upnp.network.UDPReceiver;
+import com.lgcns.sol.upnp.network.UDPSender;
 
 public class CommonServer {
 
-	static int CORE_INI_THREAD = 3;
-	static int CORE_MAX_THREAD = 5;
+	static int CORE_INI_THREAD = 5;
+	static int CORE_MAX_THREAD = 8;
 	static int KEEP_ALIVE_TIME = 5;	// 5 sec.
 	static TimeUnit BASE_TIME_UNIT = TimeUnit.SECONDS;  
 
 	CommonReceiver receiver = null;
+	CommonSender sender = null;
 	BlockingQueue<Runnable> queue = null;
 	ThreadPoolExecutor threadPool = null;
+	
+	SendEvent event = null;
+	
 	boolean needStop = false;
 	
 	public CommonServer() {
@@ -36,42 +43,82 @@ public class CommonServer {
 		this.receiver = receiver;
 	}
 	
+	public void setSender(CommonSender sender, SendEvent event) {
+		this.sender = sender;
+		this.event = event;
+	}
+	
 	int numberOfErrors = 0;
 
 	public void startServer() throws AbnormalException {
-		if ( receiver == null ) {
-			throw new AbnormalException("Listener isn't set. Before use this api, you should set listener in this class.");
+		System.out.println("Start Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
+		if ( receiver == null && sender == null ) {
+			throw new AbnormalException("A listener or a Sender isn't set. Before use this api, you should set listener or sender in this class.");
 		}
-		needStop = false;
-		threadPool.execute(new Runnable() {
-			public void run() {
-				try {
-					threadPool.execute(new Runnable() {
-						public void run() {
-							while( !needStop ) {
-								try {
-									receiver.listen();
-									Thread.sleep(1000);
-								} catch ( Exception e ) {
-									numberOfErrors++;
-									System.out.println("Listener can't Listen.");
-									e.printStackTrace();
+		if ( receiver != null ) {
+			needStop = false;
+			threadPool.execute(new Runnable() {
+				public void run() {
+					try {
+						threadPool.execute(new Runnable() {
+							public void run() {
+								while( !needStop ) {
+									try {
+										receiver.receiveData();
+										Thread.sleep(1000);
+									} catch ( Exception e ) {
+										numberOfErrors++;
+										System.out.println("Listener can't Listen.");
+										e.printStackTrace();
+									}
+									if ( numberOfErrors > 3 )
+										needStop = true;
 								}
-								if ( numberOfErrors > 3 )
-									needStop = true;
 							}
-						}
-					});
-				} catch ( Exception e ) {
-					System.out.println("There are some errors in Thread Pool.");
-					e.printStackTrace();
+						});
+					} catch ( Exception e ) {
+						System.out.println("There are some errors in Thread Pool.");
+						e.printStackTrace();
+					}
 				}
-			}
-		});
+			});
+		}
+		if ( sender != null ) {
+			needStop = false;
+			threadPool.execute(new Runnable() {
+				public void run() {
+					try {
+						threadPool.execute(new Runnable() {
+							public void run() {
+								do {
+									try {
+										sender.sendData();
+										if ( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED )
+											Thread.sleep(event.getDelayTimeInMillisec());
+									} catch ( Exception e ) {
+										numberOfErrors++;
+										System.out.println("Sender can't send.");
+										e.printStackTrace();
+									}
+									if ( numberOfErrors > 3 )
+										needStop = true;
+								} while( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED );
+							}
+						});
+					} catch ( Exception e ) {
+						System.out.println("There are some errors in Thread Pool.");
+						e.printStackTrace();
+					}
+				}
+			});
+		}
 	}
 	
 	public void stopServer() {
 		needStop = true;
+		threadPool.purge();
+		threadPool.shutdown();
+		/*
 		List<Runnable> unreleasedTasks = threadPool.shutdownNow();
 		for ( Runnable oneTask : unreleasedTasks ) {
 			try {
@@ -81,36 +128,9 @@ public class CommonServer {
 				e.printStackTrace();
 			}
 		}
+		*/
+		System.out.println("Stop Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
 	}
 
-	/**
-	 * For Testing.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			// 1. first get the default network interface. (such as eth0)
-			NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
-			InetAddress address = intf.getInetAddresses().nextElement();
-			
-			// 2. Next, create receiver & handler instance.
-			CommonReceiver receiver = new UDPReceiver(intf, address, 1901);
-			CommonHandler handler = new SSDPMessage();
-			receiver.addReceiveHandler(handler);
-			
-			// 3. Create Common server
-			CommonServer server = new CommonServer();
-			
-			// 4. set receiver into server.
-			server.setReceiver(receiver);
-			
-			// 5. start server.
-			server.startServer();
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		} catch ( AbnormalException abe ) {
-			abe.printStackTrace();
-		}
-	}
 	
 }

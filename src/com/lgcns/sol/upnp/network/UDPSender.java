@@ -7,13 +7,14 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketAddress;
+import java.util.Observable;
 
-public class UDPSender {
+public class UDPSender extends CommonSender {
 	NetworkInterface intf;
 	int port;
 	InetAddress targetAddr;
 	
-	public UDPSender(NetworkInterface intf, int port, InetAddress targetAddr) {
+	public UDPSender(NetworkInterface intf, InetAddress targetAddr, int port) {
 		this.intf = intf;
 		this.port = port;
 		this.targetAddr = targetAddr;
@@ -26,6 +27,7 @@ public class UDPSender {
 		DatagramPacket packet = null;
 		try {
 			if ( this.targetAddr.isMulticastAddress() ) {
+				System.out.println("send by using multicasting.");
 				// Multicasting.
 				addr = new InetSocketAddress(this.targetAddr, port);
 				multiSocket = new MulticastSocket(port);
@@ -33,6 +35,7 @@ public class UDPSender {
 				packet = new DatagramPacket(sendData, sendData.length, addr);
 				multiSocket.send(packet);
 			} else {
+				System.out.println("send by using unicasting.");
 				// unicasting.
 				// TODO : MODIFY THE BELOW LINES. intf.getInetAddresses().nextElement()
 				addr = new InetSocketAddress(intf.getInetAddresses().nextElement(), port);
@@ -54,6 +57,15 @@ public class UDPSender {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	protected void send(Object sendData) throws Exception {
+		send((byte[])sendData);
+	}
+
+	public void update(Observable o, Object arg) {
+		// TODO : This method used for the timing event.
 	}
 	
 }

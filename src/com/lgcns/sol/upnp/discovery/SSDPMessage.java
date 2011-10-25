@@ -7,12 +7,14 @@ import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.lgcns.sol.upnp.network.CommonHandler;
+import com.lgcns.sol.upnp.network.CommonReceiveHandler;
+import com.lgcns.sol.upnp.network.CommonSendHandler;
 
-public class SSDPMessage extends CommonHandler {
+public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	String startLine = null;
 	HashMap<String, String> headerList = new HashMap<String, String>();
 	boolean needValidation = false;
+	UPnPDevice device = null;
 	
 	public final static String ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG";
 	public final static String ID_UPNP_DISCOVERY_NEXTBOTID_UPNP_ORG = "NEXTBOOTID.UPNP.ORG";
@@ -42,7 +44,28 @@ public class SSDPMessage extends CommonHandler {
 	public boolean needBootIdUpdated(UPnPDevice device) {
 		// if the device has changed its IP, it must change BOOTID value also.
 		// if the device has rebooted, it must change BOOTID value also. (so, BOOID value has some time stamp value to differ older state.)
+		this.device = device;
 		return false;
+	}
+	
+	public SSDPMessage() {
+		
+	}
+	
+	public SSDPMessage(UPnPDevice device) {
+		this.device = device;
+		// TODO : modify below lines.
+		this.setStartLine(SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE);
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_HOST, "239.255.255.250:1900");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CACHECONTROL, "300");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_LOCATION, "http://www.korea.com");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_NOTIFICATION_TYPE,"uuid:" + this.device.getUuid() );
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_NT_SUBTYPE, SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE);
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_SERVER,"WindowsNT UPnP/1.1 simpledlna/draft");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_USN,"uuid:" + this.device.getUuid() );
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG,"1");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CONFIGID_UPNP_ORG,"1");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_SEARCHPORT_UPNP_ORG,this.device.getMulticastPort() + "");	
 	}
 	
 	public String getStartLine() {
@@ -123,7 +146,6 @@ public class SSDPMessage extends CommonHandler {
 		return isValid;
 	}
 
-	@Override
 	public void process(Object packet) {
 		DatagramPacket dgPacket = (DatagramPacket)packet;
 		SSDPMessage message = new SSDPMessage();
@@ -136,5 +158,14 @@ public class SSDPMessage extends CommonHandler {
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
+	}
+
+	public Object getSendObject() throws Exception {
+		return this.toBytes();
+	}
+
+	public Object processAfterSend(Object returnValue) {
+		// There is no actions after to send "ssdp:alive" message into the network.
+		return null;
 	}
 }

@@ -1,6 +1,9 @@
 package com.lgcns.sol.upnp.discovery;
 
 public class UPnPService {
+	
+	public static int UPNP_SERVICE_TYPE_CDS = 1;
+	
 	String serviceType;
 	String serviceId;
 	String scpdUrl;

@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 
+
 public class UDPReceiver extends CommonReceiver {
 	NetworkInterface intf;
 	int port;
@@ -19,7 +20,7 @@ public class UDPReceiver extends CommonReceiver {
 		this.port = port;
 	}
 	
-	public void listen() throws Exception {
+	public Object listen() throws Exception {
 		DatagramPacket packet = null;
 		if ( serverSocket != null ) {
 			serverSocket.close();
@@ -36,7 +37,7 @@ public class UDPReceiver extends CommonReceiver {
 		System.out.println("before.:" + Thread.currentThread() );
 		serverSocket.receive(packet);
 		System.out.println("after.:" + Thread.currentThread() );
-		process(packet);
+		return packet;
 	}
 	
 }

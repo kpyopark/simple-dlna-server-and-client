@@ -2,11 +2,12 @@ package com.lgcns.sol.upnp.network;
 
 import java.util.Vector;
 
+
 public abstract class CommonReceiver {
 
-	Vector<CommonHandler> handlerList = new Vector<CommonHandler>();
+	Vector<CommonReceiveHandler> handlerList = new Vector<CommonReceiveHandler>();
 
-	public void addReceiveHandler(CommonHandler handler) {
+	public void addReceiveHandler(CommonReceiveHandler handler) {
 		this.handlerList.add(handler);
 	}
 	
@@ -25,7 +26,22 @@ public abstract class CommonReceiver {
 	 * 
 	 * @throws Exception
 	 */
-	abstract public void listen() throws Exception;
+	abstract protected Object listen() throws Exception;
+	
+	public void beforeReceive() {
+		// TODO : API for hooking
+	}
+	
+	public void afterReceive() {
+		// TODO : API for hooking
+	}
+	
+	public void receiveData() throws Exception {
+		beforeReceive();
+		Object rtnValue = listen();
+		process(rtnValue);
+		afterReceive();
+	}
 	
 	public void clear() {
 		clearHandler();
@@ -38,7 +54,7 @@ public abstract class CommonReceiver {
 	 * @param packet
 	 */
 	public void process(Object packet) {
-		for ( CommonHandler handler : this.handlerList ) {
+		for ( CommonReceiveHandler handler : this.handlerList ) {
 			handler.process(packet);
 		}
 	}
