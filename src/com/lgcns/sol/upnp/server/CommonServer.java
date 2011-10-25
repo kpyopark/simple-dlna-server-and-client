@@ -8,8 +8,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.lgcns.sol.upnp.discovery.SSDPMessage;
 import com.lgcns.sol.upnp.exception.AbnormalException;
 import com.lgcns.sol.upnp.exception.ProcessableException;
+import com.lgcns.sol.upnp.network.CommonHandler;
 import com.lgcns.sol.upnp.network.CommonReceiver;
 import com.lgcns.sol.upnp.network.UDPReceiver;
 
@@ -34,6 +36,8 @@ public class CommonServer {
 		this.receiver = receiver;
 	}
 	
+	int numberOfErrors = 0;
+
 	public void startServer() throws AbnormalException {
 		if ( receiver == null ) {
 			throw new AbnormalException("Listener isn't set. Before use this api, you should set listener in this class.");
@@ -41,22 +45,26 @@ public class CommonServer {
 		needStop = false;
 		threadPool.execute(new Runnable() {
 			public void run() {
-				while( !needStop ) {
-					try {
-						threadPool.execute(new Runnable() {
-							public void run() {
+				try {
+					threadPool.execute(new Runnable() {
+						public void run() {
+							while( !needStop ) {
 								try {
 									receiver.listen();
+									Thread.sleep(1000);
 								} catch ( Exception e ) {
+									numberOfErrors++;
 									System.out.println("Listener can't Listen.");
 									e.printStackTrace();
 								}
+								if ( numberOfErrors > 3 )
+									needStop = true;
 							}
-						});
-					} catch ( Exception e ) {
-						System.out.println("There are some errors in Thread Pool.");
-						e.printStackTrace();
-					}
+						}
+					});
+				} catch ( Exception e ) {
+					System.out.println("There are some errors in Thread Pool.");
+					e.printStackTrace();
 				}
 			}
 		});
@@ -85,12 +93,23 @@ public class CommonServer {
 			NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
 			InetAddress address = intf.getInetAddresses().nextElement();
 			
-			CommonReceiver receiver = new UDPReceiver(intf, address, 1900);
+			// 2. Next, create receiver & handler instance.
+			CommonReceiver receiver = new UDPReceiver(intf, address, 1901);
+			CommonHandler handler = new SSDPMessage();
+			receiver.addReceiveHandler(handler);
+			
+			// 3. Create Common server
 			CommonServer server = new CommonServer();
+			
+			// 4. set receiver into server.
 			server.setReceiver(receiver);
 			
+			// 5. start server.
+			server.startServer();
 		} catch ( Exception e ) {
 			e.printStackTrace();
+		} catch ( AbnormalException abe ) {
+			abe.printStackTrace();
 		}
 	}
 	

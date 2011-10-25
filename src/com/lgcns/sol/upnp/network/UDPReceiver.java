@@ -33,7 +33,9 @@ public class UDPReceiver extends CommonReceiver {
 			serverSocket = new DatagramSocket(port);
 			packet = new DatagramPacket(new byte[4096],4096, listenAddr, port);
 		}
+		System.out.println("before.:" + Thread.currentThread() );
 		serverSocket.receive(packet);
+		System.out.println("after.:" + Thread.currentThread() );
 		process(packet);
 	}
 	
