@@ -22,12 +22,14 @@ public class UPnPDevice {
 	
 	private Vector<UPnPService> services = new Vector<UPnPService>();
 	
-	//private UDPReceiver multicastReceiver;
+	// private UDPReceiver multicastReceiver;
 	String modelSerial;
 	String uuid;
 	String upc;
 	int multicastPort = DEFAULT_UPNP_MULTICAST_PORT;
 	InetAddress multiCastAddress = null;
+	int cacheControl = 180;
+	String location;		// url for getting description.
 	
 	public Vector<NetworkInterface> getNetworkInterfaceList() {
 		return interfaces;
