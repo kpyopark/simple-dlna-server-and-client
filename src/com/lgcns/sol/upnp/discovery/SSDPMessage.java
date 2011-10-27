@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.lgcns.sol.upnp.model.UPnPDevice;
 import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonSendHandler;
 

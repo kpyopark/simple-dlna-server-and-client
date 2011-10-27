@@ -1,4 +1,6 @@
-package com.lgcns.sol.upnp.discovery;
+package com.lgcns.sol.upnp.model;
+
+import java.util.Vector;
 
 public class UPnPService {
 	
@@ -9,6 +11,20 @@ public class UPnPService {
 	String scpdUrl;
 	String controlUrl;
 	String eventsubUrl;
+	
+	String versionMajor;
+	String versionMinor;
+	
+	UPnPDevice device;
+	
+	Vector<UPnPStateVariable> stateVariable = new Vector<UPnPStateVariable>();
+	
+	public UPnPService(UPnPDevice device) {
+		this.device = device;
+	}
+	
+	Vector<UPnPAction> actionList = new Vector<UPnPAction>();
+	
 	public String getServiceType() {
 		return serviceType;
 	}

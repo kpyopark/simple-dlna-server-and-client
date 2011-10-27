@@ -1,8 +1,9 @@
-package com.lgcns.sol.upnp.discovery;
+package com.lgcns.sol.upnp.model;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Vector;
+
 
 public class UPnPDevice {
 
@@ -30,6 +31,10 @@ public class UPnPDevice {
 	InetAddress multiCastAddress = null;
 	int cacheControl = 180;
 	String location;		// url for getting description.
+	
+	public void addService(UPnPService service) {
+		services.add(service);
+	}
 	
 	public Vector<NetworkInterface> getNetworkInterfaceList() {
 		return interfaces;

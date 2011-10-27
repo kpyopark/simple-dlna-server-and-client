@@ -2,7 +2,7 @@ package com.lgcns.sol.upnp.description;
 
 import java.util.ArrayList;
 
-import com.lgcns.sol.upnp.discovery.UPnPDevice;
+import com.lgcns.sol.upnp.model.UPnPDevice;
 
 public class DeviceDescription {
 	static final String DEVICE_DESCRIPTION_CONFIG_NUMBER = "0";

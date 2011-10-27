@@ -4,8 +4,8 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 
 import com.lgcns.sol.upnp.discovery.SSDPMessage;
-import com.lgcns.sol.upnp.discovery.UPnPDevice;
 import com.lgcns.sol.upnp.exception.AbnormalException;
+import com.lgcns.sol.upnp.model.UPnPDevice;
 import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonReceiver;
 import com.lgcns.sol.upnp.network.CommonSendHandler;
@@ -16,8 +16,6 @@ import com.lgcns.sol.upnp.server.CommonServer;
 import com.lgcns.sol.upnp.server.SendEvent;
 
 public class ControlPoint {
-	
-	UPnPDevice device = null;
 	
 	public void start() {
 		startSsdpServer();
