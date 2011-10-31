@@ -13,6 +13,10 @@ public class UPnPAction {
 	public UPnPAction(UPnPService service) {
 		this.service = service;
 	}
+	
+	public UPnPService getService() {
+		return this.service;
+	}
 
 	public String getActionName() {
 		return actionName;
@@ -32,6 +36,10 @@ public class UPnPAction {
 	
 	public void addOutArgument(UPnPStateVariable outArg) {
 		outArgs.add(outArg);
+	}
+	
+	public Vector<UPnPStateVariable> getOutArguments() {
+		return this.outArgs;
 	}
 	
 }
