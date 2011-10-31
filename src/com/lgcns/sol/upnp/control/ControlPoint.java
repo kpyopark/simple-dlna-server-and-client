@@ -1,6 +1,5 @@
 package com.lgcns.sol.upnp.control;
 
-import java.net.InetAddress;
 import java.net.NetworkInterface;
 
 import com.lgcns.sol.upnp.discovery.SSDPMessage;
