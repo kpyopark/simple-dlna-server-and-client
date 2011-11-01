@@ -3,10 +3,12 @@ package com.lgcns.sol.upnp.model;
 public class UPnPStateVariable {
 	boolean needToSendEvent;
 	boolean isMulticastEvent;
+	boolean isCSVFormat;
 	UPnPDataType type;
 	Object value;
 	Object defaultValue;
 	String name;
+	boolean isUsable;
 	
 	public boolean isNeedToSendEvent() {
 		return needToSendEvent;
@@ -44,5 +46,18 @@ public class UPnPStateVariable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	public boolean isCSVFormat() {
+		return this.isCSVFormat;
+	}
+	public void setIsCSVFormat(boolean isCSVFormat) {
+		this.isCSVFormat = isCSVFormat;
+	}
+	public boolean isUsable() {
+		return this.isUsable;
+	}
+	public void setIsUsable(boolean isUsable) {
+		this.isUsable = isUsable;
+	}
+	
 	
 }
