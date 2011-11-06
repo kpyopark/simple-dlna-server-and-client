@@ -6,10 +6,14 @@ public class UPnPDataType {
 	
 	static HashMap<String, UPnPDataType> DEFAULT_TYPE_MAPPER = new HashMap<String, UPnPDataType>();
 	
+	public static final String UPNP_DATATYPE_NAME_STRING = "string";
+	public static final String UPNP_DATATYPE_NAME_UI4 = "ui4";
+	public static final String UPNP_DATATYPE_NAME_URI = "uri";
+	
 	static {
-		DEFAULT_TYPE_MAPPER.put("string", new UPnPDataType("string",String.class));
-		DEFAULT_TYPE_MAPPER.put("ui4", new UPnPDataType("ui4", Integer.class));
-		DEFAULT_TYPE_MAPPER.put("uri", new UPnPDataType("uri",String.class));
+		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_STRING, new UPnPDataType(UPNP_DATATYPE_NAME_STRING,String.class));
+		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_UI4, new UPnPDataType(UPNP_DATATYPE_NAME_UI4, Integer.class));
+		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_URI, new UPnPDataType(UPNP_DATATYPE_NAME_URI,String.class));
 	};
 	
 	String xmlType;
@@ -26,6 +30,10 @@ public class UPnPDataType {
 	
 	public Class getJavaType() {
 		return this.javaType;
+	}
+	
+	public static UPnPDataType getUPnPDataType(String upnpDataTypeName) {
+		return DEFAULT_TYPE_MAPPER.get(upnpDataTypeName);
 	}
 	
 }
