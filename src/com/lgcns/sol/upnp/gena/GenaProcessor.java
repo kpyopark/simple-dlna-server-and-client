@@ -13,8 +13,9 @@
 =================================================================================*/
 package com.lgcns.sol.upnp.gena;
 
-import upnp.core.Processor;
+import java.io.*;
+import java.net.*;
 
-public class GenaProcessor extends Processor {
+public class GenaProcessor extends Thread {
 
 }

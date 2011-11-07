@@ -13,9 +13,7 @@
 =================================================================================*/
 package com.lgcns.sol.upnp.gena;
 
-import http.*;
-
-public class GenaMessage extends HttpMessage 
+public class GenaMessage
 {
 
 	
@@ -24,7 +22,7 @@ public class GenaMessage extends HttpMessage
 	////////////////////////////////////////////////////////////////////////////////////////////////	
 	public GenaMessage( String httpMessage )
 	{
-		super( httpMessage );
+		
 	}
 
 }
