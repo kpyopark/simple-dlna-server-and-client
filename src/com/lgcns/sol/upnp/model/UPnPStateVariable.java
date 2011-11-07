@@ -10,7 +10,7 @@ public class UPnPStateVariable {
 	boolean isMulticastEvent;
 	boolean isCSVFormat;
 	UPnPDataType type;
-	Object value;
+	String value;
 	Object defaultValue;
 	String name;
 	boolean isUsable;
@@ -20,7 +20,7 @@ public class UPnPStateVariable {
 		
 	}
 	
-	public UPnPStateVariable(String name, UPnPDataType type, Object value) {
+	public UPnPStateVariable(String name, UPnPDataType type, String value) {
 		this.name = name;
 		this.type = type;
 		this.value = value;
@@ -44,10 +44,10 @@ public class UPnPStateVariable {
 	public void setType(UPnPDataType type) {
 		this.type = type;
 	}
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 	public Object getDefaultValue() {

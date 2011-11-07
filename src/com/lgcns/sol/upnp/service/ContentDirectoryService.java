@@ -148,21 +148,26 @@ public class ContentDirectoryService extends UPnPService {
 			targetAction.getInArgument(ACTION_ARG_NAME_ObjectID).setValue(objectID);
 			targetAction.getInArgument(ACTION_ARG_NAME_BrowseFlag).setValue(browseFlag);
 			targetAction.getInArgument(ACTION_ARG_NAME_Filter).setValue(filter);
-			targetAction.getInArgument(ACTION_ARG_NAME_StartingIndex).setValue(new Integer(startingIndex));
-			targetAction.getInArgument(ACTION_ARG_NAME_RequestedCount).setValue(new Integer(requestCount));
+			targetAction.getInArgument(ACTION_ARG_NAME_StartingIndex).setValue(startingIndex+"");
+			targetAction.getInArgument(ACTION_ARG_NAME_RequestedCount).setValue(requestCount+"");
 			targetAction.getInArgument(ACTION_ARG_NAME_SortCriteria).setValue(sortCriteria);
 			// 2. execute SOAP Action & SOAP response parsing and saving.
 			ActionExecutor executor = new ActionExecutor(targetAction);
 			executor.execute();
-			int numberOfReturned = ((Integer)targetAction.getOutArgument(ACTION_ARG_NAME_NumberReturned).getValue()).intValue();
-			String result = targetAction.getOutArgument(ACTION_ARG_NAME_Result).getValue().toString();
-			int totalMatches = ((Integer)targetAction.getOutArgument(ACTION_ARG_NAME_TotalMatches).getValue()).intValue();
-			String updateID = targetAction.getOutArgument(ACTION_ARG_NAME_UpdateID).getValue().toString();
+			int numberOfReturned = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_NumberReturned).getValue());
+			String result = targetAction.getOutArgument(ACTION_ARG_NAME_Result).getValue();
+			int totalMatches = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_TotalMatches).getValue());
+			String updateID = targetAction.getOutArgument(ACTION_ARG_NAME_UpdateID).getValue();
 			// 3. parse result XML into ContentDirectoryItems.
-			// TODO : Make your own codes.
+			resultRoot = parseResponseXML(result);
 		} else {
 			System.out.println("There is no browse action in this device.");
 		}
+		return resultRoot;
+	}
+	
+	static private ContentDirectoryItem parseResponseXML(String responseXML) {
+		ContentDirectoryItem resultRoot = new ContentDirectoryItem();
 		return resultRoot;
 	}
 	
