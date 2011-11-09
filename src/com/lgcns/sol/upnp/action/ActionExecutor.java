@@ -99,7 +99,7 @@ public class ActionExecutor {
 		SERVER: OS/version UPnP/1.1 product/version
 		CONTENT-LENGTH: bytes in body
 		*/
-		if ( conn.getResponseCode() != HttpURLConnection.HTTP_OK ) {
+		if ( conn.getResponseCode() == HttpURLConnection.HTTP_OK ) {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder parser;
 			Document doc;
