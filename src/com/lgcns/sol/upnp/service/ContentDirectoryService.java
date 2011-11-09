@@ -4,7 +4,18 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import com.lgcns.sol.upnp.action.ActionExecutor;
+import com.lgcns.sol.upnp.common.UPnPUtils;
 import com.lgcns.sol.upnp.model.UPnPAction;
 import com.lgcns.sol.upnp.model.UPnPDataType;
 import com.lgcns.sol.upnp.model.UPnPDevice;
@@ -140,8 +151,8 @@ public class ContentDirectoryService extends UPnPService {
 		return getStateVariableSystemUpdateID();
 	}
 	
-	public ContentDirectoryItem browse(String objectID, String browseFlag, String filter, int startingIndex, int requestCount, String sortCriteria) throws Exception {
-		ContentDirectoryItem resultRoot = new ContentDirectoryItem();
+	public ArrayList<ContentDirectoryItem> browse(String objectID, String browseFlag, String filter, int startingIndex, int requestCount, String sortCriteria) throws Exception {
+		ArrayList<ContentDirectoryItem> resultRoot = null;
 		UPnPAction targetAction = this.getAction(ACTION_NAME_CDS_Browse);
 		if ( targetAction != null ) {
 			// 1. Parameter Settings.
@@ -157,18 +168,114 @@ public class ContentDirectoryService extends UPnPService {
 			int numberOfReturned = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_NumberReturned).getValue());
 			String result = targetAction.getOutArgument(ACTION_ARG_NAME_Result).getValue();
 			int totalMatches = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_TotalMatches).getValue());
+
+			// TODO : UpdateID variable should be used. when ? idon't know.
 			String updateID = targetAction.getOutArgument(ACTION_ARG_NAME_UpdateID).getValue();
 			// 3. parse result XML into ContentDirectoryItems.
-			resultRoot = parseResponseXML(result);
+			resultRoot = parseDIDLXML(result);
 		} else {
 			System.out.println("There is no browse action in this device.");
 		}
 		return resultRoot;
 	}
 	
-	static private ContentDirectoryItem parseResponseXML(String responseXML) {
-		ContentDirectoryItem resultRoot = new ContentDirectoryItem();
+	static private ArrayList<ContentDirectoryItem> parseDIDLXML(String didlXML) throws Exception {
+		ArrayList<ContentDirectoryItem> resultRoot = new ArrayList<ContentDirectoryItem>();
+		/* resul xml is such like this.
+			
+		*/
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder parser;
+		Document doc;
+		Element documentElement;
+		NodeList resultItemList;
+		try {
+			parser = factory.newDocumentBuilder();
+			doc = parser.parse(didlXML);
+			
+			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;
+			
+			resultItemList = documentElement.getChildNodes();
+			
+			for ( int inx = 0 ; inx < resultItemList.getLength() ; inx++ ) {
+				if ( resultItemList.item(inx).getNodeType() == Node.ELEMENT_NODE ) {
+					Element item = (Element)resultItemList.item(inx);
+					
+					if ( item.getNodeName().equals("container") ) {
+						// Make a container node.
+						ContentDirectoryItem aContainer = new ContentDirectoryItem();
+						// Setting element attributes into container.
+						aContainer.setType(ContentDirectoryItem.CDS_TYPE_CONTAINER);
+						aContainer.setId(item.getAttribute("id"));
+						aContainer.setParentId(item.getAttribute("parentID"));
+						aContainer.setRestricted(item.getAttribute("restricted").equals("0") ? false : true);
+						aContainer.setSearchable(item.getAttribute("searchable").equals("0") ? false : true);
+						// Setting child element values into container.
+						NodeList childNode = item.getChildNodes();
+						for ( int propInx = 0 ; propInx < childNode.getLength() ; propInx++ ) {
+							Node childElement = childNode.item(propInx);
+							if ( childElement.getNodeName().equals("title") ) {
+								aContainer.setTitle(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("creator") ) {
+								aContainer.setCreator(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("class") ) {
+								aContainer.setUpnpClassName(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("searchClass") ) {
+								aContainer.setUpnpSearchClass(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("createClass") ) {
+								aContainer.setUpnpCreateClass(childElement.getFirstChild().getNodeValue());
+							}
+						}
+						resultRoot.add(aContainer);
+					} else if ( item.getNodeName().equals("item") ) {
+						// Make a item node.
+						ContentDirectoryItem oneItem = new ContentDirectoryItem();
+						oneItem.setType(ContentDirectoryItem.CDS_TYPE_ITEM);
+						oneItem.setId(item.getAttribute("id"));
+						oneItem.setParentId(item.getAttribute("parentID"));
+						oneItem.setRestricted(item.getAttribute("restricted").equals("0") ? false : true);
+						NodeList childNode = item.getChildNodes();
+						for ( int propInx = 0 ; propInx < childNode.getLength() ; propInx++ ) {
+							Node childElement = childNode.item(propInx);
+							if ( childElement.getNodeName().equals("title") ) {
+								oneItem.setTitle(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("date") ) {
+								oneItem.setDate(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("class") ) {
+								oneItem.setUpnpClassName(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("res") ) {
+								oneItem.setResProtocolInfo(((Element)childElement).getAttribute("protocolInfo"));
+								oneItem.setResSize(((Element)childElement).getAttribute("size"));
+								oneItem.setResValue(childElement.getFirstChild().getNodeValue());
+							} else if ( childElement.getNodeName().equals("createClass") ) {
+								oneItem.setUpnpCreateClass(childElement.getFirstChild().getNodeValue());
+							}
+						}
+						resultRoot.add(oneItem);
+					}
+				}
+			}
+		} catch(ParserConfigurationException e) {
+			e.printStackTrace();
+			throw e;
+		} catch(SAXException ex) {
+			ex.printStackTrace();
+			throw ex;
+		}
 		return resultRoot;
+	}
+	
+	public static void main(String args) {
+		
+		String sampleResultXML = "";
+		try {
+			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(sampleResultXML);
+			for ( int inx = 0; inx < itemList.size() ; inx++ ) {
+				System.out.println(itemList.get(inx).toString());
+			}
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*
