@@ -1,5 +1,8 @@
 package com.lgcns.sol.upnp.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -36,6 +39,9 @@ import com.lgcns.sol.upnp.model.UPnPStateVariable;
  */
 public class ContentDirectoryService extends UPnPService {
 
+	public static final String NAMESPACE_UPNP_ELEMENT = "urn:schemas-upnp-org:metadata-1-0/upnp/";
+	public static final String NAMESPACE_DC_ELEMENT = "http://purl.org/dc/elements/1.1/";
+	
 	public ContentDirectoryService(UPnPDevice device) {
 		super(device);
 	}
@@ -190,12 +196,16 @@ public class ContentDirectoryService extends UPnPService {
 		Element documentElement;
 		NodeList resultItemList;
 		try {
+			factory.setNamespaceAware(true);
 			parser = factory.newDocumentBuilder();
-			doc = parser.parse(didlXML);
+			doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
 			
 			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;
 			
 			resultItemList = documentElement.getChildNodes();
+			//NodeList title = doc.getElementsByTagNameNS("urn:schemas-upnp-org:metadata-1-0/upnp/", "searchClass");
+			NodeList title = doc.getElementsByTagNameNS("*", "searchClass");
+			System.out.println("title count:" + title.getLength() + ":value:" + ( title.getLength() > 0 ? title.item(0).getNodeValue() : "empty" ) );
 			
 			for ( int inx = 0 ; inx < resultItemList.getLength() ; inx++ ) {
 				if ( resultItemList.item(inx).getNodeType() == Node.ELEMENT_NODE ) {
@@ -214,16 +224,24 @@ public class ContentDirectoryService extends UPnPService {
 						NodeList childNode = item.getChildNodes();
 						for ( int propInx = 0 ; propInx < childNode.getLength() ; propInx++ ) {
 							Node childElement = childNode.item(propInx);
-							if ( childElement.getNodeName().equals("title") ) {
-								aContainer.setTitle(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("creator") ) {
-								aContainer.setCreator(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("class") ) {
-								aContainer.setUpnpClassName(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("searchClass") ) {
-								aContainer.setUpnpSearchClass(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("createClass") ) {
-								aContainer.setUpnpCreateClass(childElement.getFirstChild().getNodeValue());
+							System.out.println("node name:" + childElement.getNodeName());
+							if ( childElement.getNodeType() == Node.ELEMENT_NODE ) {
+								if ( NAMESPACE_DC_ELEMENT.equals(childElement.getNamespaceURI())
+										&& childElement.getLocalName().equals("title") ) {
+									aContainer.setTitle(childElement.getFirstChild().getNodeValue());
+								} else if ( NAMESPACE_DC_ELEMENT.equals(childElement.getNamespaceURI()) 
+										&& childElement.getLocalName().equals("creator") ) {
+									aContainer.setCreator(childElement.getFirstChild().getNodeValue());
+								} else if ( NAMESPACE_UPNP_ELEMENT.equals(childElement.getNamespaceURI()) 
+										&& childElement.getLocalName().equals("class") ) {
+									aContainer.setUpnpClassName(childElement.getFirstChild().getNodeValue());
+								} else if ( NAMESPACE_UPNP_ELEMENT.equals(childElement.getNamespaceURI()) 
+										&& childElement.getLocalName().equals("searchClass") ) {
+									aContainer.setUpnpSearchClass(childElement.getFirstChild().getNodeValue());
+								} else if ( NAMESPACE_UPNP_ELEMENT.equals(childElement.getNamespaceURI()) 
+										&& childElement.getLocalName().equals("createClass") ) {
+									aContainer.setUpnpCreateClass(childElement.getFirstChild().getNodeValue());
+								}
 							}
 						}
 						resultRoot.add(aContainer);
@@ -237,17 +255,22 @@ public class ContentDirectoryService extends UPnPService {
 						NodeList childNode = item.getChildNodes();
 						for ( int propInx = 0 ; propInx < childNode.getLength() ; propInx++ ) {
 							Node childElement = childNode.item(propInx);
-							if ( childElement.getNodeName().equals("title") ) {
+							System.out.println("node name:" + childElement.getNodeName());
+							if ( NAMESPACE_DC_ELEMENT.equals(childElement.getNamespaceURI()) 
+									&& childElement.getLocalName().equals("title") ) {
 								oneItem.setTitle(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("date") ) {
+							} else if ( NAMESPACE_DC_ELEMENT.equals(childElement.getNamespaceURI()) 
+									&& childElement.getLocalName().equals("date") ) {
 								oneItem.setDate(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("class") ) {
+							} else if ( NAMESPACE_UPNP_ELEMENT.equals(childElement.getNamespaceURI()) 
+									&& childElement.getLocalName().equals("class") ) {
 								oneItem.setUpnpClassName(childElement.getFirstChild().getNodeValue());
 							} else if ( childElement.getNodeName().equals("res") ) {
 								oneItem.setResProtocolInfo(((Element)childElement).getAttribute("protocolInfo"));
 								oneItem.setResSize(((Element)childElement).getAttribute("size"));
 								oneItem.setResValue(childElement.getFirstChild().getNodeValue());
-							} else if ( childElement.getNodeName().equals("createClass") ) {
+							} else if ( NAMESPACE_UPNP_ELEMENT.equals(childElement.getNamespaceURI()) 
+									&& childElement.getLocalName().equals("createClass") ) {
 								oneItem.setUpnpCreateClass(childElement.getFirstChild().getNodeValue());
 							}
 						}
@@ -265,11 +288,85 @@ public class ContentDirectoryService extends UPnPService {
 		return resultRoot;
 	}
 	
-	public static void main(String args) {
+	public static void main(String[] args) {
 		
-		String sampleResultXML = "";
+		StringBuffer sampleResultXML = new StringBuffer();
+		/*
+		sampleResultXML.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n");
+		sampleResultXML.append("<DIDL-Lite").append("\n");
+		sampleResultXML.append("xmlns:dc=\"http://purl.org/dc/elements/1.1/\"").append("\n");
+		sampleResultXML.append("xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"").append("\n");
+		sampleResultXML.append("xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\"").append("\n");
+		sampleResultXML.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"").append("\n");
+		sampleResultXML.append("xsi:schemaLocation=\"").append("\n");
+		sampleResultXML.append("urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/").append("\n");
+		sampleResultXML.append("http://www.upnp.org/schemas/av/didl-lite-v2-20060531.xsd").append("\n");
+		sampleResultXML.append("urn:schemas-upnp-org:metadata-1-0/upnp/").append("\n");
+		sampleResultXML.append("http://www.upnp.org/schemas/av/upnp-v2-20060531.xsd\">").append("\n");
+		sampleResultXML.append("<container id=\"4\" parentID=\"1\" childCount=\"3\" restricted=\"0\">").append("\n");
+		sampleResultXML.append("<dc:title>Brand New Day</dc:title>").append("\n");
+		sampleResultXML.append("<dc:creator>Sting</dc:creator>").append("\n");
+		sampleResultXML.append("<upnp:class>object.container.album.musicAlbum</upnp:class>").append("\n");
+		sampleResultXML.append("<upnp:searchClass includeDerived=\"0\">").append("\n");
+		sampleResultXML.append("object.item.audioItem.musicTrack").append("\n");
+		sampleResultXML.append("</upnp:searchClass>").append("\n");
+		sampleResultXML.append("<upnp:createClass includeDerived=\"0\">").append("\n");
+		sampleResultXML.append("object.item.audioItem.musicTrack").append("\n");
+		sampleResultXML.append("</upnp:createClass>").append("\n");
+		sampleResultXML.append("</container>").append("\n");
+		sampleResultXML.append("<container id=\"3\" parentID=\"1\" childCount=\"4\" restricted=\"0\">").append("\n");
+		sampleResultXML.append("<dc:title>Singles Soundtrack</dc:title>").append("\n");
+		sampleResultXML.append("<dc:creator>Various Artists</dc:creator>").append("\n");
+		sampleResultXML.append("<upnp:class>object.container.album.musicAlbum</upnp:class>").append("\n");
+		sampleResultXML.append("<upnp:searchClass includeDerived=\"0\">").append("\n");
+		sampleResultXML.append("object.item.audioItem.musicTrack").append("\n");
+		sampleResultXML.append("</upnp:searchClass>").append("\n");
+		sampleResultXML.append("<upnp:createClass includeDerived=\"0\">").append("\n");
+		sampleResultXML.append("object.item.audioItem.musicTrack").append("\n");
+		sampleResultXML.append("</upnp:createClass>").append("\n");
+		sampleResultXML.append("</container>").append("\n");
+		sampleResultXML.append("</DIDL-Lite>").append("\n");
+		*/
+		sampleResultXML.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n");
+		sampleResultXML.append("<DIDL-Lite").append("\n");
+		sampleResultXML.append("xmlns:dc=\"http://purl.org/dc/elements/1.1/\"").append("\n");
+		sampleResultXML.append("xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"").append("\n");
+		sampleResultXML.append("xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\"").append("\n");
+		sampleResultXML.append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"").append("\n");
+		sampleResultXML.append("xsi:schemaLocation=\"").append("\n");
+		sampleResultXML.append("urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/").append("\n");
+		sampleResultXML.append("http://www.upnp.org/schemas/av/didl-lite-v2-20060531.xsd").append("\n");
+		sampleResultXML.append("urn:schemas-upnp-org:metadata-1-0/upnp/").append("\n");
+		sampleResultXML.append("http://www.upnp.org/schemas/av/upnp-v2-20060531.xsd\">").append("\n");
+		sampleResultXML.append("<item id=\"14\" parentID=\"12\" restricted=\"0\">").append("\n");
+		sampleResultXML.append("<dc:title>Sunset on the beach</dc:title>").append("\n");
+		sampleResultXML.append("<dc:date>2001-10-20</dc:date>").append("\n");
+		sampleResultXML.append("<upnp:class>object.item.imageItem.photo</upnp:class>").append("\n");
+		sampleResultXML.append("<res protocolInfo=\"http-get:*:image/jpeg:*\" size=\"20000\">").append("\n");
+		sampleResultXML.append("http://10.0.0.1/getcontent.asp?id=14").append("\n");
+		sampleResultXML.append("</res>").append("\n");
+		sampleResultXML.append("</item>").append("\n");
+		sampleResultXML.append("<item id=\"15\" parentID=\"12\" restricted=\"0\">").append("\n");
+		sampleResultXML.append("<dc:title>Playing in the pool</dc:title>").append("\n");
+		sampleResultXML.append("<dc:date>2001-10-25</dc:date>").append("\n");
+		sampleResultXML.append("<upnp:class>object.item.imageItem.photo</upnp:class>").append("\n");
+		sampleResultXML.append("<res protocolInfo=\"http-get:*:image/jpeg:*\" size=\"25000\">").append("\n");
+		sampleResultXML.append("http://10.0.0.1/getcontent.asp?id=15").append("\n");
+		sampleResultXML.append("</res>").append("\n");
+		sampleResultXML.append("</item>").append("\n");
+		sampleResultXML.append("<item id=\"20\" refID=\"15\" parentID=\"13\" restricted=\"0\">").append("\n");
+		sampleResultXML.append("<dc:title>Playing in the pool</dc:title>").append("\n");
+		sampleResultXML.append("<dc:date>2001-10-25</dc:date>").append("\n");
+		sampleResultXML.append("<upnp:class>object.item.imageItem.photo</upnp:class>").append("\n");
+		sampleResultXML.append("<res protocolInfo=\"http-get:*:image/jpeg:*\" size=\"25000\">").append("\n");
+		sampleResultXML.append("http://10.0.0.1/getcontent.asp?id=15").append("\n");
+		sampleResultXML.append("</res>").append("\n");
+		sampleResultXML.append("</item>").append("\n");
+		sampleResultXML.append("</DIDL-Lite>").append("\n");
+
+
 		try {
-			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(sampleResultXML);
+			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(sampleResultXML.toString());
 			for ( int inx = 0; inx < itemList.size() ; inx++ ) {
 				System.out.println(itemList.get(inx).toString());
 			}
