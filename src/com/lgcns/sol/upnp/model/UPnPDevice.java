@@ -2,6 +2,7 @@ package com.lgcns.sol.upnp.model;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 
@@ -31,7 +32,34 @@ public class UPnPDevice {
 	InetAddress multiCastAddress = null;
 	int cacheControl = 180;
 	String location;		// url for getting description.
+	String usn;
+	String nts;
+	String nt;
+	String server;
+	boolean isRemote = true;
+	boolean isReadyToUse = false;
+	NetworkInterface networkInterface = null; 
 	
+	public boolean isRemote() {
+		return isRemote;
+	}
+
+	public void setRemote(boolean isRemote) {
+		this.isRemote = isRemote;
+	}
+
+	public String getUsn() {
+		return usn;
+	}
+
+	public void setUsn(String usn) {
+		this.usn = usn;
+		StringTokenizer st = new StringTokenizer(usn,":");
+		if ( st.nextToken().equals("uuid") && st.hasMoreTokens() ) {
+			setUuid(st.nextToken());
+		}
+	}
+
 	public void addService(UPnPService service) {
 		services.add(service);
 	}
@@ -83,6 +111,77 @@ public class UPnPDevice {
 
 	public void setMultiCastAddress(InetAddress multiCastAddress) {
 		this.multiCastAddress = multiCastAddress;
+	}
+	
+	public void setHost(String host) {
+		StringTokenizer st = new StringTokenizer(host,":");
+		String address, port;
+		if ( st.hasMoreTokens() && (address = st.nextToken()) != null ) {
+			if ( st.hasMoreTokens() && ( port = st.nextToken()) != null ) {
+				try {
+					setMultiCastAddress(InetAddress.getByName(address));
+					setMulticastPort(Integer.parseInt(port));
+				} catch ( Exception e ) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public int getCacheControl() {
+		return cacheControl;
+	}
+
+	public void setCacheControl(int cacheControl) {
+		this.cacheControl = cacheControl;
+	}
+
+	public String getNts() {
+		return nts;
+	}
+
+	public void setNts(String nts) {
+		this.nts = nts;
+	}
+
+	public String getNt() {
+		return nt;
+	}
+
+	public void setNt(String nt) {
+		this.nt = nt;
+	}
+
+	public String getServer() {
+		return server;
+	}
+
+	public void setServer(String server) {
+		this.server = server;
+	}
+
+	public boolean isReadyToUse() {
+		return isReadyToUse;
+	}
+
+	public void setReadyToUse(boolean isReadyToUse) {
+		this.isReadyToUse = isReadyToUse;
+	}
+
+	public NetworkInterface getNetworkInterface() {
+		return networkInterface;
+	}
+
+	public void setNetworkInterface(NetworkInterface networkInterface) {
+		this.networkInterface = networkInterface;
 	}
 	
 }

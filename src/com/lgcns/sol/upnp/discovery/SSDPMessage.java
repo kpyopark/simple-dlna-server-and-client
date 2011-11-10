@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import com.lgcns.sol.upnp.model.UPnPDevice;
+import com.lgcns.sol.upnp.model.UPnPDeviceManager;
 import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonSendHandler;
 
@@ -152,11 +153,21 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 		SSDPMessage message = new SSDPMessage();
 		try {
 			message.parse(dgPacket.getData());
+			UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
+			UPnPDevice device = new UPnPDevice();
 			
-			for( Iterator<String> keyIter = message.getHeaderKeyIterator() ; keyIter.hasNext() ; ) {
-				String key = keyIter.next();
-				System.out.println( "[" + key + "] :" + message.getHeaderValue(key)); 
-			}
+			device.setUsn(message.getHeaderValue(ID_UPNP_DISCOVERY_USN));
+			device.setHost(message.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
+			device.setLocation(message.getHeaderValue(ID_UPNP_DISCOVERY_LOCATION));
+			device.setCacheControl(Integer.parseInt(message.getHeaderValue(ID_UPNP_DISCOVERY_CACHECONTROL)));
+			device.setNts(message.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE));
+			device.setNt(message.getHeaderValue(ID_UPNP_DISCOVERY_NOTIFICATION_TYPE));
+			device.setServer(message.getHeaderValue(ID_UPNP_DISCOVERY_SERVER));
+			device.setRemote(true);
+			device.setReadyToUse(false);
+			
+			manager.addDevice(device);
+			
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}

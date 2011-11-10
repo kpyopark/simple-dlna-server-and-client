@@ -9,6 +9,7 @@ import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonReceiver;
 import com.lgcns.sol.upnp.network.CommonSendHandler;
 import com.lgcns.sol.upnp.network.CommonSender;
+import com.lgcns.sol.upnp.network.HTTPSender;
 import com.lgcns.sol.upnp.network.UDPReceiver;
 import com.lgcns.sol.upnp.network.UDPSender;
 import com.lgcns.sol.upnp.server.CommonServer;
@@ -54,7 +55,7 @@ public class ControlPoint {
 				// 5. start server.
 				receiveServer.startServer();
 			}
-
+			/*
 			// Sample Code for sender.
 			{
 				CommonSender sender = new UDPSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
@@ -67,10 +68,11 @@ public class ControlPoint {
 				
 				sendServer.startServer();
 			}
-			
-			Thread.sleep(10 * 1000);	// After 10 sec.
+			*/
+
+			Thread.sleep(50 * 1000);	// After 10 sec.
 			receiveServer.stopServer();
-			sendServer.stopServer();
+			//sendServer.stopServer();
 
 		} catch ( Exception e ) {
 			e.printStackTrace();

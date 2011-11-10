@@ -7,8 +7,13 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Observable;
 
-public class HTTPSender {
+import org.apache.http.Header;
+import org.apache.http.HttpRequest;
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+
+public class HTTPSender extends CommonSender {
 	NetworkInterface intf;
 	int port;
 	InetAddress target;
@@ -34,8 +39,11 @@ public class HTTPSender {
 		this.intf = intf;
 		this.targetURL = url;
 	}
-	
-	public void sendData(ArrayList<String> keyList, HashMap<String, String> properties, byte[] body) throws Exception {
+
+	@Override
+	protected void send(Object sendData) throws Exception {
+		// TODO Auto-generated method stub
+		BasicHttpEntityEnclosingRequest request = (BasicHttpEntityEnclosingRequest)sendData;
 		if ( this.targetURL == null ) {
 			this.targetURL = "http://" + this.target.getHostAddress() + ":" + this.port + this.uri;
 		}
@@ -44,14 +52,18 @@ public class HTTPSender {
 		BufferedOutputStream bos = null;
 		try {
 			urlCon = (HttpURLConnection)url.openConnection();
-			for ( String key: keyList ) {
-				String value = properties.get(key);
-				urlCon.addRequestProperty(key, value);
+			Header[] headers = request.getAllHeaders();
+			for ( int inx = 0 ; headers != null && inx < headers.length ; inx++ ) {
+				urlCon.addRequestProperty(headers[inx].getName(), headers[inx].getValue());
 			}
 			urlCon.setDoOutput(true);
 			urlCon.connect();
 			bos = new BufferedOutputStream(urlCon.getOutputStream());
-			bos.write(body);
+			byte buffer[] = new byte[1024];
+			int size = 0;
+			while( ( size = request.getEntity().getContent().read(buffer, 0, 1024) ) != -1 ) {
+				bos.write(buffer,0,size);
+			}
 			bos.flush();
 		} finally {
 			if ( bos != null ) try { bos.close(); } catch ( Exception e1 ) {
@@ -61,5 +73,10 @@ public class HTTPSender {
 				e1.printStackTrace();
 			}
 		}
+	}
+
+	public void update(Observable arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		
 	}
 }

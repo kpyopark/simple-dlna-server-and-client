@@ -2,9 +2,11 @@ package com.lgcns.sol.upnp.description;
 
 import java.util.ArrayList;
 
+import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+
 import com.lgcns.sol.upnp.model.UPnPDevice;
 
-public class DeviceDescription {
+public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendHandler {
 	static final String DEVICE_DESCRIPTION_CONFIG_NUMBER = "0";
 	static final String DEVICE_DESCRIPTION_SPECVER_MAJOR = "1";
 	static final String DEVICE_DESCRIPTION_SPECVER_MINOR = "1";
@@ -108,8 +110,10 @@ public class DeviceDescription {
 		"</device>" +
 		"</root>";
 	
-	public DeviceDescription() {
-		
+	
+	
+	public DeviceDescription(UPnPDevice device) {
+		this.device = device;
 	}
 	
 	public DeviceDescription(
@@ -327,4 +331,23 @@ public class DeviceDescription {
 		this.setModelNumber(DEVICE_DESCRIPTION_MODEL_NUMBER);
 		this.setModelUrl(DEVICE_DESCRIPTION_MODEL_URL);
 	}
+
+	public Object getSendObject() throws Exception {
+		BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest("GET",this.device.getLocation());
+		// TODO : modify below line which to retreive the version of OS.
+		String osVersion = "WindowsNT";
+		String productVersion = "simpledlna/1.0";
+		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		
+		return request;
+	}
+	
+	private String getRequestBody() {
+		return "";
+	}
+
+	public Object processAfterSend(Object returnValue) {
+		return null;
+	}
+	
 }
