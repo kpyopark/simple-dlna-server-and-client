@@ -152,6 +152,7 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 		SSDPMessage message = new SSDPMessage();
 		try {
 			message.parse(dgPacket.getData());
+			
 			for( Iterator<String> keyIter = message.getHeaderKeyIterator() ; keyIter.hasNext() ; ) {
 				String key = keyIter.next();
 				System.out.println( "[" + key + "] :" + message.getHeaderValue(key)); 
