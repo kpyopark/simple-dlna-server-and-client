@@ -151,23 +151,10 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	public void process(Object packet) {
 		DatagramPacket dgPacket = (DatagramPacket)packet;
 		SSDPMessage message = new SSDPMessage();
+		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
 		try {
 			message.parse(dgPacket.getData());
-			UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
-			UPnPDevice device = new UPnPDevice();
-			
-			device.setUsn(message.getHeaderValue(ID_UPNP_DISCOVERY_USN));
-			device.setHost(message.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
-			device.setLocation(message.getHeaderValue(ID_UPNP_DISCOVERY_LOCATION));
-			device.setCacheControl(Integer.parseInt(message.getHeaderValue(ID_UPNP_DISCOVERY_CACHECONTROL)));
-			device.setNts(message.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE));
-			device.setNt(message.getHeaderValue(ID_UPNP_DISCOVERY_NOTIFICATION_TYPE));
-			device.setServer(message.getHeaderValue(ID_UPNP_DISCOVERY_SERVER));
-			device.setRemote(true);
-			device.setReadyToUse(false);
-			
-			manager.addDevice(device);
-			
+			manager.addDevice(message.getDeviceBaseInfo());
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
@@ -180,5 +167,21 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	public Object processAfterSend(Object returnValue) {
 		// There is no actions after to send "ssdp:alive" message into the network.
 		return null;
+	}
+	
+	public UPnPDevice getDeviceBaseInfo() {
+		UPnPDevice device = new UPnPDevice();
+		
+		device.setUsn(this.getHeaderValue(ID_UPNP_DISCOVERY_USN));
+		device.setHost(this.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
+		device.setLocation(this.getHeaderValue(ID_UPNP_DISCOVERY_LOCATION));
+		device.setCacheControl(Integer.parseInt(this.getHeaderValue(ID_UPNP_DISCOVERY_CACHECONTROL)));
+		device.setNts(this.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE));
+		device.setNt(this.getHeaderValue(ID_UPNP_DISCOVERY_NOTIFICATION_TYPE));
+		device.setServer(this.getHeaderValue(ID_UPNP_DISCOVERY_SERVER));
+		device.setRemote(true);
+		device.setReadyToUse(false);
+		
+		return device;
 	}
 }

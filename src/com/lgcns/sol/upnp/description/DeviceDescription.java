@@ -1,7 +1,13 @@
 package com.lgcns.sol.upnp.description;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import com.lgcns.sol.upnp.model.UPnPDevice;
@@ -338,7 +344,8 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		String osVersion = "WindowsNT";
 		String productVersion = "simpledlna/1.0";
 		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
-		
+		BasicHttpEntity entity = new BasicHttpEntity();
+		entity.setContent(new ByteArrayInputStream(this.getRequestBody().getBytes("utf-8")));
 		return request;
 	}
 	
@@ -346,7 +353,19 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		return "";
 	}
 
-	public Object processAfterSend(Object returnValue) {
+	public Object processAfterSend(Object receivedData) {
+		// Parsing DeviceDescription XML and fill full information of that device.
+		try {
+			HttpResponse response = (HttpResponse)receivedData;
+			if ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
+				HttpEntity entity = response.getEntity();
+				
+			}
+		} catch ( Exception e ) {
+			// TODO : Exception processing is required.
+			e.printStackTrace();
+		}
+		this.device.setProgressingToRetrieve(false);
 		return null;
 	}
 	

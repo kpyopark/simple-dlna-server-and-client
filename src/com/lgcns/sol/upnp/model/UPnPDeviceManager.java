@@ -25,7 +25,6 @@ public class UPnPDeviceManager {
 	
 	// private attributes;
 	HashMap<String, UPnPDevice> deviceList = null;
-	CommonServer sendServer = null;
 	
 	private UPnPDeviceManager() {
 		deviceList = new HashMap<String,UPnPDevice>();
@@ -33,7 +32,6 @@ public class UPnPDeviceManager {
 	
 	public void clearAll() {
 		this.deviceList.clear();
-		this.stop();
 	}
 	
 	public void addDevice(UPnPDevice device) {
@@ -43,6 +41,7 @@ public class UPnPDeviceManager {
 			System.out.println("Same UUID[" + device.getUuid() + "] is used.");
 		}
 		this.deviceList.put(device.getUuid(), device);
+		this.updateRemoteDeviceInfo();
 	}
 	
 	public UPnPDevice getDevice(String uuid) {
@@ -57,17 +56,15 @@ public class UPnPDeviceManager {
 		return this.deviceList.keySet();
 	}
 	
-	public void start() {
-		if ( sendServer != null ) {
-			sendServer.stopServer();
-			sendServer = null;
-		}
+	public void updateRemoteDeviceInfo() {
 		for ( int inx = 0 ; inx < this.deviceList.size() ; inx++ ) {
 			UPnPDevice device = this.deviceList.values().iterator().next();
-			if ( !device.isReadyToUse() && device.isRemote ) {
+			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() != false ) {
+				device.setProgressingToRetrieve(true);
 				CommonSender sender = new HTTPSender(device.getNetworkInterface(),device.getLocation());
 				CommonSendHandler handler = new DeviceDescription(device);
 				sender.setSenderHandler(handler);
+				CommonServer sendServer = null;
 				sendServer = new CommonServer();
 				sendServer.setSender(sender, new SendEvent(SendEvent.SEND_EVENT_TYPE_ONCE, 500));
 				try {
@@ -79,9 +76,4 @@ public class UPnPDeviceManager {
 		}
 	}
 	
-	public void stop() {
-		if ( sendServer != null ) {
-			sendServer.stopServer();
-		}
-	}
 }

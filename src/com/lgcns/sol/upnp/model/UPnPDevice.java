@@ -38,8 +38,17 @@ public class UPnPDevice {
 	String server;
 	boolean isRemote = true;
 	boolean isReadyToUse = false;
+	boolean isProgressingToRetrieve = false;
 	NetworkInterface networkInterface = null; 
 	
+	public boolean isProgressingToRetrieve() {
+		return isProgressingToRetrieve;
+	}
+
+	public void setProgressingToRetrieve(boolean isProgressingToRetrieve) {
+		this.isProgressingToRetrieve = isProgressingToRetrieve;
+	}
+
 	public boolean isRemote() {
 		return isRemote;
 	}
