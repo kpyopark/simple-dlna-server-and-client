@@ -1,6 +1,6 @@
 package com.lgcns.sol.upnp.description;
 
-public class ServiceDescription implements ICommonDescription {
+public class ServiceElementInDDS implements ICommonDescription {
 	
 	static final String SD_REPLACEABLE_PART_SERVICE_TYPE = "#SERVICE_TYPE#";
 	static final String SD_REPLACEABLE_PART_SERVICE_ID = "#SERVICE_ID#";

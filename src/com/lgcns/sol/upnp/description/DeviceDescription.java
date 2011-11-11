@@ -45,8 +45,12 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	String manufacturerUrl;
 	String model;
 	String modelName;
+	String modelDescription;
 	String modelNumber;
 	String modelUrl;
+	String deviceType;
+	
+	String udn;
 	
 	// BELOW PART IS VARIALBES. SO YOU CAN SET THE VALUES INTO THAT BY USING CLASS CONSTRUCTORS.
 	UPnPDevice device;
@@ -58,8 +62,8 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	private String imageListDescription = null;
 	private String serviceListDescription = null;
 	
-	private ArrayList<ImageDescription> imageList = new ArrayList<ImageDescription>();
-	private ArrayList<ServiceDescription> serviceList = new ArrayList<ServiceDescription>();
+	private ArrayList<ImageElementInDDS> imageList = new ArrayList<ImageElementInDDS>();
+	private ArrayList<ServiceElementInDDS> serviceList = new ArrayList<ServiceElementInDDS>();
 	
 	static final String DDS_REPLACEABLE_PART_SERVICE_PART = "#SERVICE_PART#";
 	static final String DEVICE_DESCRIPTION_PRESENETATION_URL = "http://www.lg.com";
@@ -157,7 +161,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 			if ( deviceDescription == null || imageListUpdated || serviceListUpdated ) {
 				if ( imageListUpdated ) {
 					StringBuffer buffer = new StringBuffer();
-					for ( ImageDescription imageDesc : this.imageList ) {
+					for ( ImageElementInDDS imageDesc : this.imageList ) {
 						buffer.append( imageDesc.getDescription() );
 					}
 					this.imageListDescription = buffer.toString();
@@ -165,7 +169,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 				}
 				if ( serviceListUpdated ) {
 					StringBuffer buffer = new StringBuffer();
-					for ( ServiceDescription serviceDesc : this.serviceList ) {
+					for ( ServiceElementInDDS serviceDesc : this.serviceList ) {
 						buffer.append( serviceDesc.getDescription() );
 					}
 					this.serviceListDescription = buffer.toString();
@@ -181,22 +185,22 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		return deviceDescription;
 	}
 	
-	public void addImage(ImageDescription imageInfo) {
+	public void addImage(ImageElementInDDS imageInfo) {
 		this.imageList.add(imageInfo);
 		this.imageListUpdated = true;
 	}
 	
-	public void addImage(ArrayList<ImageDescription> imageList) {
+	public void addImage(ArrayList<ImageElementInDDS> imageList) {
 		this.imageList.addAll(imageList);
 		this.imageListUpdated = true;
 	}
 	
-	public void addService(ServiceDescription serviceInfo) {
+	public void addService(ServiceElementInDDS serviceInfo) {
 		this.serviceList.add(serviceInfo);
 		this.serviceListUpdated = true;
 	}
 	
-	public void addService(ArrayList<ServiceDescription> serviceList) {
+	public void addService(ArrayList<ServiceElementInDDS> serviceList) {
 		this.serviceList.addAll(serviceList);
 		this.serviceListUpdated = true;
 	}
@@ -369,4 +373,28 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		return null;
 	}
 	
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
+	public String getModelDescription() {
+		return modelDescription;
+	}
+
+	public void setModelDescription(String modelDescription) {
+		this.modelDescription = modelDescription;
+	}
+
+	public String getUdn() {
+		return udn;
+	}
+
+	public void setUdn(String udn) {
+		this.udn = udn;
+	}
+
 }
