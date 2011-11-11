@@ -123,11 +123,12 @@ public class UPnPDevice {
 	}
 	
 	public void setHost(String host) {
-		StringTokenizer st = new StringTokenizer(host,":");
+		StringTokenizer st = new StringTokenizer(host.trim(),":");
 		String address, port;
 		if ( st.hasMoreTokens() && (address = st.nextToken()) != null ) {
 			if ( st.hasMoreTokens() && ( port = st.nextToken()) != null ) {
 				try {
+					System.out.println("address:[" + address +  "]:port:[" + port);
 					setMultiCastAddress(InetAddress.getByName(address));
 					setMulticastPort(Integer.parseInt(port));
 				} catch ( Exception e ) {

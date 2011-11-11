@@ -175,7 +175,11 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 		device.setUsn(this.getHeaderValue(ID_UPNP_DISCOVERY_USN));
 		device.setHost(this.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
 		device.setLocation(this.getHeaderValue(ID_UPNP_DISCOVERY_LOCATION));
-		device.setCacheControl(Integer.parseInt(this.getHeaderValue(ID_UPNP_DISCOVERY_CACHECONTROL)));
+		{
+			String cacheValue = this.getHeaderValue(ID_UPNP_DISCOVERY_CACHECONTROL);
+			device.setCacheControl(Integer.parseInt(cacheValue.substring(cacheValue.indexOf("max-age=")+8).trim()));
+		}
+		
 		device.setNts(this.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE));
 		device.setNt(this.getHeaderValue(ID_UPNP_DISCOVERY_NOTIFICATION_TYPE));
 		device.setServer(this.getHeaderValue(ID_UPNP_DISCOVERY_SERVER));
