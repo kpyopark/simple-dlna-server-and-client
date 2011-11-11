@@ -264,7 +264,7 @@ public class DDSXMLParser {
 					Node fstNode = serviceLst.item(s);
 
 					if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
-						
+						ServiceElementInDDS service = new ServiceElementInDDS();
 						Element iconfstElmnt = (Element) fstNode;
 						/* service type */
 						NodeList iconfstNmElmntLst = iconfstElmnt
@@ -273,49 +273,37 @@ public class DDSXMLParser {
 							Element iconfstNmElmnt = (Element) iconfstNmElmntLst
 									.item(0);
 							NodeList iconfstNm = iconfstNmElmnt.getChildNodes();
-							System.out
-									.println("serviceType : "
-											+ ((Node) iconfstNm.item(0))
-													.getNodeValue());
+							service.setServiceType(((Node) iconfstNm.item(0)).getNodeValue());
 						}
 
-						/* width */
+						/* serviceId */
 						NodeList icon2ndElmntLst = iconfstElmnt
-								.getElementsByTagName("serviceTd");
+								.getElementsByTagName("serviceId");
 						if (icon2ndElmntLst.getLength() > 0) {
 							Element icon2ndNmElmnt = (Element) icon2ndElmntLst
 									.item(0);
 							NodeList icon2ndNm = icon2ndNmElmnt.getChildNodes();
-							System.out
-									.println("serviceTd : "
-											+ ((Node) icon2ndNm.item(0))
-													.getNodeValue());
+							service.setServiceId(((Node) icon2ndNm.item(0)).getNodeValue());
 						}
 
-						/* height */
+						/* SCPDURL */
 						NodeList icon3rdElmntLst = iconfstElmnt
 								.getElementsByTagName("SCPDURL");
 						if (icon3rdElmntLst.getLength() > 0) {
 							Element icon3rdNmElmnt = (Element) icon3rdElmntLst
 									.item(0);
 							NodeList icon3rdNm = icon3rdNmElmnt.getChildNodes();
-							System.out
-									.println("SCPDURL : "
-											+ ((Node) icon3rdNm.item(0))
-													.getNodeValue());
+							service.setScpdUrl(((Node) icon3rdNm.item(0)).getNodeValue());
 						}
 
-						/* depth */
+						/* controlURL */
 						NodeList icon4thElmntLst = iconfstElmnt
 								.getElementsByTagName("controlURL");
 						if (icon4thElmntLst.getLength() > 0) {
 							Element icon4thNmElmnt = (Element) icon4thElmntLst
 									.item(0);
 							NodeList icon4thNm = icon4thNmElmnt.getChildNodes();
-							System.out
-									.println("controlURL :"
-											+ ((Node) icon4thNm.item(0))
-													.getNodeValue());
+							service.setControlUrl(((Node) icon4thNm.item(0)).getNodeValue());
 						}
 
 						/* url */
@@ -325,16 +313,15 @@ public class DDSXMLParser {
 							Element icon5thNmElmnt = (Element) icon5thElmntLst
 									.item(0);
 							NodeList icon5thNm = icon5thNmElmnt.getChildNodes();
-							System.out
-									.println("eventSubURL :"
-											+ ((Node) icon5thNm.item(0))
-													.getNodeValue());
+							service.setEventsubUrl(((Node) icon5thNm.item(0)).getNodeValue());
 						}
+						description.addService(service);
 					}
 				}
 				System.out.println("--Information of all icons end--");
 				/* serviceList */
-				/* deviceList */
+				
+				// TODO : We wouldn't process embedded devices yet. Someone help us to process them.
 				/* deviceList */
 				/* PresentationURL */
 				Element twlvthElmnt = (Element) fstnodeDevice;
@@ -343,10 +330,8 @@ public class DDSXMLParser {
 				if (twlvthNmElmntLst.getLength() > 0) {
 					Element twlvthNmElmnt = (Element) twlvthNmElmntLst.item(0);
 					NodeList twlthNm = twlvthNmElmnt.getChildNodes();
-					//PresentationURL = ((Node) twlthNm.item(0)).getNodeValue();
-					//System.out.println("PresentationURL : " + PresentationURL);
+					description.setPresentationURL(((Node) twlthNm.item(0)).getNodeValue());
 				}
-				/* PresentationURL */
 
 			}
 		} catch (Exception e) {

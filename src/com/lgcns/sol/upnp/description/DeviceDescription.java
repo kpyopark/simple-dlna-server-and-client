@@ -13,6 +13,7 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import com.lgcns.sol.upnp.model.UPnPDevice;
 
 public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendHandler {
+	
 	static final String DEVICE_DESCRIPTION_CONFIG_NUMBER = "0";
 	static final String DEVICE_DESCRIPTION_SPECVER_MAJOR = "1";
 	static final String DEVICE_DESCRIPTION_SPECVER_MINOR = "1";
@@ -49,6 +50,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	String modelNumber;
 	String modelUrl;
 	String deviceType;
+	String presentationURL;
 	
 	String udn;
 	
@@ -396,5 +398,14 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	public void setUdn(String udn) {
 		this.udn = udn;
 	}
+
+	public String getPresentationURL() {
+		return presentationURL;
+	}
+
+	public void setPresentationURL(String presentationURL) {
+		this.presentationURL = presentationURL;
+	}
+
 
 }
