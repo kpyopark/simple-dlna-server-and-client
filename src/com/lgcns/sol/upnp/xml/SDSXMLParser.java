@@ -1,4 +1,4 @@
-package com.lgcns.sol.upnp.model;
+package com.lgcns.sol.upnp.xml;
 
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;

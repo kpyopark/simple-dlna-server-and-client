@@ -1,11 +1,15 @@
-package com.lgcns.sol.upnp.model;
+package com.lgcns.sol.upnp.xml;
 import java.io.File;
+import java.io.InputStream;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.lgcns.sol.upnp.model.UPnPDevice;
 
 public class DDSXMLParser {
 	static String SpecVerMaj; 
@@ -24,17 +28,27 @@ public class DDSXMLParser {
 	static String PresentationURL;
 
 	File DeviceDescriptionXML;
+	UPnPDevice device;
+	
+	InputStream xmlInputStream = null;
+	
+	public DDSXMLParser(UPnPDevice device, InputStream is) {
+		this.device = device;
+		this.xmlInputStream = is;
+	}
+	
+	public UPnPDevice getDeviceInfo() {
+		return this.device;
+	}
 	
 	public void execute(){
 		try {
-			/*아래는 parser가 제대로 동작하는지 test를 위한 code 입니다. */
-			/*실제 XML을 parsing 하기 위해서는 DeviceDescriptionXML 를 넣으면 됩니다. */
-		  File file = new File("c:\\DeviceDescription.xml");
-		  DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		  DocumentBuilder db = dbf.newDocumentBuilder();
-		  Document doc = db.parse(file);
-		  doc.getDocumentElement().normalize();
-		  System.out.println("Root element " + doc.getDocumentElement().getNodeName());
+			
+			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			DocumentBuilder db = dbf.newDocumentBuilder();
+			Document doc = db.parse(xmlInputStream);
+			doc.getDocumentElement().normalize();
+			System.out.println("Root element " + doc.getDocumentElement().getNodeName());
 
 /*Spec Version*/
 		  NodeList nodeLstSpecVer = doc.getElementsByTagName("specVersion");
