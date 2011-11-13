@@ -118,7 +118,7 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 				int totalLength = keyAndValue.length();
 				for ( int pos = 0; pos < totalLength; pos++ ) {
 					if ( keyAndValue.charAt(pos) == ':' ) {
-						this.headerList.put(keyAndValue.substring(0,pos), (totalLength > (pos + 1))? keyAndValue.substring(pos+1) : "" );
+						this.headerList.put(keyAndValue.substring(0,pos), (totalLength > (pos + 1))? keyAndValue.substring(pos+1).trim() : "" );
 						break;
 					}
 				}
@@ -185,6 +185,8 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 		device.setServer(this.getHeaderValue(ID_UPNP_DISCOVERY_SERVER));
 		device.setRemote(true);
 		device.setReadyToUse(false);
+		
+		System.out.println("New Device Info:\n" + device.toString());
 		
 		return device;
 	}

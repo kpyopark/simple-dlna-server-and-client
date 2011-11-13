@@ -59,7 +59,8 @@ public class UPnPDeviceManager {
 	public void updateRemoteDeviceInfo() {
 		for ( int inx = 0 ; inx < this.deviceList.size() ; inx++ ) {
 			UPnPDevice device = this.deviceList.values().iterator().next();
-			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() != false ) {
+			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() == false ) {
+				System.out.println("Update Remote Device..[" + device.getUuid() + "]" );
 				device.setProgressingToRetrieve(true);
 				CommonSender sender = new HTTPSender(device.getNetworkInterface(),device.getLocation());
 				CommonSendHandler handler = new DeviceDescription(device);

@@ -1,5 +1,6 @@
 package com.lgcns.sol.upnp.model;
 
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.StringTokenizer;
@@ -128,7 +129,7 @@ public class UPnPDevice {
 		if ( st.hasMoreTokens() && (address = st.nextToken()) != null ) {
 			if ( st.hasMoreTokens() && ( port = st.nextToken()) != null ) {
 				try {
-					System.out.println("address:[" + address +  "]:port:[" + port);
+					System.out.println("address:[" + address +  "]:port:[" + port + "]");
 					setMultiCastAddress(InetAddress.getByName(address));
 					setMulticastPort(Integer.parseInt(port));
 				} catch ( Exception e ) {
@@ -192,6 +193,19 @@ public class UPnPDevice {
 
 	public void setNetworkInterface(NetworkInterface networkInterface) {
 		this.networkInterface = networkInterface;
+	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		Field[] fields = this.getClass().getDeclaredFields();
+		for ( int inx = 0; inx < fields.length ; inx++ ) {
+			try {
+				sb.append(fields[inx].getName()).append(":").append(fields[inx].get(this).toString()).append("\n");
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
 	}
 	
 }
