@@ -52,8 +52,40 @@ public class UPnPDeviceManager {
 		return this.deviceList.size();
 	}
 	
+	public void removeDevice(String uuid) {
+		this.deviceList.remove(uuid);
+		//this.updateRemoteDeviceInfo();
+	}
+	
+	public void updateDevice(String uuid) {
+		if ( this.deviceList.get(uuid) != null ) {
+			UPnPDevice device = this.deviceList.get(uuid);
+			device.setProgressingToRetrieve(false);
+			device.setReadyToUse(false);
+			this.updateRemoteDeviceInfo();
+		}
+	}
+	
 	public Set<String> getUuidList() {
 		return this.deviceList.keySet();
+	}
+	
+	static class SampleTread extends Thread {
+		UPnPDevice innerDevice = null;
+		public SampleTread(UPnPDevice outerDevice) {
+			innerDevice = outerDevice;
+		}
+		
+		public void run() {
+			try {
+				CommonSender sender = new HTTPSender(innerDevice.getNetworkInterface(),innerDevice.getLocation());
+				CommonSendHandler handler = new DeviceDescription(innerDevice);
+				sender.setSenderHandler(handler);
+				sender.sendData();
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	public void updateRemoteDeviceInfo() {
@@ -62,6 +94,9 @@ public class UPnPDeviceManager {
 			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() == false ) {
 				System.out.println("Update Remote Device..[" + device.getUuid() + "]" );
 				device.setProgressingToRetrieve(true);
+				Thread oneTimeThread = new SampleTread(device);
+				oneTimeThread.start();
+				/*
 				CommonSender sender = new HTTPSender(device.getNetworkInterface(),device.getLocation());
 				CommonSendHandler handler = new DeviceDescription(device);
 				sender.setSenderHandler(handler);
@@ -73,6 +108,7 @@ public class UPnPDeviceManager {
 				} catch ( AbnormalException abne ) {
 					abne.printStackTrace();
 				}
+				*/
 			}
 		}
 	}

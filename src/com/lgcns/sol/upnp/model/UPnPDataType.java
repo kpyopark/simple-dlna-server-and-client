@@ -2,7 +2,7 @@ package com.lgcns.sol.upnp.model;
 
 import java.util.HashMap;
 
-public class UPnPDataType {
+public class UPnPDataType extends UPnPBase {
 	
 	static HashMap<String, UPnPDataType> DEFAULT_TYPE_MAPPER = new HashMap<String, UPnPDataType>();
 	

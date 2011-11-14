@@ -1,9 +1,8 @@
 package com.lgcns.sol.upnp.model;
 
 import java.util.HashMap;
-import java.util.Vector;
 
-public class UPnPService {
+public class UPnPService extends UPnPBase {
 	
 	public static int UPNP_SERVICE_TYPE_CDS = 1;
 	
@@ -17,6 +16,10 @@ public class UPnPService {
 	String versionMinor;
 	
 	UPnPDevice device;
+	
+	boolean isRemote = true;
+	boolean isReadyToUse = false;
+	boolean isProgressingToRetrieve = false;
 	
 	public UPnPService(UPnPDevice device) {
 		this.device = device;
@@ -72,4 +75,31 @@ public class UPnPService {
 	public UPnPStateVariable getStateVariable(String variableName) {
 		return this.variableList.get(variableName);
 	}
+	
+	public boolean isRemote() {
+		return isRemote;
+	}
+	public void setRemote(boolean isRemote) {
+		this.isRemote = isRemote;
+	}
+	public boolean isReadyToUse() {
+		return isReadyToUse;
+	}
+	public void setReadyToUse(boolean isReadyToUse) {
+		this.isReadyToUse = isReadyToUse;
+	}
+	public boolean isProgressingToRetrieve() {
+		return isProgressingToRetrieve;
+	}
+	public void setProgressingToRetrieve(boolean isProgressingToRetrieve) {
+		this.isProgressingToRetrieve = isProgressingToRetrieve;
+	}
+	public UPnPDevice getDevice() {
+		return device;
+	}
+	public void setDevice(UPnPDevice device) {
+		this.device = device;
+	}
+
+
 }

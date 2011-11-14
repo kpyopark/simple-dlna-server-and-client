@@ -1,5 +1,8 @@
 package com.lgcns.sol.upnp.description;
 
+import com.lgcns.sol.upnp.model.UPnPDevice;
+import com.lgcns.sol.upnp.model.UPnPService;
+
 public class ServiceElementInDDS implements ICommonDescription {
 	
 	static final String SD_REPLACEABLE_PART_SERVICE_TYPE = "#SERVICE_TYPE#";
@@ -67,5 +70,15 @@ public class ServiceElementInDDS implements ICommonDescription {
 
 	public void setEventsubUrl(String eventsubUrl) {
 		this.eventsubUrl = eventsubUrl;
+	}
+	
+	public UPnPService getDefaultUPnPService(UPnPDevice device) {
+		UPnPService service = new UPnPService(device);
+		service.setScpdUrl(this.getScpdUrl());
+		service.setControlUrl(this.getControlUrl());
+		service.setEventsubUrl(this.getEventsubUrl());
+		service.setServiceId(this.getServiceId());
+		service.setServiceType(this.getServiceType());
+		return service;
 	}
 }

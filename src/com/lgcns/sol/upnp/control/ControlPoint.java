@@ -1,10 +1,12 @@
 package com.lgcns.sol.upnp.control;
 
 import java.net.NetworkInterface;
+import java.util.Set;
 
 import com.lgcns.sol.upnp.discovery.SSDPMessage;
 import com.lgcns.sol.upnp.exception.AbnormalException;
 import com.lgcns.sol.upnp.model.UPnPDevice;
+import com.lgcns.sol.upnp.model.UPnPDeviceManager;
 import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonReceiver;
 import com.lgcns.sol.upnp.network.CommonSendHandler;
@@ -70,7 +72,12 @@ public class ControlPoint {
 			}
 			*/
 
-			Thread.sleep(50 * 1000);	// After 10 sec.
+			Thread.sleep(5 * 1000);	// After 10 sec.
+			Set<String> uuids = UPnPDeviceManager.getDefaultDeviceManager().getUuidList();
+			for ( String uuid : uuids ) {
+				System.out.println("uuid:" + uuid);
+				System.out.println(UPnPDeviceManager.getDefaultDeviceManager().getDevice(uuid));
+			}
 			receiveServer.stopServer();
 			//sendServer.stopServer();
 

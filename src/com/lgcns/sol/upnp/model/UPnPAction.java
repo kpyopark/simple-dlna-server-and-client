@@ -1,11 +1,8 @@
 package com.lgcns.sol.upnp.model;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
-import com.lgcns.sol.upnp.common.UPnPUtils;
-
-public class UPnPAction {
+public class UPnPAction extends UPnPBase {
 	UPnPService service;
 	
 	String actionName;

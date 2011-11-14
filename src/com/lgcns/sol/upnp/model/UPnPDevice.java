@@ -1,13 +1,12 @@
 package com.lgcns.sol.upnp.model;
 
-import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 
-public class UPnPDevice {
+public class UPnPDevice extends UPnPBase {
 
 	public static int DEFAULT_UPNP_MULTICAST_PORT = 1900;
 	public static InetAddress DEFAULT_UPNP_MULTICAST_ADDRESS = null;
@@ -72,6 +71,10 @@ public class UPnPDevice {
 
 	public void addService(UPnPService service) {
 		services.add(service);
+	}
+	
+	public Vector<UPnPService> getSerivces() {
+		return this.services;
 	}
 	
 	public Vector<NetworkInterface> getNetworkInterfaceList() {
@@ -193,19 +196,6 @@ public class UPnPDevice {
 
 	public void setNetworkInterface(NetworkInterface networkInterface) {
 		this.networkInterface = networkInterface;
-	}
-	
-	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		Field[] fields = this.getClass().getDeclaredFields();
-		for ( int inx = 0; inx < fields.length ; inx++ ) {
-			try {
-				sb.append(fields[inx].getName()).append(":").append(fields[inx].get(this).toString()).append("\n");
-			} catch ( Exception e ) {
-				e.printStackTrace();
-			}
-		}
-		return sb.toString();
 	}
 	
 }

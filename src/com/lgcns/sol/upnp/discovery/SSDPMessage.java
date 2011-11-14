@@ -35,6 +35,8 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	public final static String ID_START_LINE_NORMAL = "HTTP/1.1 200 OK";
 	
 	public final static String ID_NT_SUBTYPE_SSDPALIVE = "ssdp:alive";
+	public final static String ID_NT_SUBTYPE_SSDPBYEBYE = "ssdp:byebye";
+	public final static String ID_NT_SUBTYPE_SSDPUPDATE = "ssdp:update";
 	
 	public final static String STARTLINE_ID_LIST[] = {
 		ID_START_LINE_NOTIFY, ID_START_LINE_SEARCH, ID_START_LINE_NORMAL
@@ -83,7 +85,7 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	}
 	
 	public void setHeaderValue(String headerId, String value) {
-		headerList.put(headerId, value);
+		headerList.put(headerId.toUpperCase(), value);
 	}
 	
 	public Iterator<String> getHeaderKeyIterator() {
@@ -116,9 +118,10 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 				return false;
 			while( (keyAndValue = br.readLine()) != null ) {
 				int totalLength = keyAndValue.length();
+				System.out.println(keyAndValue);
 				for ( int pos = 0; pos < totalLength; pos++ ) {
 					if ( keyAndValue.charAt(pos) == ':' ) {
-						this.headerList.put(keyAndValue.substring(0,pos), (totalLength > (pos + 1))? keyAndValue.substring(pos+1).trim() : "" );
+						this.setHeaderValue(keyAndValue.substring(0,pos), (totalLength > (pos + 1))? keyAndValue.substring(pos+1).trim() : "" );
 						break;
 					}
 				}
@@ -151,10 +154,17 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	public void process(Object packet) {
 		DatagramPacket dgPacket = (DatagramPacket)packet;
 		SSDPMessage message = new SSDPMessage();
-		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
+ 		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
 		try {
 			message.parse(dgPacket.getData());
-			manager.addDevice(message.getDeviceBaseInfo());
+			if ( ID_NT_SUBTYPE_SSDPALIVE.equalsIgnoreCase(message.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE)) ) {
+				// If [live] message received.
+				manager.addDevice(message.getDeviceBaseInfo());
+			} else if (ID_NT_SUBTYPE_SSDPBYEBYE.equalsIgnoreCase(message.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE))) {
+				manager.removeDevice(message.getDeviceBaseInfo().getUuid());
+			} else if (ID_NT_SUBTYPE_SSDPUPDATE.equalsIgnoreCase(message.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE))) {
+				manager.updateDevice(message.getDeviceBaseInfo().getUuid());
+			}
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}

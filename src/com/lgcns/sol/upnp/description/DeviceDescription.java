@@ -1,16 +1,24 @@
 package com.lgcns.sol.upnp.description;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import com.lgcns.sol.upnp.model.UPnPDevice;
+import com.lgcns.sol.upnp.model.UPnPService;
+import com.lgcns.sol.upnp.network.CommonSendHandler;
+import com.lgcns.sol.upnp.network.CommonSender;
+import com.lgcns.sol.upnp.network.HTTPSender;
+import com.lgcns.sol.upnp.xml.DDSXMLParser;
 
 public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendHandler {
 	
@@ -199,13 +207,33 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	
 	public void addService(ServiceElementInDDS serviceInfo) {
 		this.serviceList.add(serviceInfo);
-		this.serviceListUpdated = true;
+		if ( this.device != null ) {
+			// Check duplication of services. 
+			UPnPService newService = serviceInfo.getDefaultUPnPService(this.device);
+			String newServiceId = newService.getServiceId();
+			Vector<UPnPService> services = this.device.getSerivces();
+			boolean isNewService = true;
+			for ( int inx = 0; newServiceId != null && inx < services.size() ; inx++ ) {
+				if ( newServiceId.equals( services.get(inx).getServiceId() ) ) {
+					System.out.println("Same service already exists.[" + newServiceId + "]" );
+					isNewService = false;
+					break;
+				}
+			}
+			if ( isNewService ) {
+				System.out.println("new service is added.[" + newServiceId + "]");
+				this.device.addService(newService);
+				this.serviceListUpdated = true;
+			}
+		}
 	}
 	
+	/*
 	public void addService(ArrayList<ServiceElementInDDS> serviceList) {
 		this.serviceList.addAll(serviceList);
 		this.serviceListUpdated = true;
 	}
+	*/
 	
 	public static UPnPDevice getDeviceInfoFromDescription(byte[] xmlBody) {
 		UPnPDevice rtn = new UPnPDevice();
@@ -345,7 +373,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	}
 
 	public Object getSendObject() throws Exception {
-		BasicHttpEntityEnclosingRequest request = new BasicHttpEntityEnclosingRequest("GET",this.device.getLocation());
+		HttpPost request = new HttpPost(this.device.getLocation());
 		// TODO : modify below line which to retreive the version of OS.
 		String osVersion = "WindowsNT";
 		String productVersion = "simpledlna/1.0";
@@ -365,7 +393,42 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 			HttpResponse response = (HttpResponse)receivedData;
 			if ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
 				HttpEntity entity = response.getEntity();
+				DDSXMLParser parser = new DDSXMLParser(this, entity.getContent());
+				parser.execute();
 				
+				Vector<UPnPService> services = this.getDevice().getSerivces();
+				
+				for ( int inx = 0 ; inx < services.size() ; inx++ ) {
+					UPnPService service = services.get(inx);
+					if ( service.isRemote() && service.isReadyToUse() != false && service.isProgressingToRetrieve() != false ) {
+						// 원칙적으로 여기에서 Service Description을 가지고 오는것이 아니라,
+						// UPnPDevice에서 새로이 등록된 Service가 있는 경우, Serivce를 Update하는게 이치적으로 맞음
+						// But. 구현시 서버가 추가되어야 하므로 여기서 바로 얻어서 Update하는 것으로 로직 구성
+						// 이럴 경우, Hang 현상 발생가능.
+						
+						class ServiceDescriptionSendThread extends Thread {
+							UPnPService inner = null;
+							public ServiceDescriptionSendThread(UPnPService outer) {
+								inner = outer;
+							}
+							public void run() {
+								try {
+									CommonSender sender = new HTTPSender(inner.getDevice().getNetworkInterface(),inner.getScpdUrl());
+									CommonSendHandler handler = new ServiceDescription(inner);
+									sender.setSenderHandler(handler);
+									sender.sendData();
+								} catch ( Exception e ) {
+									e.printStackTrace();
+								}
+							}
+						}
+						
+						ServiceDescriptionSendThread thread = new ServiceDescriptionSendThread(service);
+						thread.run();
+						
+						
+					}
+				}
 			}
 		} catch ( Exception e ) {
 			// TODO : Exception processing is required.
@@ -406,6 +469,18 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 	public void setPresentationURL(String presentationURL) {
 		this.presentationURL = presentationURL;
 	}
-
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		Field[] fields = this.getClass().getDeclaredFields();
+		for ( int inx = 0; inx < fields.length ; inx++ ) {
+			try {
+				sb.append(fields[inx].getName()).append(":").append((fields[inx].get(this) != null ) ? fields[inx].get(this).toString() : "null").append("\n");
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
 
 }
