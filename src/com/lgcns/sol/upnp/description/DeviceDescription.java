@@ -391,6 +391,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		// Parsing DeviceDescription XML and fill full information of that device.
 		try {
 			HttpResponse response = (HttpResponse)receivedData;
+			System.out.println("Device Description Response Status value:" + response.getStatusLine().getStatusCode() );
 			if ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
 				HttpEntity entity = response.getEntity();
 				DDSXMLParser parser = new DDSXMLParser(this, entity.getContent());
