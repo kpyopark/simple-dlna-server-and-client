@@ -31,13 +31,11 @@ public class ServiceDescription implements com.lgcns.sol.upnp.network.CommonSend
 			this.service.registerStateVariable(statVar);
 	}
 
-	@Override
 	public Object getSendObject() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public Object processAfterSend(Object returnValue) {
 		HttpResponse response = (HttpResponse)returnValue;
 		try {
