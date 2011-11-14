@@ -77,6 +77,15 @@ public class UPnPDevice extends UPnPBase {
 		return this.services;
 	}
 	
+	public UPnPService getUPnPService(String serviceId) {
+		UPnPService service = null;
+		for ( int cnt = 0 ; cnt < this.services.size() ; cnt++ ) {
+			if ( this.services.get(cnt).getServiceId().equals(serviceId))
+				service = this.services.get(cnt);
+		}
+		return service;
+	}
+	
 	public Vector<NetworkInterface> getNetworkInterfaceList() {
 		return interfaces;
 	}
