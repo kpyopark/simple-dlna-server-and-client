@@ -221,7 +221,11 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 				}
 			}
 			if ( isNewService ) {
-				System.out.println("new service is added.[" + newServiceId + "]");
+				System.out.println("new service is added.[" + newServiceId + "] into device[" + this.device.getUuid() + "]");
+				System.out.println("service are below actions & state variables");
+				System.out.println("-------------------------------------------");
+				System.out.println(newService);
+				System.out.println("-------------------------------------------");
 				this.device.addService(newService);
 				this.serviceListUpdated = true;
 			}
@@ -380,6 +384,8 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
 		BasicHttpEntity entity = new BasicHttpEntity();
 		entity.setContent(new ByteArrayInputStream(this.getRequestBody().getBytes("utf-8")));
+		if ( this.device.getAuthorizationStr() != null )
+			request.addHeader("Authorization", "Basic " + this.device.getAuthorizationStr() );
 		return request;
 	}
 	
@@ -401,7 +407,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 				
 				for ( int inx = 0 ; inx < services.size() ; inx++ ) {
 					UPnPService service = services.get(inx);
-					if ( service.isRemote() && service.isReadyToUse() != false && service.isProgressingToRetrieve() != false ) {
+					if ( service.isRemote() && !service.isReadyToUse() && !service.isProgressingToRetrieve() ) {
 						// 원칙적으로 여기에서 Service Description을 가지고 오는것이 아니라,
 						// UPnPDevice에서 새로이 등록된 Service가 있는 경우, Serivce를 Update하는게 이치적으로 맞음
 						// But. 구현시 서버가 추가되어야 하므로 여기서 바로 얻어서 Update하는 것으로 로직 구성

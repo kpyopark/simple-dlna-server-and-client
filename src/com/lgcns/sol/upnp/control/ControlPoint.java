@@ -1,12 +1,14 @@
 package com.lgcns.sol.upnp.control;
 
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Set;
 
 import com.lgcns.sol.upnp.discovery.SSDPMessage;
 import com.lgcns.sol.upnp.exception.AbnormalException;
 import com.lgcns.sol.upnp.model.UPnPDevice;
 import com.lgcns.sol.upnp.model.UPnPDeviceManager;
+import com.lgcns.sol.upnp.model.UPnPService;
 import com.lgcns.sol.upnp.network.CommonReceiveHandler;
 import com.lgcns.sol.upnp.network.CommonReceiver;
 import com.lgcns.sol.upnp.network.CommonSendHandler;
@@ -16,6 +18,8 @@ import com.lgcns.sol.upnp.network.UDPReceiver;
 import com.lgcns.sol.upnp.network.UDPSender;
 import com.lgcns.sol.upnp.server.CommonServer;
 import com.lgcns.sol.upnp.server.SendEvent;
+import com.lgcns.sol.upnp.service.ContentDirectoryItem;
+import com.lgcns.sol.upnp.service.ContentDirectoryService;
 
 public class ControlPoint {
 	
@@ -72,13 +76,27 @@ public class ControlPoint {
 			}
 			*/
 
-			Thread.sleep(5 * 1000);	// After 10 sec.
+			Thread.sleep(10 * 1000);	// After 10 sec.
 			Set<String> uuids = UPnPDeviceManager.getDefaultDeviceManager().getUuidList();
 			for ( String uuid : uuids ) {
-				System.out.println("uuid:" + uuid);
-				System.out.println(UPnPDeviceManager.getDefaultDeviceManager().getDevice(uuid));
+				System.out.println("--->>>uuid:" + uuid);
+				UPnPDevice remoteDevice = UPnPDeviceManager.getDefaultDeviceManager().getDevice(uuid); 
+				System.out.println(remoteDevice);
+				UPnPService service = null;
+				if ( ( service = remoteDevice.getUPnPService(UPnPService.UPNP_SERVICE_ID_CDS) ) != null ) {
+					ContentDirectoryService cds = (ContentDirectoryService)service;
+					try {
+						ArrayList<ContentDirectoryItem> list = cds.browse("0", "", "", 1, 10, "");
+						for ( ContentDirectoryItem item : list ) {
+							System.out.println(item);
+						}
+					} catch ( Exception e ) {
+						e.printStackTrace();
+					}
+				}
 			}
 			receiveServer.stopServer();
+			
 			//sendServer.stopServer();
 
 		} catch ( Exception e ) {

@@ -1,8 +1,12 @@
 package com.lgcns.sol.upnp.description;
 
+import java.io.ByteArrayInputStream;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.BasicHttpEntity;
 
 import com.lgcns.sol.upnp.model.UPnPAction;
 import com.lgcns.sol.upnp.model.UPnPService;
@@ -32,8 +36,20 @@ public class ServiceDescription implements com.lgcns.sol.upnp.network.CommonSend
 	}
 
 	public Object getSendObject() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		HttpPost request = new HttpPost(this.service.getDevice().getAbsoluteURL(this.service.getScpdUrl()));
+		String osVersion = "WindowsNT";
+		String productVersion = "simpledlna/1.0";
+		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		request.addHeader("HOST", this.service.getDevice().getBaseHost() );
+		BasicHttpEntity entity = new BasicHttpEntity();
+		entity.setContent(new ByteArrayInputStream(this.getRequestBody().getBytes("utf-8")));
+		if ( this.service.getDevice().getAuthorizationStr() != null )
+			request.addHeader("Authorization", "Basic " + this.service.getDevice().getAuthorizationStr() );
+		return request;
+	}
+	
+	private String getRequestBody() {
+		return "";
 	}
 
 	public Object processAfterSend(Object returnValue) {

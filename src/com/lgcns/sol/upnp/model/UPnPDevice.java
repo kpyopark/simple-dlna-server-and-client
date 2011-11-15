@@ -2,8 +2,11 @@ package com.lgcns.sol.upnp.model;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import com.lgcns.sol.upnp.common.UPnPUtils;
 
 
 public class UPnPDevice extends UPnPBase {
@@ -40,6 +43,12 @@ public class UPnPDevice extends UPnPBase {
 	boolean isReadyToUse = false;
 	boolean isProgressingToRetrieve = false;
 	NetworkInterface networkInterface = null; 
+	
+	String user;
+	String password;
+	
+	String baseURL;
+	String baseHost;
 	
 	public boolean isProgressingToRetrieve() {
 		return isProgressingToRetrieve;
@@ -157,6 +166,15 @@ public class UPnPDevice extends UPnPBase {
 
 	public void setLocation(String location) {
 		this.location = location;
+		try {
+			URL url = new URL(location);
+			this.baseHost = url.getHost() + ":" + url.getPort();
+			this.baseURL = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+		} catch ( Exception e ) {
+			this.baseURL = location;
+			this.baseHost = location;
+		}
+				
 	}
 
 	public int getCacheControl() {
@@ -205,6 +223,32 @@ public class UPnPDevice extends UPnPBase {
 
 	public void setNetworkInterface(NetworkInterface networkInterface) {
 		this.networkInterface = networkInterface;
+	}
+	
+	public void setUserAndPassword(String user, String password) {
+		this.user = user;
+		this.password = password;
+	}
+	
+	public String getAuthorizationStr() {
+		if ( this.user != null && this.password != null ) {
+			return UPnPUtils.base64encode( this.user + ":" + this.password );
+		}
+		return null;
+	}
+	
+	public String getAbsoluteURL(String orgUrl) {
+		if ( orgUrl.indexOf("http") == 0 ) {
+			return orgUrl;
+		}
+		if ( orgUrl.charAt(0) == '/' ) {
+			return this.baseURL + orgUrl;
+		}
+		return this.baseURL + "/" + orgUrl;
+	}
+	
+	public String getBaseHost() {
+		return this.baseHost;
 	}
 	
 }

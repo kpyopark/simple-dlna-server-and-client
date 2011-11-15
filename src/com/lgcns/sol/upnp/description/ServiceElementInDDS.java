@@ -2,6 +2,7 @@ package com.lgcns.sol.upnp.description;
 
 import com.lgcns.sol.upnp.model.UPnPDevice;
 import com.lgcns.sol.upnp.model.UPnPService;
+import com.lgcns.sol.upnp.service.ContentDirectoryService;
 
 public class ServiceElementInDDS implements ICommonDescription {
 	
@@ -73,7 +74,15 @@ public class ServiceElementInDDS implements ICommonDescription {
 	}
 	
 	public UPnPService getDefaultUPnPService(UPnPDevice device) {
-		UPnPService service = new UPnPService(device);
+		// TODO : modify below lines. It should be made by using factory pattern.
+		UPnPService service = null;
+		if ( this.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_CDS) ) {
+			service = new ContentDirectoryService(device);
+		} else if ( this.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_CMS) ) {
+			service = new UPnPService(device);
+		} else {
+			service = new UPnPService(device);
+		}
 		service.setScpdUrl(this.getScpdUrl());
 		service.setControlUrl(this.getControlUrl());
 		service.setEventsubUrl(this.getEventsubUrl());

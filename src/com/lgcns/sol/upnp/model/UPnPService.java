@@ -1,10 +1,16 @@
 package com.lgcns.sol.upnp.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class UPnPService extends UPnPBase {
 	
 	public static int UPNP_SERVICE_TYPE_CDS = 1;
+	public static int UPNP_SERVICE_TYPE_CMS = 2;
+	
+	public static String UPNP_SERVICE_ID_CDS = "urn:upnp-org:serviceId:ContentDirectory";
+	public static String UPNP_SERVICE_ID_CMS = "urn:upnp-org:serviceId:ConnectionManager";
 	
 	String serviceType;
 	String serviceId;
@@ -68,12 +74,20 @@ public class UPnPService extends UPnPBase {
 		return this.actionList.get(actionName);
 	}
 	
+	public Collection<UPnPAction> getActionList() {
+		return this.actionList.values();
+	}
+	
 	public void registerStateVariable(UPnPStateVariable variable) {
 		this.variableList.put(variable.getName(), variable);
 	}
 	
 	public UPnPStateVariable getStateVariable(String variableName) {
 		return this.variableList.get(variableName);
+	}
+	
+	public Collection<UPnPStateVariable> getStateVariableList() {
+		return this.variableList.values();
 	}
 	
 	public boolean isRemote() {

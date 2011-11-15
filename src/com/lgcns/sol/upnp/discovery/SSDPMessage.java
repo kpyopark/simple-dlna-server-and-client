@@ -181,7 +181,10 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	
 	public UPnPDevice getDeviceBaseInfo() {
 		UPnPDevice device = new UPnPDevice();
-		
+		for ( Iterator<String> keyIter = this.getHeaderKeyIterator() ; keyIter.hasNext() ; ) {
+			String key = keyIter.next();
+			System.out.println(key+":"+this.getHeaderValue(key));
+		}
 		device.setUsn(this.getHeaderValue(ID_UPNP_DISCOVERY_USN));
 		device.setHost(this.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
 		device.setLocation(this.getHeaderValue(ID_UPNP_DISCOVERY_LOCATION));

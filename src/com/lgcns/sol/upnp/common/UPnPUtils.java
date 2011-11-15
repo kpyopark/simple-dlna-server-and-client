@@ -40,6 +40,10 @@ public class UPnPUtils {
 		}
 		return str.toString();
 	}
+	
+	public static String base64encode(String org) {
+		return Base64Coder.encodeString(org);
+	}
 
 	
 }
