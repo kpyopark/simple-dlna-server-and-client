@@ -15,9 +15,12 @@ public class UPnPStateVariable {
 	String name;
 	boolean isUsable;
 	String argumentName;
+	UPnPAllowedValueRange valueRange;
+	ArrayList<Object> allowedValueList;
+	UPnPStateVariable relatedStateVariable;
 	
 	public UPnPStateVariable() {
-		
+		allowedValueList = new ArrayList<Object>();
 	}
 	
 	public UPnPStateVariable(String name, UPnPDataType type, String value) {
@@ -101,6 +104,42 @@ public class UPnPStateVariable {
 
 	public void setArgumentName(String argumentName) {
 		this.argumentName = argumentName;
+	}
+	
+	public void addAllowedValue(Object allowedValue) {
+		this.allowedValueList.add(allowedValue);
+	}
+	
+	public ArrayList<Object> getAllowedValueList() {
+		return this.allowedValueList;
+	}
+	
+	public void clearAllowedVaueList() {
+		this.allowedValueList.clear();
+	}
+	
+	public void setRelatedStateVariable(UPnPStateVariable relatedStateVariable) {
+		this.relatedStateVariable = relatedStateVariable;
+		this.setType(relatedStateVariable.getType());
+		this.setDefaultValue(relatedStateVariable.getDefaultValue());
+		this.setAllowedValueRange(relatedStateVariable.getAllowedValueRange());
+		this.setAllowedValueList(relatedStateVariable.getAllowedValueList());
+	}
+	
+	public UPnPStateVariable getRelatedStateVariable() {
+		return this.relatedStateVariable;
+	}
+	
+	public void setAllowedValueRange(UPnPAllowedValueRange range) {
+		this.valueRange = range;
+	}
+	
+	public UPnPAllowedValueRange getAllowedValueRange() {
+		return this.valueRange;
+	}
+	
+	public void setAllowedValueList(ArrayList<Object> valueList) {
+		this.allowedValueList = valueList;
 	}
 	
 }

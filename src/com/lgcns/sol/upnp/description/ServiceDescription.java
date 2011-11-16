@@ -34,6 +34,10 @@ public class ServiceDescription implements com.lgcns.sol.upnp.network.CommonSend
 		if ( service != null )
 			this.service.registerStateVariable(statVar);
 	}
+	
+	public UPnPStateVariable getStateVariable(String name) {
+		return this.service.getStateVariable(name);
+	}
 
 	public Object getSendObject() throws Exception {
 		HttpPost request = new HttpPost(this.service.getDevice().getAbsoluteURL(this.service.getScpdUrl()));
@@ -75,6 +79,20 @@ public class ServiceDescription implements com.lgcns.sol.upnp.network.CommonSend
 		this.service = service;
 	}
 
+	public String getSpecMajor() {
+		return specMajor;
+	}
 
+	public void setSpecMajor(String specMajor) {
+		this.specMajor = specMajor;
+	}
+
+	public String getSpecMinor() {
+		return specMinor;
+	}
+
+	public void setSpecMinor(String specMinor) {
+		this.specMinor = specMinor;
+	}
 	
 }
