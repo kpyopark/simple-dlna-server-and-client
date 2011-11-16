@@ -8,11 +8,13 @@ public class UPnPDataType extends UPnPBase {
 	
 	public static final String UPNP_DATATYPE_NAME_STRING = "string";
 	public static final String UPNP_DATATYPE_NAME_UI4 = "ui4";
+	public static final String UPNP_DATATYPE_NAME_I4 = "i4";
 	public static final String UPNP_DATATYPE_NAME_URI = "uri";
 	
 	static {
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_STRING, new UPnPDataType(UPNP_DATATYPE_NAME_STRING,String.class));
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_UI4, new UPnPDataType(UPNP_DATATYPE_NAME_UI4, Integer.class));
+		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_I4, new UPnPDataType(UPNP_DATATYPE_NAME_I4,String.class));
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_URI, new UPnPDataType(UPNP_DATATYPE_NAME_URI,String.class));
 	};
 	
