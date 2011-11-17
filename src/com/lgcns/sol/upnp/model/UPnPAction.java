@@ -83,9 +83,10 @@ public class UPnPAction extends UPnPBase {
 	public UPnPStateVariable getInArgument(String argumentName) {
 		int inx = 0;
 		for ( ; inx < inArgs.size() ; inx++ ) {
-			if ( inArgs.get(inx).getArgumentName().equals(argumentName) )
+			if ( inArgs.get(inx).getArgumentName().equalsIgnoreCase(argumentName) )
 				return inArgs.get(inx);
 		}
+		System.out.println("NULL ARGUMENT RETURNED:" + argumentName);
 		return NULL_ARGUMENT;
 	}
 	

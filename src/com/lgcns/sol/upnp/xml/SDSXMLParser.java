@@ -292,6 +292,7 @@ public class SDSXMLParser {
 						}
 					}
 					/* Arguement List */
+					this.description.addAction(action);
 				}
 			}
 			/* ActionList */

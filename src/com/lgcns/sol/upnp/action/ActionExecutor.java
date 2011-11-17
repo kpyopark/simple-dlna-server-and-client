@@ -69,7 +69,7 @@ public class ActionExecutor {
 	}
 	
 	private void findTargetUrl() throws MalformedURLException {
-		this.targetURL = this.action.getService().getControlUrl();
+		this.targetURL = this.action.getService().getDevice().getAbsoluteURL(this.action.getService().getControlUrl());
 	    this.url = new URL( targetURL );   
 	}
 	
@@ -81,8 +81,10 @@ public class ActionExecutor {
 		.append("s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n")
 		.append("<s:Body>\n")
 		.append("<u:" + action.getActionName() + " xmlns:u=\"urn:schemas-upnp-org:service:" + action.getService().getServiceType() + "\">\n");
+		System.out.println("ACTION :" + action.getActionName() );
 		for ( UPnPStateVariable arg : action.getInArguments() ) {
-			sb.append("<" + arg.getName() + ">" + arg.getValue().toString() + "</" + arg.getName() + ">\n");
+			System.out.println("IN ARG :" + arg.getArgumentName() + ":" + arg.getValue());
+			sb.append("<" + arg.getArgumentName() + ">" + ( ( arg.getValue() != null ) ? arg.getValue().toString() : "" ) + "</" + arg.getArgumentName() + ">\n");
 		}
 		sb.append("</u:" + action.getActionName() + ">\n")
 		.append("</s:Body>\n")

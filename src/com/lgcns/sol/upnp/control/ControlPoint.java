@@ -86,7 +86,7 @@ public class ControlPoint {
 				if ( ( service = remoteDevice.getUPnPService(UPnPService.UPNP_SERVICE_ID_CDS) ) != null ) {
 					ContentDirectoryService cds = (ContentDirectoryService)service;
 					try {
-						ArrayList<ContentDirectoryItem> list = cds.browse("0", "", "", 1, 10, "");
+						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 1, 10, "");
 						for ( ContentDirectoryItem item : list ) {
 							System.out.println(item);
 						}
