@@ -229,6 +229,7 @@ public class SDSXMLParser {
 			for (int s = 0; s < nodeActionList.getLength(); s++) {
 				Node fstNode = nodeActionList.item(s);
 				if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element actionNode = (Element)fstNode;
 					UPnPAction action = new UPnPAction(this.description.getService());
 					NodeList children = fstNode.getChildNodes();
 					boolean hasActionName = false;
@@ -239,13 +240,12 @@ public class SDSXMLParser {
 							action.setActionName(child.getFirstChild().getNodeValue());
 						}
 					}
+					System.out.println("-----> action name:" + action.getActionName());
 					if ( hasActionName ) {
 						/* Arguement List */
-						NodeList nodeArgList = doc.getElementsByTagName("argument");
+						NodeList nodeArgList = actionNode.getElementsByTagName("argument");
 						for (int q = 0; q < nodeArgList.getLength(); q++) {
 							Node argNode = nodeArgList.item(q);
-							System.out.println("  --Information of argumentList"
-									+ q + " start --");
 
 							if (argNode.getNodeType() == Node.ELEMENT_NODE) {
 								UPnPStateVariable arg = new UPnPStateVariable();
@@ -273,7 +273,6 @@ public class SDSXMLParser {
 									} else {
 										action.addOutArgument(arg);
 									}
-									System.out.println("direction : " + direction);
 								}
 
 								/* relatedStateVariable */
@@ -286,9 +285,8 @@ public class SDSXMLParser {
 									UPnPStateVariable relStatVar = this.description.getStateVariable(((Node) icon3rdNm.item(0)).getNodeValue());
 									arg.setRelatedStateVariable(relStatVar);
 								}
+								System.out.println("--------->" + arg.getArgumentName()+":" + direction + ":" + arg.getRelatedStateVariable().getName() );
 							}
-							System.out.println("  --Information of argumentList"
-									+ q + " end --");
 						}
 					}
 					/* Arguement List */

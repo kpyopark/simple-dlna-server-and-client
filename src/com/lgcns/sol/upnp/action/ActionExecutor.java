@@ -5,6 +5,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,13 +48,25 @@ public class ActionExecutor {
 		    conn.setRequestMethod("POST");   
 		    conn.setDoOutput( true );   
 		    conn.setDoInput( true );    
-		    conn.setRequestProperty( "Content-Type", "text/xml; charset=utf-8" );   
+			conn.setRequestProperty("HOST", this.action.getService().getDevice().getBaseHost() );
+		    conn.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"" );   
 			// 3. Create SOAP body
 		    String reqStr = makeSoapBody();  
 		    int len = reqStr.length();   
-		    conn.setRequestProperty( "Content-Length", Integer.toString( len ) );   
+		    conn.setRequestProperty("Content-Length", Integer.toString( len ) );   
 		    conn.setRequestProperty("SOAPAction", action.getService().getServiceType() + "#" + action.getActionName() );   
-	
+		    
+		    Map<String,List<String>> props = conn.getRequestProperties();
+		    Iterator<String> keyIter = props.keySet().iterator();
+		    while ( keyIter.hasNext() ) {
+		    	String key = keyIter.next();
+		    	List<String> values = props.get(key);
+		    	for ( int cnt = 0 ; cnt < values.size() ; cnt++ ) {
+		    		System.out.println("--->[" + key + "]:[" + values.get(cnt) + "]" );
+		    	}
+		    }
+		    System.out.println(reqStr);
+		    
 		    // 4. Flush
 			conn.connect();       
 			requestWriter = new OutputStreamWriter( conn.getOutputStream() );    
@@ -80,7 +95,7 @@ public class ActionExecutor {
 		.append("xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\"\n")
 		.append("s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n")
 		.append("<s:Body>\n")
-		.append("<u:" + action.getActionName() + " xmlns:u=\"urn:schemas-upnp-org:service:" + action.getService().getServiceType() + "\">\n");
+		.append("<u:" + action.getActionName() + " xmlns:u=\"" + action.getService().getServiceType() + "\">\n");
 		System.out.println("ACTION :" + action.getActionName() );
 		for ( UPnPStateVariable arg : action.getInArguments() ) {
 			System.out.println("IN ARG :" + arg.getArgumentName() + ":" + arg.getValue());

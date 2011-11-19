@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -400,6 +401,10 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 			System.out.println("Device Description Response Status value:" + response.getStatusLine().getStatusCode() );
 			if ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
 				HttpEntity entity = response.getEntity();
+				Header[] headers = response.getAllHeaders();
+				for ( int cnt = 0 ; cnt < headers.length; cnt++ ) {
+					System.out.println( headers[cnt].getName() + ":" + headers[cnt].getValue());
+				}
 				DDSXMLParser parser = new DDSXMLParser(this, entity.getContent());
 				parser.execute();
 				
