@@ -25,6 +25,7 @@ public class UPnPUtils {
 	}
 	
 	public static String escapeXML(String s) {
+		/*
 		StringBuffer str = new StringBuffer();
 		int len = (s != null) ? s.length() : 0;
 		for (int i=0; i<len; i++) {
@@ -39,6 +40,13 @@ public class UPnPUtils {
 			}
 		}
 		return str.toString();
+		*/
+		// replaced with apache's common utils.
+		return org.apache.commons.lang.StringEscapeUtils.escapeXml(s);
+	}
+	
+	public static String unescapeXML(String s) {
+		return org.apache.commons.lang.StringEscapeUtils.unescapeXml(s);
 	}
 	
 	public static String base64encode(String org) {

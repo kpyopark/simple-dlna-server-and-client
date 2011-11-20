@@ -198,6 +198,7 @@ public class ContentDirectoryService extends UPnPService {
 		try {
 			factory.setNamespaceAware(true);
 			parser = factory.newDocumentBuilder();
+			System.out.println("DIDLXML:" + didlXML);
 			doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
 			
 			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;

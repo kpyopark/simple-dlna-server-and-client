@@ -140,9 +140,25 @@ public class ActionExecutor {
 				</s:Body>
 				</s:Envelope>
 				*/
+				// For debuging. We want to see the response of dlna server.
+				/*
+				Map<String,List<String>> props = conn.getHeaderFields();
+				Iterator<String> keyIter = props.keySet().iterator();
+				while( keyIter.hasNext() ) {
+					String key = keyIter.next();
+					System.out.println("----> Response:[" + key + "]:[" + props.get(key));
+				}
+				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				String aLine;
+				while( ( aLine = br.readLine() ) != null) {
+					System.out.println("----> response:" + aLine);
+				}
+				br.close();
+				*/
+				factory.setNamespaceAware(true);
 				parser = factory.newDocumentBuilder();
 				doc = parser.parse(conn.getInputStream());
-				actionResponseNode = doc.getElementsByTagName(action.getActionName() + "Response");
+				actionResponseNode = doc.getElementsByTagNameNS("*",action.getActionName() + "Response");
 				if ( actionResponseNode != null ) {
 					actionResponseElement = (Element)actionResponseNode.item(0);
 					NodeList outArgs = actionResponseElement.getChildNodes();
@@ -151,7 +167,7 @@ public class ActionExecutor {
 							Node node = outArgs.item(inx);
 							if ( node.getNodeType() == Node.ELEMENT_NODE ) {
 								String argName = node.getNodeName();
-								String argValue = UPnPUtils.escapeXML(node.getFirstChild().getNodeValue());
+								String argValue = UPnPUtils.unescapeXML(node.getFirstChild().getNodeValue());
 								UPnPStateVariable outArg = action.getOutArgument(argName);
 								outArg.setValue(argValue);
 							}
