@@ -1,5 +1,6 @@
 package com.lgcns.sol.upnp.action;
 
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -44,12 +45,15 @@ public class ActionExecutor {
 			// 1. find target URL.
 			findTargetUrl();
 			// 2. Open connection and make Http Header.
+			String osVersion = "WindowsNT";
+			String productVersion = "simpledlna/1.0";
 		    conn = (HttpURLConnection)url.openConnection();   
 		    conn.setRequestMethod("POST");   
 		    conn.setDoOutput( true );   
 		    conn.setDoInput( true );    
 			conn.setRequestProperty("HOST", this.action.getService().getDevice().getBaseHost() );
 		    conn.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"" );   
+		    conn.setRequestProperty("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
 			// 3. Create SOAP body
 		    String reqStr = makeSoapBody();  
 		    int len = reqStr.length();   
@@ -85,6 +89,7 @@ public class ActionExecutor {
 	
 	private void findTargetUrl() throws MalformedURLException {
 		this.targetURL = this.action.getService().getDevice().getAbsoluteURL(this.action.getService().getControlUrl());
+		System.out.println("-----> action url:" + this.targetURL );
 	    this.url = new URL( targetURL );   
 	}
 	
@@ -163,6 +168,29 @@ public class ActionExecutor {
 				throw ex;
 			}
 		} else {
+			System.out.println("---> response code:" + conn.getResponseCode());
+			BufferedReader br = null;
+			try {
+				// 1. print HTTP header.
+				Map<String,List<String>> props = conn.getHeaderFields();
+				Iterator<String> iterKey = props.keySet().iterator();
+				while( iterKey.hasNext() ) {
+					String key = iterKey.next();
+					System.out.println("---->> ERROR:[" + key + "]:" + props.get(key));
+				}
+				// 2. print body.
+				br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				String aLine = null;
+				while( ( aLine = br.readLine() ) != null ) {
+					System.out.println("---->> ERROR:" + aLine );
+				}
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			} finally {
+				try { 
+					if ( br != null ) br.close();
+				} catch ( Exception ie ) {}
+			}
 			throw new Exception(conn.getResponseMessage());
 		}
 	}
