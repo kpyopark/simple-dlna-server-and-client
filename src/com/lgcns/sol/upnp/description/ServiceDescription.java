@@ -64,6 +64,8 @@ public class ServiceDescription implements com.lgcns.sol.upnp.network.CommonSend
 				SDSXMLParser parser = new SDSXMLParser(this, entity.getContent());
 				parser.execute();
 				
+				if(this.service!=null)
+					this.service.printAllDescirption();
 			}
 		} catch ( Exception e ) {
 			
@@ -94,5 +96,5 @@ public class ServiceDescription implements com.lgcns.sol.upnp.network.CommonSend
 	public void setSpecMinor(String specMinor) {
 		this.specMinor = specMinor;
 	}
-	
+
 }

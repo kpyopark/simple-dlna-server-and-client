@@ -407,6 +407,7 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 				}
 				DDSXMLParser parser = new DDSXMLParser(this, entity.getContent());
 				parser.execute();
+				PrintAllValue();
 				
 				Vector<UPnPService> services = this.getDevice().getSerivces();
 				
@@ -495,4 +496,22 @@ public class DeviceDescription implements com.lgcns.sol.upnp.network.CommonSendH
 		return sb.toString();
 	}
 
+	public void PrintAllValue(){
+		if(this.configNumber!="") System.out.println(this.configNumber);
+		if(this.specMajor!="") System.out.println(this.specMajor);
+		if(this.specMinor!="") System.out.println(this.specMinor);
+		if(this.friendlyName!="") System.out.println(this.friendlyName);
+		if(this.manufacturerName!="") System.out.println(this.manufacturerName);
+		if(this.manufacturerUrl!="") System.out.println(this.manufacturerUrl);
+		if(this.model!="") System.out.println(this.model);
+		if(this.modelName!="") System.out.println(this.modelName);
+		if(this.modelNumber!="") System.out.println(this.modelNumber);
+		if(this.modelUrl!="") System.out.println(this.modelUrl);
+		if(this.modelDescription!="") System.out.println(this.modelDescription);
+		if(this.deviceType!="") System.out.println(this.deviceType);
+		if(this.presentationURL!="") System.out.println(this.presentationURL);
+		if(this.configNumber!="") System.out.println(this.configNumber);
+		if(this.configNumber!="") System.out.println(this.configNumber);
+	}
+	
 }

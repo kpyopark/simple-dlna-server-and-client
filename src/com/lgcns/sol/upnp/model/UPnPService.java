@@ -115,5 +115,15 @@ public class UPnPService extends UPnPBase {
 		this.device = device;
 	}
 
-
+	public void printAllDescirption(){
+		if(this.versionMajor!="") System.out.println(this.versionMajor);
+		if(this.versionMinor!="") System.out.println(this.versionMinor);
+		if(this.serviceId!="") System.out.println(this.serviceId);
+		if(this.scpdUrl!="") System.out.println(this.scpdUrl);
+		if(this.controlUrl!="") System.out.println(this.controlUrl);
+		if(this.eventsubUrl!="") System.out.println(this.eventsubUrl);
+		System.out.println(this.isRemote);
+		System.out.println(this.isReadyToUse);
+		System.out.println(this.isProgressingToRetrieve);
+	}
 }
