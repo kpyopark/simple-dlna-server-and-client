@@ -88,7 +88,7 @@ public class ControlPoint {
 					try {
 						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 0, 0, "");
 						for ( ContentDirectoryItem item : list ) {
-							System.out.println(item);
+							testBrowseRecursively(cds,item,0);
 						}
 					} catch ( Exception e ) {
 						e.printStackTrace();
@@ -103,6 +103,20 @@ public class ControlPoint {
 			e.printStackTrace();
 		} catch ( AbnormalException abe ) {
 			abe.printStackTrace();
+		}
+	}
+	
+	private void testBrowseRecursively(ContentDirectoryService cds, ContentDirectoryItem parent,int depth) throws Exception {
+		String padding = "";
+		for ( int cnt = 0 ; cnt < depth ; cnt++ ) {
+			padding += "--";
+		}
+		System.out.println(padding + parent);
+		if ( parent.getType() == ContentDirectoryItem.CDS_TYPE_CONTAINER ) {
+			ArrayList<ContentDirectoryItem> items = cds.browse(parent.getId() , "BrowseDirectChildren", "*", 0, 0, "");
+			for ( ContentDirectoryItem child : items ) {
+				testBrowseRecursively(cds, child, depth+1);
+			}
 		}
 	}
 	

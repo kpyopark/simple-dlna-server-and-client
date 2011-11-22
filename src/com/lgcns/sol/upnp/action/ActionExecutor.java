@@ -54,6 +54,9 @@ public class ActionExecutor {
 			conn.setRequestProperty("HOST", this.action.getService().getDevice().getBaseHost() );
 		    conn.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"" );   
 		    conn.setRequestProperty("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+			if ( this.action.getService().getDevice().getAuthorizationStr() != null )
+				conn.setRequestProperty("Authorization", "Basic " + this.action.getService().getDevice().getAuthorizationStr() );
+
 			// 3. Create SOAP body
 		    String reqStr = makeSoapBody();  
 		    int len = reqStr.length();   
