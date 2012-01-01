@@ -7,7 +7,7 @@ import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.CommonReceiveHandler;
+import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
 import com.elevenquest.sol.upnp.network.CommonReceiver;
 import com.elevenquest.sol.upnp.network.CommonSender;
 import com.elevenquest.sol.upnp.network.UDPReceiver;
@@ -31,7 +31,7 @@ public class SsdpControlPointServer {
 				// 1. Next, create ssdp message receiver & handler instance.
 				CommonReceiver receiver = new UDPReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
 						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
-				CommonReceiveHandler handler = new SSDPMessage();
+				ICommonReceiveHandler handler = new SSDPMessage();
 				receiver.addReceiveHandler(handler);
 				// 2. Create Common server
 				CommonServer receiveServer = new CommonServer();

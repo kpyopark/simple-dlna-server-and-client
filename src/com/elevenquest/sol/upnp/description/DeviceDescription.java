@@ -16,12 +16,12 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.network.CommonSendHandler;
+import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 import com.elevenquest.sol.upnp.network.CommonSender;
 import com.elevenquest.sol.upnp.network.HTTPSender;
 import com.elevenquest.sol.upnp.xml.DDSXMLParser;
 
-public class DeviceDescription implements com.elevenquest.sol.upnp.network.CommonSendHandler {
+public class DeviceDescription implements com.elevenquest.sol.upnp.network.ICommonSendHandler {
 	
 	static final String DEVICE_DESCRIPTION_CONFIG_NUMBER = "0";
 	static final String DEVICE_DESCRIPTION_SPECVER_MAJOR = "1";
@@ -427,7 +427,7 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.Commo
 							public void run() {
 								try {
 									CommonSender sender = new HTTPSender(inner.getDevice().getNetworkInterface(),inner.getScpdUrl());
-									CommonSendHandler handler = new ServiceDescription(inner);
+									ICommonSendHandler handler = new ServiceDescription(inner);
 									sender.setSenderHandler(handler);
 									sender.sendData();
 								} catch ( Exception e ) {

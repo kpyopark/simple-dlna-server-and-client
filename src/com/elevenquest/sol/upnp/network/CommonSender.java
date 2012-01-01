@@ -5,9 +5,9 @@ import java.util.Observer;
 
 public abstract class CommonSender implements Observer {
 	
-	CommonSendHandler handler = null;
+	ICommonSendHandler handler = null;
 	
-	public void setSenderHandler(CommonSendHandler handler) {
+	public void setSenderHandler(ICommonSendHandler handler) {
 		this.handler = handler;
 	}
 	

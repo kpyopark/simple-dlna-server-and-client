@@ -6,7 +6,7 @@ import java.util.Set;
 import com.elevenquest.sol.upnp.description.DeviceDescription;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
-import com.elevenquest.sol.upnp.network.CommonSendHandler;
+import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 import com.elevenquest.sol.upnp.network.CommonSender;
 import com.elevenquest.sol.upnp.network.HTTPSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
@@ -80,7 +80,7 @@ public class UPnPDeviceManager {
 		public void run() {
 			try {
 				CommonSender sender = new HTTPSender(innerDevice.getNetworkInterface(),innerDevice.getLocation());
-				CommonSendHandler handler = new DeviceDescription(innerDevice);
+				ICommonSendHandler handler = new DeviceDescription(innerDevice);
 				sender.setSenderHandler(handler);
 				sender.sendData();
 			} catch ( Exception e ) {

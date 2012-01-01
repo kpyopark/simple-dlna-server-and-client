@@ -9,9 +9,9 @@ import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.network.CommonReceiveHandler;
+import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
 import com.elevenquest.sol.upnp.network.CommonReceiver;
-import com.elevenquest.sol.upnp.network.CommonSendHandler;
+import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 import com.elevenquest.sol.upnp.network.CommonSender;
 import com.elevenquest.sol.upnp.network.HTTPSender;
 import com.elevenquest.sol.upnp.network.UDPReceiver;
@@ -37,41 +37,6 @@ public class ControlPoint {
 	public void start() {
 		startSsdpServer();
 		startGenaServer();
-	}
-	
-	/**
-	 * It's not used. just for testment.
-	 * @deprecated
-	 */
-	public void testSsdpSenderServer() {
-		try {
-			NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
-			UPnPDevice device = new UPnPDevice();
-			
-			device.addNetworkInterface(intf);
-			device.setModelSerial("abcdefg");
-			device.setMulticastPort(UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
-			device.setUpc("1029101");
-			device.setUuid("1234567890");
-			device.setMultiCastAddress(UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS);
-			CommonServer sendServer = null;
-			// Sample Code for sender.
-			{
-				CommonSender sender = new UDPSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
-				CommonSendHandler handler = new SSDPMessage(device);
-				sender.setSenderHandler(handler);
-				
-				sendServer = new CommonServer();
-				
-				sendServer.setSender(sender, new SendEvent(SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED, 500));
-				
-				sendServer.startServer();
-			}
-		} catch ( AbnormalException abe ) {
-			abe.printStackTrace();
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
 	}
 	
 	public void startSsdpServer() {
@@ -129,6 +94,33 @@ public class ControlPoint {
 		printDeviceState();
 		if ( ssdpServer != null )
 			ssdpServer.stop();
+	}
+	
+	public void sendDeviceSearchMessage() {
+		try {
+			NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
+			UPnPDevice device = new UPnPDevice();
+			
+			device.setMulticastPort(UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
+			device.setMultiCastAddress(UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS);
+			CommonServer sendServer = null;
+			// Sample Code for sender.
+			{
+				CommonSender sender = new UDPSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
+				ICommonSendHandler handler = new SSDPMessage(device);
+				sender.setSenderHandler(handler);
+				
+				sendServer = new CommonServer();
+				
+				sendServer.setSender(sender, new SendEvent(SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED, 500));
+				
+				sendServer.startServer();
+			}
+		} catch ( AbnormalException abe ) {
+			abe.printStackTrace();
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**

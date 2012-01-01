@@ -5,9 +5,9 @@ import java.util.Vector;
 
 public abstract class CommonReceiver {
 
-	Vector<CommonReceiveHandler> handlerList = new Vector<CommonReceiveHandler>();
+	Vector<ICommonReceiveHandler> handlerList = new Vector<ICommonReceiveHandler>();
 
-	public void addReceiveHandler(CommonReceiveHandler handler) {
+	public void addReceiveHandler(ICommonReceiveHandler handler) {
 		this.handlerList.add(handler);
 	}
 	
@@ -54,7 +54,7 @@ public abstract class CommonReceiver {
 	 * @param packet
 	 */
 	public void process(Object packet) {
-		for ( CommonReceiveHandler handler : this.handlerList ) {
+		for ( ICommonReceiveHandler handler : this.handlerList ) {
 			handler.process(packet);
 		}
 	}

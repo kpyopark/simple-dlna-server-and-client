@@ -13,7 +13,7 @@ import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
 import com.elevenquest.sol.upnp.xml.SDSXMLParser;
 
-public class ServiceDescription implements com.elevenquest.sol.upnp.network.CommonSendHandler {
+public class ServiceDescription implements com.elevenquest.sol.upnp.network.ICommonSendHandler {
 	
 	String specMajor;
 	String specMinor;

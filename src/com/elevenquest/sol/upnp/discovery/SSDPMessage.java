@@ -9,10 +9,10 @@ import java.util.Iterator;
 
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
-import com.elevenquest.sol.upnp.network.CommonReceiveHandler;
-import com.elevenquest.sol.upnp.network.CommonSendHandler;
+import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
+import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 
-public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
+public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 	String startLine = null;
 	HashMap<String, String> headerList = new HashMap<String, String>();
 	boolean needValidation = false;
@@ -29,6 +29,8 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	public final static String ID_UPNP_DISCOVERY_NT_SUBTYPE = "NTS";
 	public final static String ID_UPNP_DISCOVERY_SERVER = "SERVER";
 	public final static String ID_UPNP_DISCOVERY_USN = "USN";
+	
+	
 	
 	public final static String ID_START_LINE_NOTIFY = "NOTIFY * HTTP/1.1";
 	public final static String ID_START_LINE_SEARCH = "M-SEARCH * HTTP/1.1";
@@ -90,18 +92,6 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	
 	public Iterator<String> getHeaderKeyIterator() {
 		return this.headerList.keySet().iterator();
-	}
-	
-	public byte[] toBytes() {
-		StringBuffer fullMessage = new StringBuffer();
-		// append start header.
-		fullMessage.append(startLine).append('\n');
-		// append other header list.
-		for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
-			String key = keyIter.next();
-			fullMessage.append(key).append(':').append(headerList.get(key)).append('\n');
-		}
-		return fullMessage.toString().getBytes();
 	}
 	
 	public boolean parse(byte[] content) throws Exception {
@@ -171,7 +161,15 @@ public class SSDPMessage implements CommonReceiveHandler, CommonSendHandler {
 	}
 
 	public Object getSendObject() throws Exception {
-		return this.toBytes();
+		StringBuffer fullMessage = new StringBuffer();
+		// append start header.
+		fullMessage.append(startLine).append('\n');
+		// append other header list.
+		for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
+			String key = keyIter.next();
+			fullMessage.append(key).append(':').append(headerList.get(key)).append('\n');
+		}
+		return fullMessage.toString().getBytes();
 	}
 
 	public Object processAfterSend(Object returnValue) {

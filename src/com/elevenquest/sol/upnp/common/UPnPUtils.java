@@ -2,13 +2,91 @@ package com.elevenquest.sol.upnp.common;
 
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.StringTokenizer;
 
 public class UPnPUtils {
 	
+	private static void fillHexStringFromByte(StringBuffer sb, byte value) {
+		byte high = (byte)(value >> 8);
+		byte low = (byte)(value & 0x0f);
+		if ( high > 9 ) {
+			sb.append('a' + high - 10);
+		} else {
+			sb.append('0' + high );
+		}
+		if ( low > 9 ) {
+			sb.append('a' + low - 10);
+		} else {
+			sb.append('0' + low);
+		}
+	}
+	
 	public static String getRandomUuid() {
-		// TODO : Modify this. below text is just a sample. but its format is right.
-		return "2fac1234-31f8-11b4-a222-08002b34c003";
+		NetworkInterface validOne = null;
+		byte[] uuidBytes = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+		try {
+			Enumeration<NetworkInterface> intfs = NetworkInterface.getNetworkInterfaces();
+			while( intfs.hasMoreElements() ) {
+				validOne = intfs.nextElement();
+				if ( !validOne.isLoopback() && !validOne.isVirtual() ) {
+					break;
+				}
+			}
+		} catch ( Exception e ) {
+			// If you can't take the valid network interface,
+			// use common network interface;
+		}
+		int pos = 0;
+		byte[] mac = {0,0,0,0,0,0,0,0}; 
+		if ( validOne != null ) {
+			try {
+				mac = validOne.getHardwareAddress();
+			} catch ( Exception e ) {
+				// If you can't take the valid MAC address from the hardware
+				// use common MAC address.
+			}
+		}
+		// 1. setting the mac address
+		for ( int inx = 0 ; inx < mac.length ; inx++ ) {
+			uuidBytes[pos++] = mac[inx];
+		}
+		// 2. calculate the datetime stamp.
+		long timestamp = System.currentTimeMillis();
+		uuidBytes[8] = (byte)((timestamp >> 56) & 0xff);
+		uuidBytes[9] = (byte)((timestamp >> 48) & 0xff);
+		uuidBytes[10] = (byte)((timestamp >> 40) & 0xff);
+		uuidBytes[11] = (byte)((timestamp >> 32) & 0xff);
+		uuidBytes[12] = (byte)((timestamp >> 24) & 0xff);
+		uuidBytes[13] = (byte)((timestamp >> 16) & 0xff);
+		uuidBytes[14] = (byte)((timestamp >> 8) & 0xff);
+		uuidBytes[15] = (byte)((timestamp >> 0) & 0xff);
+		
+		// 3. convert to string
+		StringBuffer sb = new StringBuffer();
+		fillHexStringFromByte(sb,uuidBytes[0]);
+		fillHexStringFromByte(sb,uuidBytes[1]);
+		fillHexStringFromByte(sb,uuidBytes[2]);
+		fillHexStringFromByte(sb,uuidBytes[3]);
+		sb.append("-");
+		fillHexStringFromByte(sb,uuidBytes[4]);
+		fillHexStringFromByte(sb,uuidBytes[5]);
+		sb.append("-");
+		fillHexStringFromByte(sb,uuidBytes[6]);
+		fillHexStringFromByte(sb,uuidBytes[7]);
+		sb.append("-");
+		fillHexStringFromByte(sb,uuidBytes[8]);
+		fillHexStringFromByte(sb,uuidBytes[9]);
+		sb.append("-");
+		fillHexStringFromByte(sb,uuidBytes[10]);
+		fillHexStringFromByte(sb,uuidBytes[11]);
+		fillHexStringFromByte(sb,uuidBytes[12]);
+		fillHexStringFromByte(sb,uuidBytes[13]);
+		fillHexStringFromByte(sb,uuidBytes[14]);
+		fillHexStringFromByte(sb,uuidBytes[15]);
+		
+		return sb.toString();
+		//return "2fac1234-31f8-11b4-a222-08002b34c003";
 	}
 	
 	public static ArrayList<String> getTokenizedCSVElements(String csvValue) {
