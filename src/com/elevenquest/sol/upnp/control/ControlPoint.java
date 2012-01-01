@@ -18,21 +18,34 @@ import com.elevenquest.sol.upnp.network.UDPReceiver;
 import com.elevenquest.sol.upnp.network.UDPSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
 import com.elevenquest.sol.upnp.server.SendEvent;
+import com.elevenquest.sol.upnp.server.SsdpControlPointServer;
 import com.elevenquest.sol.upnp.service.ContentDirectoryItem;
 import com.elevenquest.sol.upnp.service.ContentDirectoryService;
 
+/**
+ * 
+ * Retrieves device and service descriptions, sends actions to services, polls for service state variables, and receives events from services
+ * 
+ * @author Administrator
+ * 
+ *
+ */
 public class ControlPoint {
 	
+	SsdpControlPointServer ssdpServer = null;
+
 	public void start() {
 		startSsdpServer();
 		startGenaServer();
 	}
 	
-	public void startSsdpServer() {
+	/**
+	 * It's not used. just for testment.
+	 * @deprecated
+	 */
+	public void testSsdpSenderServer() {
 		try {
-			// 1. first get the default network interface. (such as eth0)
 			NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
-
 			UPnPDevice device = new UPnPDevice();
 			
 			device.addNetworkInterface(intf);
@@ -41,27 +54,7 @@ public class ControlPoint {
 			device.setUpc("1029101");
 			device.setUuid("1234567890");
 			device.setMultiCastAddress(UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS);
-
-			CommonServer receiveServer = null;
 			CommonServer sendServer = null;
-			// Sample Code for receiver.
-			{
-				// 2. Next, create receiver & handler instance.
-				CommonReceiver receiver = new UDPReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
-						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
-				CommonReceiveHandler handler = new SSDPMessage();
-				receiver.addReceiveHandler(handler);
-				
-				// 3. Create Common server
-				receiveServer = new CommonServer();
-				
-				// 4. set receiver into server.
-				receiveServer.setReceiver(receiver);
-				
-				// 5. start server.
-				receiveServer.startServer();
-			}
-			/*
 			// Sample Code for sender.
 			{
 				CommonSender sender = new UDPSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
@@ -74,36 +67,18 @@ public class ControlPoint {
 				
 				sendServer.startServer();
 			}
-			*/
-
-			Thread.sleep(10 * 1000);	// After 10 sec.
-			Set<String> uuids = UPnPDeviceManager.getDefaultDeviceManager().getUuidList();
-			for ( String uuid : uuids ) {
-				System.out.println("--->>>uuid:" + uuid);
-				UPnPDevice remoteDevice = UPnPDeviceManager.getDefaultDeviceManager().getDevice(uuid); 
-				System.out.println(remoteDevice);
-				UPnPService service = null;
-				if ( ( service = remoteDevice.getUPnPService(UPnPService.UPNP_SERVICE_ID_CDS) ) != null ) {
-					ContentDirectoryService cds = (ContentDirectoryService)service;
-					try {
-						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 0, 0, "");
-						for ( ContentDirectoryItem item : list ) {
-							testBrowseRecursively(cds,item,0);
-						}
-					} catch ( Exception e ) {
-						e.printStackTrace();
-					}
-				}
-			}
-			receiveServer.stopServer();
-			
-			//sendServer.stopServer();
-
-		} catch ( Exception e ) {
-			e.printStackTrace();
 		} catch ( AbnormalException abe ) {
 			abe.printStackTrace();
+		} catch ( Exception e ) {
+			e.printStackTrace();
 		}
+	}
+	
+	public void startSsdpServer() {
+		if ( ssdpServer != null )
+			ssdpServer.stop();
+		ssdpServer = new SsdpControlPointServer();
+		ssdpServer.start();
 	}
 	
 	private void testBrowseRecursively(ContentDirectoryService cds, ContentDirectoryItem parent,int depth) throws Exception {
@@ -124,6 +99,38 @@ public class ControlPoint {
 		
 	}
 	
+	private void printDeviceState() {
+		try {
+			Thread.sleep(10 * 1000);	// After 10 sec.
+			Set<String> uuids = UPnPDeviceManager.getDefaultDeviceManager().getUuidList();
+			for ( String uuid : uuids ) {
+				System.out.println("--->>>uuid:" + uuid);
+				UPnPDevice remoteDevice = UPnPDeviceManager.getDefaultDeviceManager().getDevice(uuid); 
+				System.out.println(remoteDevice);
+				UPnPService service = null;
+				if ( ( service = remoteDevice.getUPnPService(UPnPService.UPNP_SERVICE_ID_CDS) ) != null ) {
+					ContentDirectoryService cds = (ContentDirectoryService)service;
+					try {
+						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 0, 0, "");
+						for ( ContentDirectoryItem item : list ) {
+							testBrowseRecursively(cds,item,0);
+						}
+					} catch ( Exception e ) {
+						e.printStackTrace();
+					}
+				}
+			}
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void stop() {
+		printDeviceState();
+		if ( ssdpServer != null )
+			ssdpServer.stop();
+	}
+	
 	/**
 	 * For Testing.
 	 * @param args
@@ -131,6 +138,7 @@ public class ControlPoint {
 	public static void main(String[] args) {
 		ControlPoint cp = new ControlPoint();
 		cp.start();
+		cp.stop();
 	}
 
 	

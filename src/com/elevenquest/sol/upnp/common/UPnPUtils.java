@@ -1,5 +1,6 @@
 package com.elevenquest.sol.upnp.common;
 
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -52,6 +53,20 @@ public class UPnPUtils {
 	public static String base64encode(String org) {
 		return Base64Coder.encodeString(org);
 	}
+	
+	static ArrayList<NetworkInterface> AVAIL_INTERFACES = new ArrayList<NetworkInterface>();
 
+	public static ArrayList<NetworkInterface> getAvailiableNetworkInterfaces() {
+		if ( AVAIL_INTERFACES.size() == 0 ) {
+			// TODO : MODIFY BELOW LINES.
+			try {
+				AVAIL_INTERFACES.add(NetworkInterface.getNetworkInterfaces().nextElement());
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+			//AVAIL_INTERFACES.addAll(NetworkInterface.getNetworkInterfaces());
+		}
+		return AVAIL_INTERFACES;
+	}
 	
 }
