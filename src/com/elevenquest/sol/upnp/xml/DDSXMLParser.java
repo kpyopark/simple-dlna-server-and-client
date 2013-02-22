@@ -37,6 +37,8 @@ public class DDSXMLParser {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(xmlInputStream);
 			doc.getDocumentElement().normalize();
+			System.out.println("Base URI :" + doc.getBaseURI());
+			System.out.println("Full text: \n" + doc.getTextContent());
 			System.out.println("Root element "
 					+ doc.getDocumentElement().getNodeName());
 

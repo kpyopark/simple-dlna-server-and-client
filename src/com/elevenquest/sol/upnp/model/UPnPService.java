@@ -122,8 +122,8 @@ public class UPnPService extends UPnPBase {
 		if(this.scpdUrl!="") System.out.println(this.scpdUrl);
 		if(this.controlUrl!="") System.out.println(this.controlUrl);
 		if(this.eventsubUrl!="") System.out.println(this.eventsubUrl);
-		System.out.println(this.isRemote);
-		System.out.println(this.isReadyToUse);
-		System.out.println(this.isProgressingToRetrieve);
+		System.out.println("isRemote Service:"+this.isRemote);
+		System.out.println("isReadyToUse :"+this.isReadyToUse);
+		System.out.println("isProgressingToRetrieve :"+this.isProgressingToRetrieve);
 	}
 }

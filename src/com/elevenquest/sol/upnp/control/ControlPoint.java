@@ -91,7 +91,6 @@ public class ControlPoint {
 	}
 	
 	public void stop() {
-		printDeviceState();
 		if ( ssdpServer != null )
 			ssdpServer.stop();
 	}
@@ -130,6 +129,10 @@ public class ControlPoint {
 	public static void main(String[] args) {
 		ControlPoint cp = new ControlPoint();
 		cp.start();
+		for ( int count = 0; count < 1000 ; count++ )
+		{
+			cp.printDeviceState();
+		}
 		cp.stop();
 	}
 

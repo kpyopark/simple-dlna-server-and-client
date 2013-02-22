@@ -94,7 +94,7 @@ public class UPnPDeviceManager {
 			UPnPDevice device = this.deviceList.values().iterator().next();
 			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() == false ) {
 				System.out.println("Update Remote Device..[" + device.getUuid() + "]" );
-				device.setUserAndPassword("toheaven01@korea.com", "1q2w3e4r");
+				//device.setUserAndPassword("toheaven01@korea.com", "1q2w3e4r");
 				device.setProgressingToRetrieve(true);
 				Thread oneTimeThread = new SampleTread(device);
 				oneTimeThread.start();

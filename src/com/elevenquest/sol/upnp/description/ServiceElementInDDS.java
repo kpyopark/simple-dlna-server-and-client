@@ -28,9 +28,11 @@ public class ServiceElementInDDS implements ICommonDescription {
 	String eventsubUrl;
 	
 	public String getDescription() {
-		// TODO : Replace all replaceable parts.
-		// TODO : Or replace all structure to XML builder such as DOM parser.
-		return DEVICE_DESCRIPTION_SERVICE_TEMPLATE;
+		return DEVICE_DESCRIPTION_SERVICE_TEMPLATE.replace(SD_REPLACEABLE_PART_SERVICE_TYPE, this.serviceType)
+				.replace(SD_REPLACEABLE_PART_SERVICE_ID, this.serviceId)
+				.replace(SD_REPLACEABLE_PART_SCPD_URL, this.scpdUrl)
+				.replace(SD_REPLACEABLE_PART_CONTROL_URL, this.controlUrl)
+				.replace(SD_REPLACEABLE_PART_EVENTSUB_URL, this.controlUrl);
 	}
 
 	public String getServiceType() {

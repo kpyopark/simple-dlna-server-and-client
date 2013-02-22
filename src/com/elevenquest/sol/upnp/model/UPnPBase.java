@@ -1,11 +1,9 @@
 package com.elevenquest.sol.upnp.model;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Vector;
 
 public class UPnPBase {
 
@@ -38,21 +36,25 @@ public class UPnPBase {
 							canonicalNameOfReturnType.equals("java.util.ArrayList") ||
 							canonicalNameOfReturnType.equals("java.util.Collection")
 							)
-							&& methods[inx].getName().indexOf("get") == 0) {
-						Collection<Object> vec = (Collection<Object>) methods[inx].invoke(this, null);
-						try {
-							sb.append(className).append(":").append(
-									methods[inx].getName()).append(":");
-							if ( vec == null ) {
-								sb.append("null");
-							} else {
-								for (Iterator<Object> iter = vec.iterator(); iter.hasNext() ; ) {
-									sb.append("[").append(toString(iter.next(),depth))
-											.append("]");
+							&& methods[inx].getName().indexOf("get") == 0 ) {
+						if ( Modifier.isPublic(methods[inx].getModifiers()) || Modifier.isProtected(methods[inx].getModifiers()) ) {
+							Collection<Object> vec = (Collection<Object>) methods[inx].invoke(this, null);
+							try {
+								sb.append(className).append(":").append(
+										methods[inx].getName()).append(":");
+								if ( vec == null ) {
+									sb.append("null");
+								} else {
+									for (Iterator<Object> iter = vec.iterator(); iter.hasNext() ; ) {
+										sb.append("[").append(toString(iter.next(),depth))
+												.append("]");
+									}
 								}
+							} catch (Exception e1) {
+								System.out.println(e1.getMessage());
 							}
-						} catch (Exception e1) {
-							System.out.println(e1.getMessage());
+						} else {
+							System.out.println("methid[" + methods[inx].getName() + "] is not public or protected.");
 						}
 						//System.out.println("after appending:" + methods[inx].getName() );
 					} else if ( methods[inx].getName().indexOf("get") == 0 ) {

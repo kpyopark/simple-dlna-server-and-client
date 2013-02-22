@@ -1,21 +1,14 @@
 package com.elevenquest.sol.upnp.network;
 
-import java.io.BufferedOutputStream;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Observable;
 
-import org.apache.http.Header;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 public class HTTPSender extends CommonSender {
 	NetworkInterface intf;
@@ -46,14 +39,22 @@ public class HTTPSender extends CommonSender {
 
 	@Override
 	protected void send(Object sendData) throws Exception {
-		HttpPost postRequest = (HttpPost)sendData;
 		
 		// 1. At first, retrieving target URL.
 		if ( this.targetURL == null ) {
 			this.targetURL = "http://" + this.target.getHostAddress() + ":" + this.port + this.uri;
 		}
+
 		HttpClient client = new DefaultHttpClient();
-		HttpResponse response = client.execute(postRequest);
+		HttpResponse response = null;
+		if ( sendData instanceof HttpGet ) {
+			HttpGet getRequest = (HttpGet)sendData;
+			response = client.execute(getRequest);
+		}
+		else if ( sendData instanceof HttpPost ) {
+			HttpPost postRequest = (HttpPost)sendData;
+			response = client.execute(postRequest);
+		}
 		
 		/*
 		java.net.URL url = new URL(this.targetURL);

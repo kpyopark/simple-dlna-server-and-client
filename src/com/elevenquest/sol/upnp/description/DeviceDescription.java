@@ -9,16 +9,14 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 import com.elevenquest.sol.upnp.network.CommonSender;
 import com.elevenquest.sol.upnp.network.HTTPSender;
+import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 import com.elevenquest.sol.upnp.xml.DDSXMLParser;
 
 public class DeviceDescription implements com.elevenquest.sol.upnp.network.ICommonSendHandler {
@@ -28,14 +26,14 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 	static final String DEVICE_DESCRIPTION_SPECVER_MINOR = "1";
 	
 	static final String DEVICE_DESCRIPTION_FRIENDLY_NAME = "Default Device Description.";
-	static final String DEVICE_DESCRIPTION_MANUFACTURER_NAME = "LG";
-	static final String DEVICE_DESCRIPTION_MANUFACTURER_URL = "http://www.lg.com";
+	static final String DEVICE_DESCRIPTION_MANUFACTURER_NAME = "elevenquest";
+	static final String DEVICE_DESCRIPTION_MANUFACTURER_URL = "http://www.elevenquest.com";
 	
 	static final String DEVICE_DESCRIPTION_MODEL = "Test Device";
 	
-	static final String DEVICE_DESCRIPTION_MODEL_NAME = "LGTSTDEVICE";
-	static final String DEVICE_DESCRIPTION_MODEL_NUMBER = "LGDEVICE000";
-	static final String DEVICE_DESCRIPTION_MODEL_URL = "http://www.lg.com";
+	static final String DEVICE_DESCRIPTION_MODEL_NAME = "ELEVENQUESTDEVICE";
+	static final String DEVICE_DESCRIPTION_MODEL_NUMBER = "11_DEVICE000";
+	static final String DEVICE_DESCRIPTION_MODEL_URL = "http://www.eleventquest.com";
 	
 	
 	static final String DDS_REPLACEABLE_PART_MODEL_SERIAL = "#MODEL_SERIAL#";
@@ -210,6 +208,7 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 		this.serviceList.add(serviceInfo);
 		if ( this.device != null ) {
 			// Check duplication of services. 
+			System.out.println("Target Service Element in DDS :" + serviceInfo.getDescription());
 			UPnPService newService = serviceInfo.getDefaultUPnPService(this.device);
 			String newServiceId = newService.getServiceId();
 			Vector<UPnPService> services = this.device.getSerivces();
@@ -378,7 +377,7 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 	}
 
 	public Object getSendObject() throws Exception {
-		HttpPost request = new HttpPost(this.device.getLocation());
+		HttpGet request = new HttpGet(this.device.getLocation());
 		// TODO : modify below line which to retreive the version of OS.
 		String osVersion = "WindowsNT";
 		String productVersion = "simpledlna/1.0";
@@ -405,7 +404,11 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 				for ( int cnt = 0 ; cnt < headers.length; cnt++ ) {
 					System.out.println( headers[cnt].getName() + ":" + headers[cnt].getValue());
 				}
-				DDSXMLParser parser = new DDSXMLParser(this, entity.getContent());
+				byte[] contentBytes = new byte[(int)entity.getContentLength()];
+				entity.getContent().read(contentBytes,0, (int)entity.getContentLength());
+				String trimmedContents = new String(contentBytes).trim();
+				ByteArrayInputStream ais = new ByteArrayInputStream(trimmedContents.getBytes());
+				DDSXMLParser parser = new DDSXMLParser(this, ais);
 				parser.execute();
 				PrintAllValue();
 				
@@ -442,6 +445,10 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 						
 					}
 				}
+			}
+			else
+			{
+				System.out.println("To retrieve Device Description failed. cause : " + response.toString() );
 			}
 		} catch ( Exception e ) {
 			// TODO : Exception processing is required.

@@ -5,7 +5,7 @@ import java.io.ByteArrayInputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
 
 import com.elevenquest.sol.upnp.model.UPnPAction;
@@ -40,7 +40,7 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.ICom
 	}
 
 	public Object getSendObject() throws Exception {
-		HttpPost request = new HttpPost(this.service.getDevice().getAbsoluteURL(this.service.getScpdUrl()));
+		HttpGet request = new HttpGet(this.service.getDevice().getAbsoluteURL(this.service.getScpdUrl()));
 		String osVersion = "WindowsNT";
 		String productVersion = "simpledlna/1.0";
 		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
