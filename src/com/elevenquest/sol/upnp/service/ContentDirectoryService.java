@@ -15,7 +15,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.ext.LexicalHandler;
+import org.xml.sax.helpers.DefaultHandler;
 
 import com.elevenquest.sol.upnp.action.ActionExecutor;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
@@ -185,6 +189,77 @@ public class ContentDirectoryService extends UPnPService {
 		return resultRoot;
 	}
 	
+	static class TolerableErrorHandler extends DefaultHandler implements LexicalHandler {
+		
+		private String currentEntity = null;
+
+		@Override
+		public void error(SAXParseException exception) throws SAXException {
+			// TODO Auto-generated method stub
+			exception.printStackTrace();
+		}
+
+		@Override
+		public void fatalError(SAXParseException exception) throws SAXException {
+			// TODO Auto-generated method stub
+			exception.printStackTrace();
+		}
+
+		@Override
+		public void warning(SAXParseException exception) throws SAXException {
+			// TODO Auto-generated method stub
+			exception.printStackTrace();
+		}
+		
+		@Override
+	    public void characters(char[] ch, int start, int length)
+	            throws SAXException {
+	        String content = new String(ch, start, length);
+	        if (currentEntity != null) {
+	            content = "&" + currentEntity + content;
+	            currentEntity = null;
+	        }
+	        System.out.print(content);
+	    }
+
+		@Override
+		public void startEntity(String name) throws SAXException {
+			currentEntity = name;
+		}
+
+		@Override
+	    public void endEntity(String name) throws SAXException {
+	    }
+
+		@Override
+	    public void startDTD(String name, String publicId, String systemId)
+	            throws SAXException {
+	    }
+
+	    @Override
+	    public void endDTD() throws SAXException {
+	    }
+
+	    @Override
+	    public void startCDATA() throws SAXException {
+	    }
+
+	    @Override
+	    public void endCDATA() throws SAXException {
+	    }
+
+	    @Override
+	    public void comment(char[] ch, int start, int length) throws SAXException {
+	    }
+
+	}
+	
+	static TolerableErrorHandler teh = null;
+	
+	static {
+		teh = new TolerableErrorHandler();
+	}
+	
 	static private ArrayList<ContentDirectoryItem> parseDIDLXML(String didlXML) throws Exception {
 		ArrayList<ContentDirectoryItem> resultRoot = new ArrayList<ContentDirectoryItem>();
 		/* resul xml is such like this.
@@ -196,15 +271,24 @@ public class ContentDirectoryService extends UPnPService {
 		Element documentElement;
 		NodeList resultItemList;
 		try {
+			factory.setExpandEntityReferences(false);
 			factory.setNamespaceAware(true);
+			factory.setIgnoringComments(true);
+			factory.setValidating(false);
+			factory.setXIncludeAware(false);
+			factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+			factory.setFeature("http://apache.org/xml/features/continue-after-fatal-error",true);
+
 			parser = factory.newDocumentBuilder();
-			System.out.println("DIDLXML:" + didlXML);
+			parser.setErrorHandler(teh);
+			System.out.println("DIDLXML1:" + didlXML);
 			doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
-			
+			System.out.println("DIDLXML2:" + didlXML);
 			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;
-			
+			System.out.println("DIDLXML3:" + didlXML);
 			resultItemList = documentElement.getChildNodes();
 			//NodeList title = doc.getElementsByTagNameNS("urn:schemas-upnp-org:metadata-1-0/upnp/", "searchClass");
+			System.out.println("DIDLXML4:" + didlXML);
 			NodeList title = doc.getElementsByTagNameNS("*", "searchClass");
 			System.out.println("title count:" + title.getLength() + ":value:" + ( title.getLength() > 0 ? title.item(0).getNodeValue() : "empty" ) );
 			
