@@ -1,4 +1,4 @@
-package com.elevenquest.sol.upnp.service;
+package com.elevenquest.sol.upnp.service.directory;
 
 public class ContentDirectoryItem {
 

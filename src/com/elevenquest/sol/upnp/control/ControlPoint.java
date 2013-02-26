@@ -19,8 +19,8 @@ import com.elevenquest.sol.upnp.network.UDPSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
 import com.elevenquest.sol.upnp.server.SendEvent;
 import com.elevenquest.sol.upnp.server.SsdpControlPointServer;
-import com.elevenquest.sol.upnp.service.ContentDirectoryItem;
-import com.elevenquest.sol.upnp.service.ContentDirectoryService;
+import com.elevenquest.sol.upnp.service.directory.ContentDirectoryItem;
+import com.elevenquest.sol.upnp.service.directory.ContentDirectoryService;
 
 /**
  * 

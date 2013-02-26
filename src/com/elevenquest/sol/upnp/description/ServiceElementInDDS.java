@@ -2,7 +2,7 @@ package com.elevenquest.sol.upnp.description;
 
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.service.ContentDirectoryService;
+import com.elevenquest.sol.upnp.service.directory.ContentDirectoryService;
 
 public class ServiceElementInDDS implements ICommonDescription {
 	
