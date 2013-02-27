@@ -73,6 +73,7 @@ public class ContentDirectoryService extends UPnPService {
 	static final String SV_NAME_CDS_SystemUpdateID = "SystemUpdateID";
 	static final String SV_NAME_CDS_ContainerUpdateIDs = "ContainerUpdateIDs";
 	
+	// List of parameters used in each UPnPAction.
 	static final String ACTION_ARG_NAME_SearchCaps = "SearchCaps";
 	static final String ACTION_ARG_NAME_SortCaps = "SortCaps";
 	static final String ACTION_ARG_NAME_Id = "Id";
@@ -99,6 +100,7 @@ public class ContentDirectoryService extends UPnPService {
 	static final String ACTION_ARG_NAME_TransferTotal = "TransferTotal";
 	static final String ACTION_ARG_NAME_NewID = "NewID";
 	
+	// List of Action Name.
 	static final String ACTION_NAME_CDS_GetSearchCapabilities = "GetSearchCapabilities";
 	static final String ACTION_NAME_CDS_GetSortCapabilities = "GetSortCapabilities";
 	static final String ACTION_NAME_CDS_GetSystemUpdateID = "GetSystemUpdateID";
