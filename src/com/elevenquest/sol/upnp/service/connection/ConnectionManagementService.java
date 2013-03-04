@@ -107,5 +107,51 @@ public class ConnectionManagementService extends UPnPService {
 		}
 		return item;
 	}
+	
+	public void connectionComplete(int connectionID) throws Exception {
+		UPnPAction targetAction = this.getAction(ACTION_NAME_CMS_ConnectionComplete);
+		if ( targetAction != null ) {
+			// 1. Parameter Settings.
+			targetAction.getInArgument(ACTION_ARG_NAME_ConnectionID).setValue(connectionID+"");
+			// 2. execute SOAP Action & SOAP response parsing and saving.
+			ActionExecutor executor = new ActionExecutor(targetAction);
+			executor.execute();
+		} else {
+			System.out.println("There is no prepareForConnection action in this device.");
+		}
+	}
+	
+	public ArrayList<Integer> getCurrentConnectionIDs() throws Exception {
+		UPnPAction targetAction = this.getAction(ACTION_NAME_CMS_GetCurrentConnectionIDs);
+		ActionExecutor executor = new ActionExecutor(targetAction);
+		executor.execute();
+		return getStateVariableCurrentConnectionIDs();
+	}
+	
+	public ConnectionItem getCurrentConnectionInfo(int connectionID) throws Exception {
+		ConnectionItem item = new ConnectionItem();
+		UPnPAction targetAction = this.getAction(ACTION_NAME_CMS_GetCurrentConnectionInfo);
+		if ( targetAction != null ) {
+			// 1. Parameter Settings.
+			targetAction.getInArgument(ACTION_ARG_NAME_ConnectionID).setValue(connectionID + "");
+			// 2. execute SOAP Action & SOAP response parsing and saving.
+			ActionExecutor executor = new ActionExecutor(targetAction);
+			executor.execute();
+			item.setRcsID(Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_RcsID).getValue()));
+			item.setAVTransportID(Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_AVTransportID).getValue()));
+			item.setProtocolInfo(targetAction.getOutArgument(ACTION_ARG_NAME_AVTransportID).getValue());
+			// TODO: 3-5 일 여기까지 완성. 
+			int AVTransportID = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_AVTransportID).getValue());
+			int rcsID = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_AVTransportID).getValue());
+			
+			item.setConnectionID(connectionID);
+			item.setAVTransportID(AVTransportID);
+			item.setRcsID(rcsID);
+
+		} else {
+			System.out.println("There is no prepareForConnection action in this device.");
+		}
+		return item;
+	}
 
 }
