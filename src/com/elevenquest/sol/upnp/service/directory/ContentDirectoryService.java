@@ -144,22 +144,34 @@ public class ContentDirectoryService extends UPnPService {
 	
 	public ArrayList<String> getSearchCapabilities() throws Exception {
 		UPnPAction targetAction = this.getAction(ACTION_NAME_CDS_GetSearchCapabilities);
-		ActionExecutor executor = new ActionExecutor(targetAction);
-		executor.execute();
+		if ( targetAction != null ) {
+			ActionExecutor executor = new ActionExecutor(targetAction);
+			executor.execute();
+		} else {
+			System.out.println("[Warning] There is no action which name is 'getSearchCapabilities'.");
+		}
 		return getStateVariableSearchCapabilities();
 	}
 	
 	public ArrayList<String> getSortCapabilities() throws Exception {
 		UPnPAction targetAction = this.getAction(ACTION_NAME_CDS_GetSortCapabilities);
-		ActionExecutor executor = new ActionExecutor(targetAction);
-		executor.execute();
+		if ( targetAction != null ) {
+			ActionExecutor executor = new ActionExecutor(targetAction);
+			executor.execute();
+		} else {
+			System.out.println("[Warning] There is no action which name is 'getSortCapabilities'.");
+		}
 		return getStateVariableSortCapabilities();
 	}
 	
 	public String getSystemUpdateID() throws Exception {
 		UPnPAction targetAction = this.getAction(ACTION_NAME_CDS_GetSystemUpdateID);
-		ActionExecutor executor = new ActionExecutor(targetAction);
-		executor.execute();
+		if ( targetAction != null ) {
+			ActionExecutor executor = new ActionExecutor(targetAction);
+			executor.execute();
+		} else {
+			System.out.println("[Warning] There is no action which name is 'getSystemUpdateID'.");
+		}
 		return getStateVariableSystemUpdateID();
 	}
 	

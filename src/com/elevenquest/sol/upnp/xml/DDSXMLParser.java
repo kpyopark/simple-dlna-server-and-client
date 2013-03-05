@@ -47,23 +47,10 @@ public class DDSXMLParser {
 			Node fstNodeSpecVer = nodeLstSpecVer.item(0);
 
 			if (fstNodeSpecVer.getNodeType() == Node.ELEMENT_NODE) {
-				Element fstElmnt = (Element) fstNodeSpecVer;
 				/* major */
-				NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("major");
-				if (fstNmElmntLst.getLength() > 0) {
-					Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
-					NodeList fstNm = fstNmElmnt.getChildNodes();
-					description.setSpecMajor(((Node) fstNm.item(0)).getNodeValue());
-					//System.out.println("major : " + SpecVerMaj);
-				}
+				description.setSpecMajor(XMLParserUtility.getFirstNodeValue((Element)fstNodeSpecVer, "major"));
 				/* minor */
-				NodeList lstNmElmntLst = fstElmnt.getElementsByTagName("minor");
-				if (lstNmElmntLst.getLength() > 0) {
-					Element lstNmElmnt = (Element) lstNmElmntLst.item(0);
-					NodeList lstNm = lstNmElmnt.getChildNodes();
-					description.setSpecMinor(((Node) lstNm.item(0)).getNodeValue());
-					//System.out.println("minor : " + SpecVerMin);
-				}
+				description.setSpecMajor(XMLParserUtility.getFirstNodeValue((Element)fstNodeSpecVer, "minor"));
 			}
 			/* Spec Version */
 
@@ -72,122 +59,29 @@ public class DDSXMLParser {
 			Node fstnodeDevice = nodeDevice.item(0);
 
 			if (fstnodeDevice.getNodeType() == Node.ELEMENT_NODE) {
+				Element deviceElement = (Element) fstnodeDevice;
 				/* deviceType */
-				Element fstElmnt = (Element) fstnodeDevice;
-				NodeList fstNmElmntLst = fstElmnt
-						.getElementsByTagName("deviceType");
-				if (fstNmElmntLst.getLength() > 0) {
-					Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
-					NodeList fstNm = fstNmElmnt.getChildNodes();
-					description.setDeviceType(((Node) fstNm.item(0)).getNodeValue());
-					//System.out.println("deviceType : " + deviceType);
-				}
-				/* deviceType */
+				description.setDeviceType(XMLParserUtility.getFirstNodeValue(deviceElement, "deviceType"));
 				/* friendlyName */
-				Element secElmnt = (Element) fstnodeDevice;
-				NodeList secNmElmntLst = secElmnt
-						.getElementsByTagName("friendlyName");
-				if (secNmElmntLst.getLength() > 0) {
-					Element secNmElmnt = (Element) secNmElmntLst.item(0);
-					NodeList secNm = secNmElmnt.getChildNodes();
-					description.setFriendlyName(((Node) secNm.item(0)).getNodeValue());
-					//System.out.println("friendlyName : " + friendlyName);
-				}
-				/* friendlyName */
+				description.setFriendlyName(XMLParserUtility.getFirstNodeValue(deviceElement, "friendlyName"));
 				/* manufacturer */
-				Element trdElmnt = (Element) fstnodeDevice;
-				NodeList trdNmElmntLst = trdElmnt
-						.getElementsByTagName("manufacturer");
-				if (trdNmElmntLst.getLength() > 0) {
-					Element trdNmElmnt = (Element) trdNmElmntLst.item(0);
-					NodeList trdNm = trdNmElmnt.getChildNodes();
-					description.setManufacturerName(((Node) trdNm.item(0)).getNodeValue());
-					//System.out.println("manufacturer : " + manufacturer);
-				}
-				/* manufacturer */
+				description.setManufacturerName(XMLParserUtility.getFirstNodeValue(deviceElement, "manufacturer"));
 				/* manufacturerURL */
-				Element frthElmnt = (Element) fstnodeDevice;
-				NodeList frthNmElmntLst = frthElmnt
-						.getElementsByTagName("manufacturerURL");
-				if (frthNmElmntLst.getLength() > 0) {
-					Element trtfNmElmnt = (Element) frthNmElmntLst.item(0);
-					NodeList frthNm = trtfNmElmnt.getChildNodes();
-					description.setManufacturerUrl(((Node) frthNm.item(0)).getNodeValue());
-					//System.out.println("manufacturerURL : " + manufacturerURL);
-				}
-				/* manufacturerURL */
+				description.setManufacturerUrl(XMLParserUtility.getFirstNodeValue(deviceElement, "manufacturerURL"));
 				/* modelDescription */
-				Element fifthElmnt = (Element) fstnodeDevice;
-				NodeList fifthNmElmntLst = fifthElmnt
-						.getElementsByTagName("modelDescription");
-				if (fifthNmElmntLst.getLength() > 0) {
-					Element fifthNmElmnt = (Element) fifthNmElmntLst.item(0);
-					NodeList fifthNm = fifthNmElmnt.getChildNodes();
-					description.setModelDescription(((Node) fifthNm.item(0)).getNodeValue());
-				}
-				/* modelDescription */
+				description.setModelDescription(XMLParserUtility.getFirstNodeValue(deviceElement, "modelDescription"));
 				/* modelName */
-				Element sixthElmnt = (Element) fstnodeDevice;
-				NodeList sixthNmElmntLst = sixthElmnt
-						.getElementsByTagName("modelName");
-				if (sixthNmElmntLst.getLength() > 0) {
-					Element sixthNmElmnt = (Element) sixthNmElmntLst.item(0);
-					NodeList sixthNm = sixthNmElmnt.getChildNodes();
-					description.setModelName(((Node) sixthNm.item(0)).getNodeValue());
-				}
-				/* modelName */
+				description.setModelName(XMLParserUtility.getFirstNodeValue(deviceElement, "modelName"));
 				/* modelNumber */
-				Element sevthElmnt = (Element) fstnodeDevice;
-				NodeList sevthNmElmntLst = sevthElmnt
-						.getElementsByTagName("modelNumber");
-				if (sevthNmElmntLst.getLength() > 0) {
-					Element sevthNmElmnt = (Element) sevthNmElmntLst.item(0);
-					NodeList sevthNm = sevthNmElmnt.getChildNodes();
-					description.setModelNumber(((Node) sevthNm.item(0)).getNodeValue());
-				}
-				/* modelNumber */
+				description.setModelNumber(XMLParserUtility.getFirstNodeValue(deviceElement, "modelNumber"));
 				/* modelURL */
-				Element eigthElmnt = (Element) fstnodeDevice;
-				NodeList eigthNmElmntLst = eigthElmnt
-						.getElementsByTagName("modelURL");
-				if (eigthNmElmntLst.getLength() > 0) {
-					Element eigthNmElmnt = (Element) eigthNmElmntLst.item(0);
-					NodeList eigthNm = eigthNmElmnt.getChildNodes();
-					description.setModelUrl(((Node) eigthNm.item(0)).getNodeValue());
-				}
-				/* modelURL */
+				description.setModelUrl(XMLParserUtility.getFirstNodeValue(deviceElement, "modelURL"));
 				/* serialNumber */
-				Element ninthElmnt = (Element) fstnodeDevice;
-				NodeList ninthNmElmntLst = ninthElmnt
-						.getElementsByTagName("serialNumber");
-				if (ninthNmElmntLst.getLength() > 0) {
-					Element ninthNmElmnt = (Element) ninthNmElmntLst.item(0);
-					NodeList ninthNm = ninthNmElmnt.getChildNodes();
-					description.setModelSerial(((Node) ninthNm.item(0)).getNodeValue());
-				}
-				/* serialNumber */
-
+				description.setModelSerial(XMLParserUtility.getFirstNodeValue(deviceElement, "serialNumber"));
 				/* UDN */
-				Element tenthElmnt = (Element) fstnodeDevice;
-				NodeList tenthNmElmntLst = tenthElmnt
-						.getElementsByTagName("UDN");
-				if (tenthNmElmntLst.getLength() > 0) {
-					Element tenthNmElmnt = (Element) tenthNmElmntLst.item(0);
-					NodeList tenthNm = tenthNmElmnt.getChildNodes();
-					description.setUdn(((Node) tenthNm.item(0)).getNodeValue());
-				}
-				/* UDN */
+				description.setUdn(XMLParserUtility.getFirstNodeValue(deviceElement, "UDN"));
 				/* UPC */
-				Element elevnthElmnt = (Element) fstnodeDevice;
-				NodeList elevnthNmElmntLst = elevnthElmnt
-						.getElementsByTagName("UPC");
-				if (elevnthNmElmntLst.getLength() > 0) {
-					Element elevnthNmElmnt = (Element) elevnthNmElmntLst
-							.item(0);
-					NodeList elevnthNm = elevnthNmElmnt.getChildNodes();
-					description.setUpc(((Node) elevnthNm.item(0)).getNodeValue());
-				}
-				/* UPC */
+				description.setUpc(XMLParserUtility.getFirstNodeValue(deviceElement, "UPC"));
 				/* iconList */
 				NodeList nodeLsticon = doc.getElementsByTagName("icon");
 				System.out.println("--Information of all icons start --");
@@ -198,59 +92,15 @@ public class DDSXMLParser {
 						ImageElementInDDS imageInfo = new ImageElementInDDS();
 						Element iconfstElmnt = (Element) fstNode;
 						/* mime type */
-						NodeList iconfstNmElmntLst = iconfstElmnt
-								.getElementsByTagName("mimeType");
-						if (iconfstNmElmntLst.getLength() > 0) {
-							Element iconfstNmElmnt = (Element) iconfstNmElmntLst
-									.item(0);
-							NodeList iconfstNm = iconfstNmElmnt.getChildNodes();
-							imageInfo.setMimeType(((Node) iconfstNm.item(0)).getNodeValue());
-						}
-
+						imageInfo.setMimeType(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "mimeType"));
 						/* width */
-						NodeList icon2ndElmntLst = iconfstElmnt
-								.getElementsByTagName("width");
-						if (icon2ndElmntLst.getLength() > 0) {
-							Element icon2ndNmElmnt = (Element) icon2ndElmntLst
-									.item(0);
-							NodeList icon2ndNm = icon2ndNmElmnt.getChildNodes();
-							try {
-							imageInfo.setWidth(Integer.parseInt(((Node) icon2ndNm.item(0))
-									.getNodeValue()));
-							} catch ( Exception e ) {
-								e.printStackTrace();
-							}
-						}
-
+						imageInfo.setWidth(Integer.parseInt(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "width")));
 						/* height */
-						NodeList icon3rdElmntLst = iconfstElmnt
-								.getElementsByTagName("height");
-						if (icon3rdElmntLst.getLength() > 0) {
-							Element icon3rdNmElmnt = (Element) icon3rdElmntLst
-									.item(0);
-							NodeList icon3rdNm = icon3rdNmElmnt.getChildNodes();
-							imageInfo.setHeight(Integer.parseInt(((Node) icon3rdNm.item(0)).getNodeValue()));
-						}
-
+						imageInfo.setHeight(Integer.parseInt(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "height")));
 						/* depth */
-						NodeList icon4thElmntLst = iconfstElmnt
-								.getElementsByTagName("depth");
-						if (icon4thElmntLst.getLength() > 0) {
-							Element icon4thNmElmnt = (Element) icon4thElmntLst
-									.item(0);
-							NodeList icon4thNm = icon4thNmElmnt.getChildNodes();
-							imageInfo.setDepth(Integer.parseInt(((Node) icon4thNm.item(0)).getNodeValue()));
-						}
-
+						imageInfo.setDepth(Integer.parseInt(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "depth")));
 						/* url */
-						NodeList icon5thElmntLst = iconfstElmnt
-								.getElementsByTagName("url");
-						if (icon5thElmntLst.getLength() > 0) {
-							Element icon5thNmElmnt = (Element) icon5thElmntLst
-									.item(0);
-							NodeList icon5thNm = icon5thNmElmnt.getChildNodes();
-							imageInfo.setUrl(((Node) icon5thNm.item(0)).getNodeValue());
-						}
+						imageInfo.setMimeType(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "url"));
 						description.addImage(imageInfo);
 					}
 					
@@ -269,54 +119,15 @@ public class DDSXMLParser {
 						ServiceElementInDDS service = new ServiceElementInDDS();
 						Element iconfstElmnt = (Element) fstNode;
 						/* service type */
-						NodeList iconfstNmElmntLst = iconfstElmnt
-								.getElementsByTagName("serviceType");
-						if (iconfstNmElmntLst.getLength() > 0) {
-							Element iconfstNmElmnt = (Element) iconfstNmElmntLst
-									.item(0);
-							NodeList iconfstNm = iconfstNmElmnt.getChildNodes();
-							service.setServiceType(((Node) iconfstNm.item(0)).getNodeValue());
-						}
-
+						service.setServiceType(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "serviceType"));
 						/* serviceId */
-						NodeList icon2ndElmntLst = iconfstElmnt
-								.getElementsByTagName("serviceId");
-						if (icon2ndElmntLst.getLength() > 0) {
-							Element icon2ndNmElmnt = (Element) icon2ndElmntLst
-									.item(0);
-							NodeList icon2ndNm = icon2ndNmElmnt.getChildNodes();
-							service.setServiceId(((Node) icon2ndNm.item(0)).getNodeValue());
-						}
-
+						service.setServiceId(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "serviceId"));
 						/* SCPDURL */
-						NodeList icon3rdElmntLst = iconfstElmnt
-								.getElementsByTagName("SCPDURL");
-						if (icon3rdElmntLst.getLength() > 0) {
-							Element icon3rdNmElmnt = (Element) icon3rdElmntLst
-									.item(0);
-							NodeList icon3rdNm = icon3rdNmElmnt.getChildNodes();
-							service.setScpdUrl(((Node) icon3rdNm.item(0)).getNodeValue());
-						}
-
+						service.setScpdUrl(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "SCPDURL"));
 						/* controlURL */
-						NodeList icon4thElmntLst = iconfstElmnt
-								.getElementsByTagName("controlURL");
-						if (icon4thElmntLst.getLength() > 0) {
-							Element icon4thNmElmnt = (Element) icon4thElmntLst
-									.item(0);
-							NodeList icon4thNm = icon4thNmElmnt.getChildNodes();
-							service.setControlUrl(((Node) icon4thNm.item(0)).getNodeValue());
-						}
-
+						service.setControlUrl(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "controlURL"));
 						/* url */
-						NodeList icon5thElmntLst = iconfstElmnt
-								.getElementsByTagName("eventSubURL");
-						if (icon5thElmntLst.getLength() > 0) {
-							Element icon5thNmElmnt = (Element) icon5thElmntLst
-									.item(0);
-							NodeList icon5thNm = icon5thNmElmnt.getChildNodes();
-							service.setEventsubUrl(((Node) icon5thNm.item(0)).getNodeValue());
-						}
+						service.setEventsubUrl(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "eventSubURL"));
 						description.addService(service);
 					}
 				}
@@ -326,15 +137,7 @@ public class DDSXMLParser {
 				// TODO : We wouldn't process embedded devices yet. Someone help us to process them.
 				/* deviceList */
 				/* PresentationURL */
-				Element twlvthElmnt = (Element) fstnodeDevice;
-				NodeList twlvthNmElmntLst = twlvthElmnt
-						.getElementsByTagName("PresentationURL");
-				if (twlvthNmElmntLst.getLength() > 0) {
-					Element twlvthNmElmnt = (Element) twlvthNmElmntLst.item(0);
-					NodeList twlthNm = twlvthNmElmnt.getChildNodes();
-					description.setPresentationURL(((Node) twlthNm.item(0)).getNodeValue());
-				}
-
+				description.setPresentationURL(XMLParserUtility.getFirstNodeValue(deviceElement, "PresentationURL"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

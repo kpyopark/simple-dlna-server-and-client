@@ -12,6 +12,7 @@ import org.w3c.dom.NodeList;
 
 import com.elevenquest.sol.upnp.description.ServiceDescription;
 import com.elevenquest.sol.upnp.model.UPnPAction;
+import com.elevenquest.sol.upnp.model.UPnPAllowedValueRange;
 import com.elevenquest.sol.upnp.model.UPnPDataType;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
 
@@ -30,8 +31,6 @@ public class SDSXMLParser {
 	public void execute() {
 		try {
 
-			/* 아래는 parser가 제대로 동작하는지 test를 위한 code 입니다. */
-			/* 실제 XML을 parsing 하기 위해서는 ServiceDescriptionXML 를 넣으면 됩니다. */
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(xmlInputStream);
@@ -45,30 +44,11 @@ public class SDSXMLParser {
 				Node fstNodeSpecVer = nodeLstSpecVer.item(0);
 
 				if (fstNodeSpecVer.getNodeType() == Node.ELEMENT_NODE) {
-					Element fstElmnt = (Element) fstNodeSpecVer;
+					Element specElement = (Element) fstNodeSpecVer;
 					/* major */
-					NodeList fstNmElmntLst = fstElmnt
-							.getElementsByTagName("major");
-					if (fstNmElmntLst.getLength() > 0) {
-						Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
-						NodeList fstNm = fstNmElmnt.getChildNodes();
-						if (((Node) fstNm.item(0)).getNodeValue() != null) {
-							SpecVerMaj = ((Node) fstNm.item(0)).getNodeValue();
-							this.description.setSpecMajor(SpecVerMaj);
-						}
-					}
-
+					this.description.setSpecMajor(XMLParserUtility.getFirstNodeValue(specElement, "major"));
 					/* minor */
-					NodeList lstNmElmntLst = fstElmnt
-							.getElementsByTagName("minor");
-					if (lstNmElmntLst.getLength() > 0) {
-						Element lstNmElmnt = (Element) lstNmElmntLst.item(0);
-						NodeList lstNm = lstNmElmnt.getChildNodes();
-						if (((Node) lstNm.item(0)).getNodeValue() != null) {
-							SpecVerMin = ((Node) lstNm.item(0)).getNodeValue();
-							this.description.setSpecMinor(SpecVerMin);
-						}
-					}
+					this.description.setSpecMinor(XMLParserUtility.getFirstNodeValue(specElement, "minor"));
 				}
 			}
 			/* Spec Version */
@@ -86,102 +66,36 @@ public class SDSXMLParser {
 				Node fstNode = nodeLsticon.item(s);
 				if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
 					UPnPStateVariable statVar = new UPnPStateVariable();
-					Element iconfstElmnt = (Element) fstNode;
+					Element stateVariableElement = (Element) fstNode;
 					/* name */
-					NodeList iconfstNmElmntLst = iconfstElmnt
-							.getElementsByTagName("name");
-					
-					if (iconfstNmElmntLst.getLength() > 0) {
-						Element iconfstNmElmnt = (Element) iconfstNmElmntLst.item(0);
-						NodeList iconfstNm = iconfstNmElmnt.getChildNodes();
-						if (((Node) iconfstNm.item(0)).getNodeValue() != null)
-							statVar.setName(((Node) iconfstNm.item(0))
-									.getNodeValue());
-					}
-
+					statVar.setName(XMLParserUtility.getFirstNodeValue(stateVariableElement, "name"));
 					/* dataType */
-					NodeList icon2ndElmntLst = iconfstElmnt
-							.getElementsByTagName("dataType");
-					if (icon2ndElmntLst.getLength() > 0) {
-						Element icon2ndNmElmnt = (Element) icon2ndElmntLst
-								.item(0);
-						NodeList icon2ndNm = icon2ndNmElmnt.getChildNodes();
-						if (((Node) icon2ndNm.item(0)).getNodeValue() != null) {
-							UPnPDataType type = UPnPDataType.getUPnPDataType(((Node) icon2ndNm.item(0)).getNodeValue());
-							if ( type != null ) {
-								statVar.setType(type);
-							} else {
-								System.out.println("There is no matching UPnPDataType. You must define the new type[" + ((Node) icon2ndNm.item(0)).getNodeValue() + "] in the UPnPDataType Class." );
-							}
+					String upnpDataType = XMLParserUtility.getFirstNodeValue(stateVariableElement, "dataType");
+					if ( upnpDataType != null ) {
+						UPnPDataType type = UPnPDataType.getUPnPDataType(upnpDataType);
+						if ( type != null ) {
+							statVar.setType(type);
+						} else {
+							System.out.println("[ERROR] There is no matching UPnPDataType. You must define the new type[" + upnpDataType + "] in the UPnPDataType Class." );
 						}
-							
 					}
-
 					/* defaultValue */
-					NodeList icon3rdElmntLst = iconfstElmnt
-							.getElementsByTagName("defaultValue");
-					if (icon3rdElmntLst.getLength() > 0) {
-						Element icon3rdNmElmnt = (Element) icon3rdElmntLst
-								.item(0);
-						NodeList icon3rdNm = icon3rdNmElmnt.getChildNodes();
-						if (((Node) icon3rdNm.item(0)).getNodeValue() != null) {
-							statVar.setDefaultValue(((Node) icon3rdNm.item(0)).getNodeValue());
-						}
-					}
-
+					statVar.setDefaultValue(XMLParserUtility.getFirstNodeValue(stateVariableElement, "defaultValue"));
 					/* allowdValueRange */
-					System.out
-							.println("   --Information of all allowdValueRange start --");
-
-					/* MIN */
-					NodeList range1ElmntLst = iconfstElmnt
-							.getElementsByTagName("minimum");
-					if (range1ElmntLst.getLength() > 0) {
-						Element range1thNmElmnt = (Element) range1ElmntLst
-								.item(0);
-						NodeList range1thNm = range1thNmElmnt.getChildNodes();
-						if (((Node) range1thNm.item(0)).getNodeValue() != null) {
-							System.out.println("minimum :"
-									+ ((Node) range1thNm.item(0))
-											.getNodeValue());
-							// TODO : Now, we don't use this parameter. case of no use in Content Directory service.
-							// statVar.set
+					System.out.println("   --Information of all allowdValueRange start --");
+					NodeList childOfstateVariable = stateVariableElement.getElementsByTagName("allowedValueRange");
+					for ( int count = 0; count < childOfstateVariable.getLength(); count++ ) {
+						if (childOfstateVariable.item(count).getNodeType() == Node.ELEMENT_NODE) {
+							Element allowedValueRange = (Element)childOfstateVariable.item(count);
+							UPnPAllowedValueRange valueRange = new UPnPAllowedValueRange();
+							/* MIN */
+							valueRange.setMinimum(XMLParserUtility.getFirstNodeValue(allowedValueRange, "minimum"));
+							/* MAX */
+							valueRange.setMaximum(XMLParserUtility.getFirstNodeValue(allowedValueRange, "maximum"));
+							/* STEP */
+							valueRange.setStep(XMLParserUtility.getFirstNodeValue(allowedValueRange, "step"));
 						}
 					}
-
-					/* MAX */
-					NodeList range2ElmntLst = iconfstElmnt
-							.getElementsByTagName("maximum");
-					if (range2ElmntLst.getLength() > 0) {
-						Element range2thNmElmnt = (Element) range2ElmntLst
-								.item(0);
-						NodeList range2thNm = range2thNmElmnt.getChildNodes();
-						if (((Node) range2thNm.item(0)).getNodeValue() != null) {
-							System.out.println("maximum :"
-									+ ((Node) range2thNm.item(0))
-											.getNodeValue());
-							// TODO : Now, we don't use this parameter. case of no use in Content Directory service.
-							// statVar.set
-						}
-					}
-
-					/* STEP */
-					NodeList range3ElmntLst = iconfstElmnt
-							.getElementsByTagName("step");
-					if (range3ElmntLst.getLength() > 0) {
-						Element range3thNmElmnt = (Element) range3ElmntLst
-								.item(0);
-						NodeList range3thNm = range3thNmElmnt.getChildNodes();
-						if (((Node) range3thNm.item(0)).getNodeValue() != null) {
-							System.out.println("step :"
-									+ ((Node) range3thNm.item(0))
-											.getNodeValue());
-							// TODO : Now, we don't use this parameter. case of no use in Content Directory service.
-							// statVar.set
-						}
-					}
-					/* allowdValueRange */
-
 					/* allowed value */
 					NodeList allowdValLsticon = doc
 							.getElementsByTagName("allowdValueList");
@@ -194,21 +108,10 @@ public class SDSXMLParser {
 						if (allowdValListNode.getNodeType() == Node.ELEMENT_NODE) {
 							Element allowdValElmnt = (Element) allowdValListNode;
 
-							/* name */
-							NodeList AVfstNmElmntLst = allowdValElmnt
-									.getElementsByTagName("allowdValue");
-							if (AVfstNmElmntLst.getLength() > 0) {
-								Element AAVfstNmElmnt = (Element) AVfstNmElmntLst
-										.item(0);
-								NodeList AVfstNm = AAVfstNmElmnt
-										.getChildNodes();
-								if (((Node) AVfstNm.item(0)).getNodeValue() != null) {
-									statVar.addAllowedValue(((Node) AVfstNm.item(0)).getNodeValue());
-									System.out.println("allowdValue : "
-											+ ((Node) AVfstNm.item(0))
-													.getNodeValue());
-								}
-							}
+							/* allowedValue */
+							String allowedValue = XMLParserUtility.getFirstNodeValue(allowdValElmnt, "allowdValue");
+							if ( allowedValue != null && allowedValue.length() > 0 )
+								statVar.addAllowedValue(allowedValue);
 						}
 					}
 					this.description.addStateVariable(statVar);
@@ -247,41 +150,24 @@ public class SDSXMLParser {
 
 							if (argNode.getNodeType() == Node.ELEMENT_NODE) {
 								UPnPStateVariable arg = new UPnPStateVariable();
-								Element iconfstElmnt = (Element) argNode;
-
+								Element argElement = (Element) argNode;
 								/* name */
-								NodeList iconfstNmElmntLst = iconfstElmnt
-										.getElementsByTagName("name");
-								Element iconfstNmElmnt = (Element) iconfstNmElmntLst
-										.item(0);
-								NodeList iconfstNm = iconfstNmElmnt.getChildNodes();
-								if (((Node) iconfstNm.item(0)).getNodeValue() != null) {
-									arg.setArgumentName(((Node) iconfstNm.item(0)).getNodeValue());
-								}
+								arg.setArgumentName(XMLParserUtility.getFirstNodeValue(argElement, "name"));
 								/* direction */
-								NodeList icon2ndElmntLst = iconfstElmnt
-										.getElementsByTagName("direction");
-								Element icon2ndNmElmnt = (Element) icon2ndElmntLst
-										.item(0);
-								NodeList icon2ndNm = icon2ndNmElmnt.getChildNodes();
-								String direction = null;
-								if ((direction = ((Node) icon2ndNm.item(0)).getNodeValue()) != null) {
+								String direction = XMLParserUtility.getFirstNodeValue(argElement, "direction");
+								if ( direction != null) {
 									if ( direction.equalsIgnoreCase("in") ) {
 										action.addInArgument(arg);
 									} else {
 										action.addOutArgument(arg);
 									}
 								}
-
 								/* relatedStateVariable */
-								NodeList icon3rdElmntLst = iconfstElmnt
-										.getElementsByTagName("relatedStateVariable");
-								Element icon3rdNmElmnt = (Element) icon3rdElmntLst
-										.item(0);
-								NodeList icon3rdNm = icon3rdNmElmnt.getChildNodes();
-								if (((Node) icon3rdNm.item(0)).getNodeValue() != null) {
-									UPnPStateVariable relStatVar = this.description.getStateVariable(((Node) icon3rdNm.item(0)).getNodeValue());
-									arg.setRelatedStateVariable(relStatVar);
+								String relatedStateVariableName = XMLParserUtility.getFirstNodeValue(argElement, "relatedStateVariable");
+								if ( relatedStateVariableName != null ) {
+									UPnPStateVariable relStatVar = this.description.getStateVariable(relatedStateVariableName);
+									if ( relStatVar != null )
+										arg.setRelatedStateVariable(relStatVar);
 								}
 								System.out.println("--------->" + arg.getArgumentName()+":" + direction + ":" + arg.getRelatedStateVariable().getName() );
 							}
