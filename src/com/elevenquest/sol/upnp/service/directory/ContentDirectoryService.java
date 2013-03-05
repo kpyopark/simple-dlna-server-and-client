@@ -280,10 +280,10 @@ public class ContentDirectoryService extends UPnPService {
 			
 		*/
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder parser;
-		Document doc;
-		Element documentElement;
-		NodeList resultItemList;
+		DocumentBuilder parser = null;
+		Document doc = null;
+		Element documentElement = null;
+		NodeList resultItemList = null;
 		try {
 			factory.setExpandEntityReferences(false);
 			factory.setNamespaceAware(true);
@@ -296,7 +296,19 @@ public class ContentDirectoryService extends UPnPService {
 			parser = factory.newDocumentBuilder();
 			parser.setErrorHandler(teh);
 			System.out.println("DIDLXML1:" + didlXML);
-			doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
+			try {
+				doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
+			} catch ( Exception e ) {
+				// If the special letter such like '&' cause exeption in parsing.
+				// We replace '&' with '&amp;'
+				didlXML.replaceAll("&", "&amp;");
+				try {
+					System.out.println("DIDLXML1`:" + didlXML);
+					doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
+				} catch ( SAXParseException saxe2 ) {
+					saxe2.printStackTrace();
+				}
+			}
 			System.out.println("DIDLXML2:" + didlXML);
 			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;
 			System.out.println("DIDLXML3:" + didlXML);

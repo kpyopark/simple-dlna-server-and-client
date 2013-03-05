@@ -1,6 +1,10 @@
 package com.elevenquest.sol.upnp.action;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -125,6 +129,7 @@ public class ActionExecutor {
 		CONTENT-LENGTH: bytes in body
 		*/
 		if ( conn.getResponseCode() == HttpURLConnection.HTTP_OK ) {
+			InputStream is = null;
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder parser;
 			Document doc;
@@ -143,24 +148,35 @@ public class ActionExecutor {
 				</s:Body>
 				</s:Envelope>
 				*/
-				// For debuging. We want to see the response of dlna server.
-				/*
-				Map<String,List<String>> props = conn.getHeaderFields();
-				Iterator<String> keyIter = props.keySet().iterator();
-				while( keyIter.hasNext() ) {
-					String key = keyIter.next();
-					System.out.println("----> Response:[" + key + "]:[" + props.get(key));
-				}
-				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-				String aLine;
-				while( ( aLine = br.readLine() ) != null) {
-					System.out.println("----> response:" + aLine);
-				}
-				br.close();
-				*/
+
 				factory.setNamespaceAware(true);
 				parser = factory.newDocumentBuilder();
-				doc = parser.parse(conn.getInputStream());
+				is = conn.getInputStream();
+				// For debuging. We want to see the response of dlna server.
+				{
+					Map<String,List<String>> props = conn.getHeaderFields();
+					Iterator<String> keyIter = props.keySet().iterator();
+					while( keyIter.hasNext() ) {
+						String key = keyIter.next();
+						System.out.println("----> Response:[" + key + "]:[" + props.get(key));
+					}
+				}
+				{
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					byte[] buffer = new byte[1024];
+					int length = 0;
+					try {
+						while( (length = is.read(buffer, 0, 1024)) >= 0) {
+							baos.write(buffer, 0, length);
+						}
+						baos.flush();
+					} catch ( IOException ioe ) {
+						ioe.printStackTrace();
+					}
+					is = new ByteArrayInputStream(baos.toByteArray());
+					System.out.println("xml text:" + new String(baos.toByteArray()));
+				}
+				doc = parser.parse(is);
 				actionResponseNode = doc.getElementsByTagNameNS("*",action.getActionName() + "Response");
 				if ( actionResponseNode != null ) {
 					actionResponseElement = (Element)actionResponseNode.item(0);

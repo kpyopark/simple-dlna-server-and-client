@@ -1,5 +1,8 @@
 package com.elevenquest.sol.upnp.xml;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -24,6 +27,23 @@ public class DDSXMLParser {
 	public DDSXMLParser(DeviceDescription desc, InputStream is) {
 		this.description = desc;
 		this.xmlInputStream = is;
+		printInputStream();
+	}
+	
+	private void printInputStream() {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int length = 0;
+		try {
+			while( (length = xmlInputStream.read(buffer, 0, 1024)) >= 0) {
+				baos.write(buffer, 0, length);
+			}
+			baos.flush();
+		} catch ( IOException ioe ) {
+			ioe.printStackTrace();
+		}
+		this.xmlInputStream = new ByteArrayInputStream(baos.toByteArray());
+		System.out.println("xml text:" + new String(baos.toByteArray()));
 	}
 
 	public UPnPDevice getDeviceDescription() {
@@ -38,7 +58,6 @@ public class DDSXMLParser {
 			Document doc = db.parse(xmlInputStream);
 			doc.getDocumentElement().normalize();
 			System.out.println("Base URI :" + doc.getBaseURI());
-			System.out.println("Full text: \n" + doc.getTextContent());
 			System.out.println("Root element "
 					+ doc.getDocumentElement().getNodeName());
 
@@ -92,7 +111,7 @@ public class DDSXMLParser {
 						ImageElementInDDS imageInfo = new ImageElementInDDS();
 						Element iconfstElmnt = (Element) fstNode;
 						/* mime type */
-						imageInfo.setMimeType(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "mimeType"));
+						imageInfo.setMimeType(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "mimetype"));
 						/* width */
 						imageInfo.setWidth(Integer.parseInt(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "width")));
 						/* height */
