@@ -12,6 +12,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.network.CommonSender;
@@ -208,24 +209,24 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 		this.serviceList.add(serviceInfo);
 		if ( this.device != null ) {
 			// Check duplication of services. 
-			System.out.println("Target Service Element in DDS :" + serviceInfo.getDescription());
+			Logger.println(Logger.DEBUG, "Target Service Element in DDS :" + serviceInfo.getDescription());
 			UPnPService newService = serviceInfo.getDefaultUPnPService(this.device);
 			String newServiceId = newService.getServiceId();
 			Vector<UPnPService> services = this.device.getSerivces();
 			boolean isNewService = true;
 			for ( int inx = 0; newServiceId != null && inx < services.size() ; inx++ ) {
 				if ( newServiceId.equals( services.get(inx).getServiceId() ) ) {
-					System.out.println("Same service already exists.[" + newServiceId + "]" );
+					Logger.println(Logger.INFO, "Same service already exists.[" + newServiceId + "]" );
 					isNewService = false;
 					break;
 				}
 			}
 			if ( isNewService ) {
-				System.out.println("new service is added.[" + newServiceId + "] into device[" + this.device.getUuid() + "]");
-				System.out.println("service are below actions & state variables");
-				System.out.println("-------------------------------------------");
-				System.out.println(newService);
-				System.out.println("-------------------------------------------");
+				Logger.println(Logger.INFO, "new service is added.[" + newServiceId + "] into device[" + this.device.getUuid() + "]");
+				Logger.println(Logger.DEBUG, "service are below actions & state variables");
+				Logger.println(Logger.DEBUG, "-------------------------------------------");
+				Logger.println(Logger.DEBUG, newService.toString());
+				Logger.println(Logger.DEBUG, "-------------------------------------------");
 				this.device.addService(newService);
 				this.serviceListUpdated = true;
 			}
@@ -504,21 +505,21 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 	}
 
 	public void PrintAllValue(){
-		if(this.configNumber!="") System.out.println(this.configNumber);
-		if(this.specMajor!="") System.out.println(this.specMajor);
-		if(this.specMinor!="") System.out.println(this.specMinor);
-		if(this.friendlyName!="") System.out.println(this.friendlyName);
-		if(this.manufacturerName!="") System.out.println(this.manufacturerName);
-		if(this.manufacturerUrl!="") System.out.println(this.manufacturerUrl);
-		if(this.model!="") System.out.println(this.model);
-		if(this.modelName!="") System.out.println(this.modelName);
-		if(this.modelNumber!="") System.out.println(this.modelNumber);
-		if(this.modelUrl!="") System.out.println(this.modelUrl);
-		if(this.modelDescription!="") System.out.println(this.modelDescription);
-		if(this.deviceType!="") System.out.println(this.deviceType);
-		if(this.presentationURL!="") System.out.println(this.presentationURL);
-		if(this.configNumber!="") System.out.println(this.configNumber);
-		if(this.configNumber!="") System.out.println(this.configNumber);
+		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
+		if(this.specMajor!="") Logger.println(Logger.INFO, this.specMajor);
+		if(this.specMinor!="") Logger.println(Logger.INFO, this.specMinor);
+		if(this.friendlyName!="") Logger.println(Logger.INFO, this.friendlyName);
+		if(this.manufacturerName!="") Logger.println(Logger.INFO, this.manufacturerName);
+		if(this.manufacturerUrl!="") Logger.println(Logger.INFO, this.manufacturerUrl);
+		if(this.model!="") Logger.println(Logger.INFO, this.model);
+		if(this.modelName!="") Logger.println(Logger.INFO, this.modelName);
+		if(this.modelNumber!="") Logger.println(Logger.INFO, this.modelNumber);
+		if(this.modelUrl!="") Logger.println(Logger.INFO, this.modelUrl);
+		if(this.modelDescription!="") Logger.println(Logger.INFO, this.modelDescription);
+		if(this.deviceType!="")Logger.println(Logger.INFO, this.deviceType);
+		if(this.presentationURL!="") Logger.println(Logger.INFO, this.presentationURL);
+		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
+		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
 	}
 	
 }

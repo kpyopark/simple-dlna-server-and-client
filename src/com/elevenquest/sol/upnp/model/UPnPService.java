@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.elevenquest.sol.upnp.common.Logger;
+
 public class UPnPService extends UPnPBase {
 	
 	public static int UPNP_SERVICE_TYPE_CDS = 1;
@@ -116,14 +118,14 @@ public class UPnPService extends UPnPBase {
 	}
 
 	public void printAllDescirption(){
-		if(this.versionMajor!="") System.out.println(this.versionMajor);
-		if(this.versionMinor!="") System.out.println(this.versionMinor);
-		if(this.serviceId!="") System.out.println(this.serviceId);
-		if(this.scpdUrl!="") System.out.println(this.scpdUrl);
-		if(this.controlUrl!="") System.out.println(this.controlUrl);
-		if(this.eventsubUrl!="") System.out.println(this.eventsubUrl);
-		System.out.println("isRemote Service:"+this.isRemote);
-		System.out.println("isReadyToUse :"+this.isReadyToUse);
-		System.out.println("isProgressingToRetrieve :"+this.isProgressingToRetrieve);
+		if(this.versionMajor!="") Logger.println(Logger.INFO, this.versionMajor);
+		if(this.versionMinor!="") Logger.println(Logger.INFO, this.versionMinor);
+		if(this.serviceId!="") Logger.println(Logger.INFO, this.serviceId);
+		if(this.scpdUrl!="") Logger.println(Logger.INFO, this.scpdUrl);
+		if(this.controlUrl!="") Logger.println(Logger.INFO, this.controlUrl);
+		if(this.eventsubUrl!="") Logger.println(Logger.INFO, this.eventsubUrl);
+		Logger.println(Logger.INFO, "isRemote Service:"+this.isRemote);
+		Logger.println(Logger.INFO, "isReadyToUse :"+this.isReadyToUse);
+		Logger.println(Logger.INFO, "isProgressingToRetrieve :"+this.isProgressingToRetrieve);
 	}
 }

@@ -4,6 +4,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.elevenquest.sol.upnp.common.Logger;
+
 public class XMLParserUtility {
 	
 	static String getFirstNodeValue(Element parentElement, String childTagName) {
@@ -11,17 +13,17 @@ public class XMLParserUtility {
 		if (childNodeList != null) {
 			switch ( childNodeList.getLength() ) {
 			case 0 :
-				System.out.println("[WARNING] There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
+				Logger.println(Logger.WARNING, "There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
 				break;
 			default :
 				if ( childNodeList.getLength() > 1 )
-					System.out.println("[INFO] There are many childNodes [" + childNodeList.getLength() + "]");
+					Logger.println(Logger.INFO, "There are many childNodes [" + childNodeList.getLength() + "]");
 				Element childFirstElement = (Element)childNodeList.item(0);
 				NodeList valueNode = childFirstElement.getChildNodes();
 				if ( valueNode != null ) {
 					switch( valueNode.getLength() ) {
 					case 0 :
-						System.out.println("[WARNING] There is no value in child element[" + childTagName + "]" + " of parent element[" + parentElement.getTagName() + "]");
+						Logger.println(Logger.WARNING, "There is no value in child element[" + childTagName + "]" + " of parent element[" + parentElement.getTagName() + "]");
 						break;
 					case 1 :
 					default :
@@ -30,7 +32,7 @@ public class XMLParserUtility {
 				}
 			}
 		} else {
-			System.out.println("[WARNING] There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
+			Logger.println(Logger.WARNING, "There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
 		}
 		return null;
 	}

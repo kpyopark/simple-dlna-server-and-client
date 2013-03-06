@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
@@ -44,7 +45,7 @@ public class ActionExecutor {
 	}
 	
 	public void execute() throws Exception {
-	    System.out.println("Start sending " + action.getActionName() + " request");
+	    Logger.println(Logger.DEBUG, "Start sending " + action.getActionName() + " request");
 	    try {
 			// 1. find target URL.
 			findTargetUrl();
@@ -73,10 +74,10 @@ public class ActionExecutor {
 		    	String key = keyIter.next();
 		    	List<String> values = props.get(key);
 		    	for ( int cnt = 0 ; cnt < values.size() ; cnt++ ) {
-		    		System.out.println("--->[" + key + "]:[" + values.get(cnt) + "]" );
+		    		Logger.println(Logger.DEBUG, "--->[" + key + "]:[" + values.get(cnt) + "]" );
 		    	}
 		    }
-		    System.out.println(reqStr);
+		    Logger.println(Logger.DEBUG, reqStr);
 		    
 		    // 4. Flush
 			conn.connect();       
@@ -96,7 +97,7 @@ public class ActionExecutor {
 	
 	private void findTargetUrl() throws MalformedURLException {
 		this.targetURL = this.action.getService().getDevice().getAbsoluteURL(this.action.getService().getControlUrl());
-		System.out.println("-----> action url:" + this.targetURL );
+		Logger.println(Logger.DEBUG, "-----> action url:" + this.targetURL );
 	    this.url = new URL( targetURL );   
 	}
 	
@@ -108,9 +109,9 @@ public class ActionExecutor {
 		.append("s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n")
 		.append("<s:Body>\n")
 		.append("<u:" + action.getActionName() + " xmlns:u=\"" + action.getService().getServiceType() + "\">\n");
-		System.out.println("ACTION :" + action.getActionName() );
+		Logger.println(Logger.DEBUG, "ACTION :" + action.getActionName() );
 		for ( UPnPStateVariable arg : action.getInArguments() ) {
-			System.out.println("IN ARG :" + arg.getArgumentName() + ":" + arg.getValue());
+			Logger.println(Logger.DEBUG, "IN ARG :" + arg.getArgumentName() + ":" + arg.getValue());
 			sb.append("<" + arg.getArgumentName() + ">" + ( ( arg.getValue() != null ) ? arg.getValue().toString() : "" ) + "</" + arg.getArgumentName() + ">\n");
 		}
 		sb.append("</u:" + action.getActionName() + ">\n")
@@ -158,7 +159,7 @@ public class ActionExecutor {
 					Iterator<String> keyIter = props.keySet().iterator();
 					while( keyIter.hasNext() ) {
 						String key = keyIter.next();
-						System.out.println("----> Response:[" + key + "]:[" + props.get(key));
+						Logger.println(Logger.DEBUG, "----> Response:[" + key + "]:[" + props.get(key));
 					}
 				}
 				{
@@ -174,7 +175,7 @@ public class ActionExecutor {
 						ioe.printStackTrace();
 					}
 					is = new ByteArrayInputStream(baos.toByteArray());
-					System.out.println("xml text:" + new String(baos.toByteArray()));
+					Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
 				}
 				doc = parser.parse(is);
 				actionResponseNode = doc.getElementsByTagNameNS("*",action.getActionName() + "Response");
@@ -203,7 +204,7 @@ public class ActionExecutor {
 				throw ex;
 			}
 		} else {
-			System.out.println("---> response code:" + conn.getResponseCode());
+			Logger.println(Logger.DEBUG, "---> response code:" + conn.getResponseCode());
 			BufferedReader br = null;
 			try {
 				// 1. print HTTP header.
@@ -211,13 +212,13 @@ public class ActionExecutor {
 				Iterator<String> iterKey = props.keySet().iterator();
 				while( iterKey.hasNext() ) {
 					String key = iterKey.next();
-					System.out.println("---->> ERROR:[" + key + "]:" + props.get(key));
+					Logger.println(Logger.ERROR, "---->> ERROR:[" + key + "]:" + props.get(key));
 				}
 				// 2. print body.
 				br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				String aLine = null;
 				while( ( aLine = br.readLine() ) != null ) {
-					System.out.println("---->> ERROR:" + aLine );
+					Logger.println(Logger.ERROR, "---->> ERROR:" + aLine );
 				}
 			} catch ( Exception e ) {
 				e.printStackTrace();

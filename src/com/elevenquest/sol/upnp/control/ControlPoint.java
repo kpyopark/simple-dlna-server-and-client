@@ -3,7 +3,9 @@ package com.elevenquest.sol.upnp.control;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.Vector;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
@@ -69,10 +71,12 @@ public class ControlPoint {
 			Thread.sleep(10 * 1000);	// After 10 sec.
 			Set<String> uuids = UPnPDeviceManager.getDefaultDeviceManager().getUuidList();
 			for ( String uuid : uuids ) {
-				System.out.println("--->>>uuid:" + uuid);
+				Logger.println(Logger.INFO, "--->>>uuid:" + uuid);
 				UPnPDevice remoteDevice = UPnPDeviceManager.getDefaultDeviceManager().getDevice(uuid); 
-				System.out.println(remoteDevice);
-				UPnPService service = null;
+				Logger.println(Logger.INFO, remoteDevice);
+				Vector<UPnPService> serviceList = remoteDevice.getSerivces();
+				for ( UPnPService service : serviceList )
+					//System.out.println( service );
 				if ( ( service = remoteDevice.getUPnPService(UPnPService.UPNP_SERVICE_ID_CDS) ) != null ) {
 					ContentDirectoryService cds = (ContentDirectoryService)service;
 					try {

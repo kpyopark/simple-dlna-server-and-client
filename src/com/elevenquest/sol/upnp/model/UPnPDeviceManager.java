@@ -3,6 +3,7 @@ package com.elevenquest.sol.upnp.model;
 import java.util.HashMap;
 import java.util.Set;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.description.DeviceDescription;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
@@ -38,7 +39,7 @@ public class UPnPDeviceManager {
 		if ( this.deviceList.get(device.getUuid()) != null ) {
 			// If same UUID exists in local Device List.
 			// 1. Replace the device info.
-			System.out.println("Same UUID[" + device.getUuid() + "] is used.");
+			Logger.println(Logger.WARNING, "Same UUID[" + device.getUuid() + "] is used.");
 		} else {
 			this.deviceList.put(device.getUuid(), device);
 			this.updateRemoteDeviceInfo();
@@ -93,7 +94,7 @@ public class UPnPDeviceManager {
 		for ( int inx = 0 ; inx < this.deviceList.size() ; inx++ ) {
 			UPnPDevice device = this.deviceList.values().iterator().next();
 			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() == false ) {
-				System.out.println("Update Remote Device..[" + device.getUuid() + "]" );
+				Logger.println(Logger.INFO, "Update Remote Device..[" + device.getUuid() + "]" );
 				//device.setUserAndPassword("toheaven01@korea.com", "1q2w3e4r");
 				device.setProgressingToRetrieve(true);
 				Thread oneTimeThread = new SampleTread(device);

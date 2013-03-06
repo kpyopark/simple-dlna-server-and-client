@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.Socket;
 
+import com.elevenquest.sol.upnp.common.Logger;
+
 public class HTTPReader {
 	
 	Socket clientSocket = null;
@@ -25,7 +27,7 @@ public class HTTPReader {
 		try {
 			baos = new ByteArrayOutputStream();
 			while( ( curByte = this.is.read() ) != -1 ) {
-				System.out.println( curByte );
+				Logger.println(Logger.DEBUG,  curByte );
 				if ( curByte != '\n' )
 					break;
 				baos.write(curByte);

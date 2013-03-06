@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.description.ServiceDescription;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPAllowedValueRange;
@@ -45,7 +46,7 @@ public class SDSXMLParser {
 			ioe.printStackTrace();
 		}
 		this.xmlInputStream = new ByteArrayInputStream(baos.toByteArray());
-		System.out.println("xml text:" + new String(baos.toByteArray()));
+		Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
 	}
 
 	public void execute() {
@@ -55,7 +56,7 @@ public class SDSXMLParser {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(xmlInputStream);
 			doc.getDocumentElement().normalize();
-			System.out.println("Root element "
+			Logger.println(Logger.DEBUG, "Root element "
 					+ doc.getDocumentElement().getNodeName());
 
 			/* Spec Version */
@@ -96,13 +97,13 @@ public class SDSXMLParser {
 						if ( type != null ) {
 							statVar.setType(type);
 						} else {
-							System.out.println("[ERROR] There is no matching UPnPDataType. You must define the new type[" + upnpDataType + "] in the UPnPDataType Class." );
+							Logger.println(Logger.ERROR, "There is no matching UPnPDataType. You must define the new type[" + upnpDataType + "] in the UPnPDataType Class." );
 						}
 					}
 					/* defaultValue */
 					statVar.setDefaultValue(XMLParserUtility.getFirstNodeValue(stateVariableElement, "defaultValue"));
 					/* allowdValueRange */
-					System.out.println("   --Information of all allowdValueRange start --");
+					Logger.println(Logger.DEBUG, "   --Information of all allowdValueRange start --");
 					NodeList childOfstateVariable = stateVariableElement.getElementsByTagName("allowedValueRange");
 					for ( int count = 0; count < childOfstateVariable.getLength(); count++ ) {
 						if (childOfstateVariable.item(count).getNodeType() == Node.ELEMENT_NODE) {
@@ -145,7 +146,7 @@ public class SDSXMLParser {
 
 			/* ActionList */
 			NodeList nodeActionList = doc.getElementsByTagName("action");
-			System.out.println("--Information of Action List start --");
+			Logger.println(Logger.DEBUG, "--Information of Action List start --");
 
 			for (int s = 0; s < nodeActionList.getLength(); s++) {
 				Node fstNode = nodeActionList.item(s);
@@ -161,7 +162,7 @@ public class SDSXMLParser {
 							action.setActionName(child.getFirstChild().getNodeValue());
 						}
 					}
-					System.out.println("-----> action name:" + action.getActionName());
+					Logger.println(Logger.DEBUG, "-----> action name:" + action.getActionName());
 					if ( hasActionName ) {
 						/* Arguement List */
 						NodeList nodeArgList = actionNode.getElementsByTagName("argument");
@@ -189,7 +190,7 @@ public class SDSXMLParser {
 									if ( relStatVar != null )
 										arg.setRelatedStateVariable(relStatVar);
 								}
-								System.out.println("--------->" + arg.getArgumentName()+":" + direction + ":" + arg.getRelatedStateVariable().getName() );
+								Logger.println(Logger.DEBUG, "--------->" + arg.getArgumentName()+":" + direction + ":" + arg.getRelatedStateVariable().getName() );
 							}
 						}
 					}

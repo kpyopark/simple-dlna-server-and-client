@@ -5,6 +5,8 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.elevenquest.sol.upnp.common.Logger;
+
 public class UPnPBase {
 
 	public String toString() {
@@ -51,10 +53,10 @@ public class UPnPBase {
 									}
 								}
 							} catch (Exception e1) {
-								System.out.println(e1.getMessage());
+								Logger.println(Logger.ERROR, e1.getMessage());
 							}
 						} else {
-							System.out.println("methid[" + methods[inx].getName() + "] is not public or protected.");
+							Logger.println(Logger.DEBUG, "method[" + methods[inx].getName() + "] is not public or protected.");
 						}
 						//System.out.println("after appending:" + methods[inx].getName() );
 					} else if ( methods[inx].getName().indexOf("get") == 0 ) {
@@ -79,7 +81,7 @@ public class UPnPBase {
 														: "null").append("\n");
 							}
 						} catch (Exception e1) {
-							System.out.println(e1.getMessage());
+							Logger.println(Logger.DEBUG, e1.getMessage());
 						}
 						//System.out.println("after appending:" + methods[inx].getName() );
 					}

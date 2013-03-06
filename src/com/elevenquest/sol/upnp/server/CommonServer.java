@@ -8,6 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
@@ -51,7 +52,7 @@ public class CommonServer {
 	int numberOfErrors = 0;
 
 	public void startServer() throws AbnormalException {
-		System.out.println("Start Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
+		Logger.println(Logger.INFO, "Start Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
 		if ( receiver == null && sender == null ) {
 			throw new AbnormalException("A listener or a Sender isn't set. Before use this api, you should set listener or sender in this class.");
 		}
@@ -68,7 +69,7 @@ public class CommonServer {
 										Thread.sleep(1000);
 									} catch ( Exception e ) {
 										numberOfErrors++;
-										System.out.println("Listener can't Listen.");
+										Logger.println(Logger.ERROR, "Listener can't Listen.");
 										e.printStackTrace();
 									}
 									if ( numberOfErrors > 3 )
@@ -77,7 +78,7 @@ public class CommonServer {
 							}
 						});
 					} catch ( Exception e ) {
-						System.out.println("There are some errors in Thread Pool.");
+						Logger.println(Logger.ERROR, "There are some errors in Thread Pool.");
 						e.printStackTrace();
 					}
 				}
@@ -97,7 +98,7 @@ public class CommonServer {
 											Thread.sleep(event.getDelayTimeInMillisec());
 									} catch ( Exception e ) {
 										numberOfErrors++;
-										System.out.println("Sender can't send.");
+										Logger.println(Logger.ERROR, "Sender can't send.");
 										e.printStackTrace();
 									}
 									if ( numberOfErrors > 3 )
@@ -106,7 +107,7 @@ public class CommonServer {
 							}
 						});
 					} catch ( Exception e ) {
-						System.out.println("There are some errors in Thread Pool.");
+						Logger.println(Logger.ERROR, "There are some errors in Thread Pool.");
 						e.printStackTrace();
 					}
 				}
@@ -129,7 +130,7 @@ public class CommonServer {
 			}
 		}
 		*/
-		System.out.println("Stop Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
+		Logger.println(Logger.INFO, "Stop Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
 	}
 
 	

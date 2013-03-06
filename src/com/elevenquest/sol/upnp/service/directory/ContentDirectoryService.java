@@ -22,6 +22,7 @@ import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.elevenquest.sol.upnp.action.ActionExecutor;
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPDataType;
@@ -148,7 +149,7 @@ public class ContentDirectoryService extends UPnPService {
 			ActionExecutor executor = new ActionExecutor(targetAction);
 			executor.execute();
 		} else {
-			System.out.println("[Warning] There is no action which name is 'getSearchCapabilities'.");
+			Logger.println(Logger.WARNING, "There is no action which name is 'getSearchCapabilities'.");
 		}
 		return getStateVariableSearchCapabilities();
 	}
@@ -159,7 +160,7 @@ public class ContentDirectoryService extends UPnPService {
 			ActionExecutor executor = new ActionExecutor(targetAction);
 			executor.execute();
 		} else {
-			System.out.println("[Warning] There is no action which name is 'getSortCapabilities'.");
+			Logger.println(Logger.WARNING, "There is no action which name is 'getSortCapabilities'.");
 		}
 		return getStateVariableSortCapabilities();
 	}
@@ -198,7 +199,7 @@ public class ContentDirectoryService extends UPnPService {
 			// 3. parse result XML into ContentDirectoryItems.
 			resultRoot = parseDIDLXML(result);
 		} else {
-			System.out.println("There is no browse action in this device.");
+			Logger.println(Logger.WARNING, "There is no browse action in this device.");
 		}
 		return resultRoot;
 	}
@@ -295,7 +296,7 @@ public class ContentDirectoryService extends UPnPService {
 
 			parser = factory.newDocumentBuilder();
 			parser.setErrorHandler(teh);
-			System.out.println("DIDLXML1:" + didlXML);
+			Logger.println(Logger.DEBUG, "DIDLXML1:" + didlXML);
 			try {
 				doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
 			} catch ( Exception e ) {
@@ -303,20 +304,20 @@ public class ContentDirectoryService extends UPnPService {
 				// We replace '&' with '&amp;'
 				didlXML.replaceAll("&", "&amp;");
 				try {
-					System.out.println("DIDLXML1`:" + didlXML);
+					Logger.println(Logger.DEBUG, "DIDLXML1`:" + didlXML);
 					doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
 				} catch ( SAXParseException saxe2 ) {
 					saxe2.printStackTrace();
 				}
 			}
-			System.out.println("DIDLXML2:" + didlXML);
+			Logger.println(Logger.DEBUG, "DIDLXML2:" + didlXML);
 			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;
-			System.out.println("DIDLXML3:" + didlXML);
+			Logger.println(Logger.DEBUG, "DIDLXML3:" + didlXML);
 			resultItemList = documentElement.getChildNodes();
 			//NodeList title = doc.getElementsByTagNameNS("urn:schemas-upnp-org:metadata-1-0/upnp/", "searchClass");
-			System.out.println("DIDLXML4:" + didlXML);
+			Logger.println(Logger.DEBUG, "DIDLXML4:" + didlXML);
 			NodeList title = doc.getElementsByTagNameNS("*", "searchClass");
-			System.out.println("title count:" + title.getLength() + ":value:" + ( title.getLength() > 0 ? title.item(0).getNodeValue() : "empty" ) );
+			Logger.println(Logger.DEBUG, "title count:" + title.getLength() + ":value:" + ( title.getLength() > 0 ? title.item(0).getNodeValue() : "empty" ) );
 			
 			for ( int inx = 0 ; inx < resultItemList.getLength() ; inx++ ) {
 				if ( resultItemList.item(inx).getNodeType() == Node.ELEMENT_NODE ) {
@@ -335,7 +336,7 @@ public class ContentDirectoryService extends UPnPService {
 						NodeList childNode = item.getChildNodes();
 						for ( int propInx = 0 ; propInx < childNode.getLength() ; propInx++ ) {
 							Node childElement = childNode.item(propInx);
-							System.out.println("node name:" + childElement.getNodeName());
+							Logger.println(Logger.DEBUG, "node name:" + childElement.getNodeName());
 							if ( childElement.getNodeType() == Node.ELEMENT_NODE ) {
 								if ( NAMESPACE_DC_ELEMENT.equals(childElement.getNamespaceURI())
 										&& childElement.getLocalName().equals("title") ) {
@@ -366,7 +367,7 @@ public class ContentDirectoryService extends UPnPService {
 						NodeList childNode = item.getChildNodes();
 						for ( int propInx = 0 ; propInx < childNode.getLength() ; propInx++ ) {
 							Node childElement = childNode.item(propInx);
-							System.out.println("node name:" + childElement.getNodeName());
+							Logger.println(Logger.DEBUG, "node name:" + childElement.getNodeName());
 							if ( NAMESPACE_DC_ELEMENT.equals(childElement.getNamespaceURI()) 
 									&& childElement.getLocalName().equals("title") ) {
 								oneItem.setTitle(childElement.getFirstChild().getNodeValue());
@@ -479,7 +480,7 @@ public class ContentDirectoryService extends UPnPService {
 		try {
 			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(sampleResultXML.toString());
 			for ( int inx = 0; inx < itemList.size() ; inx++ ) {
-				System.out.println(itemList.get(inx).toString());
+				Logger.println(Logger.DEBUG, itemList.get(inx).toString());
 			}
 		} catch ( Exception e ) {
 			e.printStackTrace();

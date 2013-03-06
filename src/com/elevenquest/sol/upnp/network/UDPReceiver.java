@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 
+import com.elevenquest.sol.upnp.common.Logger;
+
 
 public class UDPReceiver extends CommonReceiver {
 	NetworkInterface intf;
@@ -34,9 +36,9 @@ public class UDPReceiver extends CommonReceiver {
 			serverSocket = new DatagramSocket(port);
 			packet = new DatagramPacket(new byte[4096],4096, listenAddr, port);
 		}
-		System.out.println("before.:" + Thread.currentThread() );
+		Logger.println(Logger.DEBUG, "before.:" + Thread.currentThread() );
 		serverSocket.receive(packet);
-		System.out.println("after.:" + Thread.currentThread() );
+		Logger.println(Logger.DEBUG, "after.:" + Thread.currentThread() );
 		return packet;
 	}
 	

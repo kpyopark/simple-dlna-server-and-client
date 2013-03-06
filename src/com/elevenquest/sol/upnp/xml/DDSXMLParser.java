@@ -13,6 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.description.DeviceDescription;
 import com.elevenquest.sol.upnp.description.ImageElementInDDS;
 import com.elevenquest.sol.upnp.description.ServiceElementInDDS;
@@ -43,7 +44,7 @@ public class DDSXMLParser {
 			ioe.printStackTrace();
 		}
 		this.xmlInputStream = new ByteArrayInputStream(baos.toByteArray());
-		System.out.println("xml text:" + new String(baos.toByteArray()));
+		Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
 	}
 
 	public UPnPDevice getDeviceDescription() {
@@ -57,8 +58,8 @@ public class DDSXMLParser {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(xmlInputStream);
 			doc.getDocumentElement().normalize();
-			System.out.println("Base URI :" + doc.getBaseURI());
-			System.out.println("Root element "
+			Logger.println(Logger.DEBUG, "Base URI :" + doc.getBaseURI());
+			Logger.println(Logger.DEBUG, "Root element "
 					+ doc.getDocumentElement().getNodeName());
 
 			/* Spec Version */
@@ -103,7 +104,7 @@ public class DDSXMLParser {
 				description.setUpc(XMLParserUtility.getFirstNodeValue(deviceElement, "UPC"));
 				/* iconList */
 				NodeList nodeLsticon = doc.getElementsByTagName("icon");
-				System.out.println("--Information of all icons start --");
+				Logger.println(Logger.DEBUG, "--Information of all icons start --");
 
 				for (int s = 0; s < nodeLsticon.getLength(); s++) {
 					Node fstNode = nodeLsticon.item(s);
@@ -124,7 +125,7 @@ public class DDSXMLParser {
 					}
 					
 				}
-				System.out.println("--Information of all icons end--");
+				Logger.println(Logger.DEBUG, "--Information of all icons end--");
 				/* iconList */
 				/* serviceList */
 				NodeList serviceLst = doc.getElementsByTagName("service");
@@ -150,7 +151,7 @@ public class DDSXMLParser {
 						description.addService(service);
 					}
 				}
-				System.out.println("--Information of all icons end--");
+				Logger.println(Logger.DEBUG, "--Information of all icons end--");
 				/* serviceList */
 				
 				// TODO : We wouldn't process embedded devices yet. Someone help us to process them.

@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
@@ -108,7 +109,7 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 				return false;
 			while( (keyAndValue = br.readLine()) != null ) {
 				int totalLength = keyAndValue.length();
-				System.out.println(keyAndValue);
+				Logger.println(Logger.DEBUG, keyAndValue);
 				for ( int pos = 0; pos < totalLength; pos++ ) {
 					if ( keyAndValue.charAt(pos) == ':' ) {
 						this.setHeaderValue(keyAndValue.substring(0,pos), (totalLength > (pos + 1))? keyAndValue.substring(pos+1).trim() : "" );
@@ -181,7 +182,7 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 		UPnPDevice device = new UPnPDevice();
 		for ( Iterator<String> keyIter = this.getHeaderKeyIterator() ; keyIter.hasNext() ; ) {
 			String key = keyIter.next();
-			System.out.println(key+":"+this.getHeaderValue(key));
+			Logger.println(Logger.INFO, key+":"+this.getHeaderValue(key));
 		}
 		device.setUsn(this.getHeaderValue(ID_UPNP_DISCOVERY_USN));
 		device.setHost(this.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
@@ -197,7 +198,7 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 		device.setRemote(true);
 		device.setReadyToUse(false);
 		
-		System.out.println("New Device Info:\n" + device.toString());
+		Logger.println(Logger.DEBUG, "New Device Info:\n" + device.toString());
 		
 		return device;
 	}

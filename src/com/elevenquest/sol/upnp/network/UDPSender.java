@@ -9,6 +9,8 @@ import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.util.Observable;
 
+import com.elevenquest.sol.upnp.common.Logger;
+
 public class UDPSender extends CommonSender {
 	NetworkInterface intf;
 	int port;
@@ -27,7 +29,7 @@ public class UDPSender extends CommonSender {
 		DatagramPacket packet = null;
 		try {
 			if ( this.targetAddr.isMulticastAddress() ) {
-				System.out.println("send by using multicasting.");
+				Logger.println(Logger.DEBUG, "send by using multicasting.");
 				// Multicasting.
 				addr = new InetSocketAddress(this.targetAddr, port);
 				multiSocket = new MulticastSocket(port);
@@ -35,7 +37,7 @@ public class UDPSender extends CommonSender {
 				packet = new DatagramPacket(sendData, sendData.length, addr);
 				multiSocket.send(packet);
 			} else {
-				System.out.println("send by using unicasting.");
+				Logger.println(Logger.DEBUG, "send by using unicasting.");
 				// unicasting.
 				// TODO : MODIFY THE BELOW LINES. intf.getInetAddresses().nextElement()
 				addr = new InetSocketAddress(intf.getInetAddresses().nextElement(), port);

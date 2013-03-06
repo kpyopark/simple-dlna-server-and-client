@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 
 
@@ -150,7 +151,7 @@ public class UPnPDevice extends UPnPBase {
 		if ( st.hasMoreTokens() && (address = st.nextToken()) != null ) {
 			if ( st.hasMoreTokens() && ( port = st.nextToken()) != null ) {
 				try {
-					System.out.println("address:[" + address +  "]:port:[" + port + "]");
+					Logger.println(Logger.DEBUG, "address:[" + address +  "]:port:[" + port + "]");
 					setMultiCastAddress(InetAddress.getByName(address));
 					setMulticastPort(Integer.parseInt(port));
 				} catch ( Exception e ) {
