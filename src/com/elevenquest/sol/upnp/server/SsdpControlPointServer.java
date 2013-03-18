@@ -41,10 +41,10 @@ public class SsdpControlPointServer {
 				receiveServer.startServer();
 				
 				receiveServerList.add(receiveServer);
-			} catch ( Exception e ) {
-				e.printStackTrace();
 			} catch ( AbnormalException abe ) {
 				abe.printStackTrace();
+			} catch ( Exception e ) {
+				e.printStackTrace();
 			}
 		}
 	}

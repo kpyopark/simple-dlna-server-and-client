@@ -26,6 +26,7 @@ import org.xml.sax.SAXException;
 
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
+import com.elevenquest.sol.upnp.exception.ProcessableException;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
 
@@ -86,7 +87,13 @@ public class ActionExecutor {
 			requestWriter.flush();
 			
 			// 5. Retrieve Response & Parsing.
-		    parseReponse();
+			try {
+				parseReponse();
+			} catch (ActionError actionError) {
+				throw new ProcessableException(actionError.getMessage(), actionError);
+			} catch (Throwable unhandledError) {
+				throw new Exception(unhandledError.getMessage());
+			}
 		    
 		} finally {
 	    	if ( responseReader != null ) try { responseReader.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
@@ -120,7 +127,7 @@ public class ActionExecutor {
 		return sb.toString();
 	}
 	
-	private void parseReponse() throws Exception {
+	private void parseReponse() throws Throwable {
 
 		/*
 		HTTP/1.0 200 OK				---> only this field used.
@@ -206,6 +213,7 @@ public class ActionExecutor {
 		} else {
 			Logger.println(Logger.DEBUG, "---> response code:" + conn.getResponseCode());
 			BufferedReader br = null;
+			int errorCode = conn.getResponseCode();
 			try {
 				// 1. print HTTP header.
 				Map<String,List<String>> props = conn.getHeaderFields();
@@ -227,7 +235,9 @@ public class ActionExecutor {
 					if ( br != null ) br.close();
 				} catch ( Exception ie ) {}
 			}
-			throw new Exception(conn.getResponseMessage());
+			
+			if (errorCode != 200)
+				throw new ActionError(errorCode);
 		}
 	}
 	
