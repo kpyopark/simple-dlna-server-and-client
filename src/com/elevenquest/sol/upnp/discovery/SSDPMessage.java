@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
@@ -63,12 +64,12 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 		this.device = device;
 		// TODO : modify below lines.
 		this.setStartLine(SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE);
-		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_HOST, "239.255.255.250:1900");
-		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CACHECONTROL, "300");
-		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_LOCATION, "http://www.korea.com");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_HOST, DefaultConfig.ID_UPNP_DISCOVERY_HOST_VALUE);
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CACHECONTROL, DefaultConfig.ID_UPNP_DISCOVERY_CACHECONTROL_VALUE);
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_LOCATION, DefaultConfig.ID_UPNP_DISCOVERY_LOCATION_VALUE);
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_NOTIFICATION_TYPE,"uuid:" + this.device.getUuid() );
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_NT_SUBTYPE, SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE);
-		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_SERVER,"WindowsNT UPnP/1.1 simpledlna/draft");
+		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_SERVER,DefaultConfig.ID_UPNP_DISCOVERY_SERVER_VALUE);
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_USN,"uuid:" + this.device.getUuid() );
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG,"1");
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CONFIGID_UPNP_ORG,"1");

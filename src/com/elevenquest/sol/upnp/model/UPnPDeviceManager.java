@@ -95,23 +95,12 @@ public class UPnPDeviceManager {
 			UPnPDevice device = this.deviceList.values().iterator().next();
 			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() == false ) {
 				Logger.println(Logger.INFO, "Update Remote Device..[" + device.getUuid() + "]" );
-				//device.setUserAndPassword("toheaven01@korea.com", "1q2w3e4r");
+				// TODO : Some DMS product need user id & password for authorization.
+				// So, we need to support simple http authorization.
+				//device.setUserAndPassword("user_id", "password");
 				device.setProgressingToRetrieve(true);
 				Thread oneTimeThread = new SampleTread(device);
 				oneTimeThread.start();
-				/*
-				CommonSender sender = new HTTPSender(device.getNetworkInterface(),device.getLocation());
-				CommonSendHandler handler = new DeviceDescription(device);
-				sender.setSenderHandler(handler);
-				CommonServer sendServer = null;
-				sendServer = new CommonServer();
-				sendServer.setSender(sender, new SendEvent(SendEvent.SEND_EVENT_TYPE_ONCE, 500));
-				try {
-					sendServer.startServer();
-				} catch ( AbnormalException abne ) {
-					abne.printStackTrace();
-				}
-				*/
 			}
 		}
 	}

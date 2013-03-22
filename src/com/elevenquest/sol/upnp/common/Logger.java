@@ -29,9 +29,19 @@ public class Logger {
 	}
 
 	public static void println(int level, Object msg) {
-		StringBuffer sb = new StringBuffer();
-		sb.append(getLevelTitle(level));
-		sb.append(msg);
-		System.out.println(sb.toString());
+		if ( msg instanceof Throwable ) {
+			StringBuffer sb = new StringBuffer();
+			Throwable error = (Throwable)msg;
+			sb.append(getLevelTitle(level));
+			sb.append(getLevelTitle(ERROR));
+			sb.append(error.getMessage());
+			System.out.println(sb.toString());
+			error.printStackTrace();
+		} else {
+			StringBuffer sb = new StringBuffer();
+			sb.append(getLevelTitle(level));
+			sb.append(msg);
+			System.out.println(sb.toString());
+		}
 	}
 }
