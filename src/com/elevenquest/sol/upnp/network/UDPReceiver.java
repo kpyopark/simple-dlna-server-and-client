@@ -22,7 +22,8 @@ public class UDPReceiver extends CommonReceiver {
 		this.port = port;
 	}
 	
-	public Object listen() throws Exception {
+	public HTTPRequest listen() throws Exception {
+		HTTPRequest request = null;
 		DatagramPacket packet = null;
 		if ( serverSocket != null ) {
 			serverSocket.close();
@@ -39,7 +40,9 @@ public class UDPReceiver extends CommonReceiver {
 		Logger.println(Logger.DEBUG, "before.:" + Thread.currentThread() );
 		serverSocket.receive(packet);
 		Logger.println(Logger.DEBUG, "after.:" + Thread.currentThread() );
-		return packet;
+		HTTPParser parser = new HTTPParser(packet.getData());
+		request = parser.parse();
+		return request;
 	}
 	
 }

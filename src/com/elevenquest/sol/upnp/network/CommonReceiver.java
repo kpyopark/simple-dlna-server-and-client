@@ -16,17 +16,17 @@ public abstract class CommonReceiver {
 	}
 	
 	/**
-	 * ½ÇÁ¦·Î network layer¿¡ ÀÖ´Â ÀÚ·á¸¦ ¹Þ´Â ¿ªÈ°À» ÇÏ´Â ¸Þ½îµå.
-	 * ServerSocketÀÇ °æ¿ì, accept¸¦ È£ÃâÇÏ´Â ¿ªÈ°.
-	 * µ¥ÀÌÅ¸ ½ºÆ®¸²À» ¹ÞÀº ÀÌÈÄ, process ÇÔ¼ö¸¦ È£ÃâÇØ ÁÖ¾î¾ß ÇÑ´Ù.
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ network layerï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ú·á¸¦ ï¿½Þ´ï¿½ ï¿½ï¿½È°ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Þ½ï¿½ï¿½.
+	 * ServerSocketï¿½ï¿½ ï¿½ï¿½ï¿½, acceptï¿½ï¿½ È£ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½È°.
+	 * ï¿½ï¿½ï¿½ï¿½Å¸ ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, process ï¿½Ô¼ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½ ï¿½Ñ´ï¿½.
 	 * 
-	 * ÁÖÀÇ : ÇØ´ç ¸Þ½îµå´Â Blocking methods·Î °£ÁÖÇÑ´Ù. (Sync ¹æ½Ä)
-	 *       ¸¸¾à, BlockingÀÌ µÇÁö ¾Ê´Â °æ¿ì, ÇØ´ç Listener°¡ Áö¼ÓÀûÀ¸·Î ¹Ýº¹µÇ¾î
-	 *       ¼­¹ö ºÎÇÏ°¡ ´ë·®À¸·Î ¹ß»ýµÈ´Ù.
+	 * ï¿½ï¿½ï¿½ï¿½ : ï¿½Ø´ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ Blocking methodsï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½. (Sync ï¿½ï¿½ï¿½)
+	 *       ï¿½ï¿½ï¿½ï¿½, Blockingï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½ï¿½, ï¿½Ø´ï¿½ Listenerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ýºï¿½ï¿½Ç¾ï¿½
+	 *       ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ë·®ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½È´ï¿½.
 	 * 
 	 * @throws Exception
 	 */
-	abstract protected Object listen() throws Exception;
+	abstract protected HTTPRequest listen() throws Exception;
 	
 	public void beforeReceive() {
 		// TODO : API for hooking
@@ -38,7 +38,7 @@ public abstract class CommonReceiver {
 	
 	public void receiveData() throws Exception {
 		beforeReceive();
-		Object rtnValue = listen();
+		HTTPRequest rtnValue = listen();
 		process(rtnValue);
 		afterReceive();
 	}
@@ -48,14 +48,14 @@ public abstract class CommonReceiver {
 	}
 	
 	/**
-	 * listenÇÑ ÀÚ·á¸¦ ½ÇÁ¦·Î Ã³¸®ÇÏ´Â CommonHandler¸¦ È£ÃâÇÑ´Ù.
-	 * ³»ºÎÀûÀ¸·Î µî·ÏµÈ(addReceiveHandler) Handler¸¦ ¿©·¯¹ø È£ÃâÇÒ ¼ö ÀÖ´Ù. 
+	 * listenï¿½ï¿½ ï¿½Ú·á¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ CommonHandlerï¿½ï¿½ È£ï¿½ï¿½ï¿½Ñ´ï¿½.
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ïµï¿½(addReceiveHandler) Handlerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½. 
 	 * 
 	 * @param packet
 	 */
-	public void process(Object packet) {
+	public void process(HTTPRequest request) {
 		for ( ICommonReceiveHandler handler : this.handlerList ) {
-			handler.process(packet);
+			handler.process(request);
 		}
 	}
 

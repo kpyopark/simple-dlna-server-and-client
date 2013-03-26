@@ -11,6 +11,7 @@ import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
+import com.elevenquest.sol.upnp.network.HTTPRequest;
 import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
 import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 
@@ -143,8 +144,7 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 		return isValid;
 	}
 
-	public void process(Object packet) {
-		DatagramPacket dgPacket = (DatagramPacket)packet;
+	public void process(HTTPRequest request) {
 		SSDPMessage message = new SSDPMessage();
  		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
 		try {
