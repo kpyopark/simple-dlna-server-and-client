@@ -9,6 +9,7 @@ import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPBase;
 import com.elevenquest.sol.upnp.model.UPnPService;
+import com.elevenquest.sol.upnp.network.HTTPRequest;
 import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
 import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 
@@ -104,7 +105,7 @@ public class Subscriber extends UPnPBase implements ICommonReceiveHandler, IComm
 		return null;
 	}
 	@Override
-	public void process(Object packet) {
+	public void process(HTTPRequest request) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -11,15 +12,17 @@ import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
+import com.elevenquest.sol.upnp.network.BaseHTTPMapper;
 import com.elevenquest.sol.upnp.network.HTTPRequest;
 import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
 import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 
-public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
+public class SSDPMessage extends BaseHTTPMapper implements ICommonReceiveHandler, ICommonSendHandler {
 	String startLine = null;
-	HashMap<String, String> headerList = new HashMap<String, String>();
 	boolean needValidation = false;
 	UPnPDevice device = null;
+	ArrayList<String> headerNames = null;
+	ArrayList<String> headerValues = null;
 	
 	public final static String ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG";
 	public final static String ID_UPNP_DISCOVERY_NEXTBOTID_UPNP_ORG = "NEXTBOOTID.UPNP.ORG";
@@ -58,10 +61,11 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 	}
 	
 	public SSDPMessage() {
-		
+		super();
 	}
 	
 	public SSDPMessage(UPnPDevice device) {
+		this();
 		this.device = device;
 		// TODO : modify below lines.
 		this.setStartLine(SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE);
@@ -75,26 +79,6 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG,"1");
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CONFIGID_UPNP_ORG,"1");
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_SEARCHPORT_UPNP_ORG,this.device.getMulticastPort() + "");	
-	}
-	
-	public String getStartLine() {
-		return this.startLine;
-	}
-	
-	public void setStartLine(String startLine) {
-		this.startLine= startLine;
-	}
-	
-	public String getHeaderValue(String headerId) {
-		return headerList.get(headerId);
-	}
-	
-	public void setHeaderValue(String headerId, String value) {
-		headerList.put(headerId.toUpperCase(), value);
-	}
-	
-	public Iterator<String> getHeaderKeyIterator() {
-		return this.headerList.keySet().iterator();
 	}
 	
 	public boolean parse(byte[] content) throws Exception {
@@ -160,18 +144,6 @@ public class SSDPMessage implements ICommonReceiveHandler, ICommonSendHandler {
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
-	}
-
-	public Object getSendObject() throws Exception {
-		StringBuffer fullMessage = new StringBuffer();
-		// append start header.
-		fullMessage.append(startLine).append('\n');
-		// append other header list.
-		for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
-			String key = keyIter.next();
-			fullMessage.append(key).append(':').append(headerList.get(key)).append('\n');
-		}
-		return fullMessage.toString().getBytes();
 	}
 
 	public Object processAfterSend(Object returnValue) {

@@ -57,6 +57,14 @@ public class HTTPRequest {
 		return headerCount;
 	}
 	
+	public ArrayList<String> getHeaderNames() {
+		return this.headerNames;
+	}
+	
+	public ArrayList<String> getHeaderValues() {
+		return this.headerValues;
+	}
+
 	public String[] getHeaderList(String headerName) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
@@ -72,6 +80,14 @@ public class HTTPRequest {
 				return headerValues.get(cnt);
 		}
 		return null;
+	}
+	
+	public String getHeaderName(int cnt) {
+		return this.headerNames.get(cnt);
+	}
+	
+	public String getHeaderValue(int cnt) {
+		return this.headerValues.get(cnt);
 	}
 	
 	public byte[] getBodyArray() {

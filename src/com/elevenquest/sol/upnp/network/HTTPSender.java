@@ -1,7 +1,13 @@
 package com.elevenquest.sol.upnp.network;
 
+import java.io.BufferedOutputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Observable;
 
 import org.apache.http.HttpResponse;
@@ -38,26 +44,16 @@ public class HTTPSender extends CommonSender {
 	}
 
 	@Override
-	protected void send(Object sendData) throws Exception {
+	protected void send(HTTPRequest request) throws Exception {
+
+		HTTPResponse response = new HTTPResponse();
 		
 		// 1. At first, retrieving target URL.
 		if ( this.targetURL == null ) {
 			this.targetURL = "http://" + this.target.getHostAddress() + ":" + this.port + this.uri;
 		}
 
-		HttpClient client = new DefaultHttpClient();
-		HttpResponse response = null;
-		if ( sendData instanceof HttpGet ) {
-			HttpGet getRequest = (HttpGet)sendData;
-			response = client.execute(getRequest);
-		}
-		else if ( sendData instanceof HttpPost ) {
-			HttpPost postRequest = (HttpPost)sendData;
-			response = client.execute(postRequest);
-		}
-		
-		/*
-		java.net.URL url = new URL(this.targetURL);
+		URL url = new URL(this.targetURL);
 		HttpURLConnection urlCon = null;
 		BufferedOutputStream bos = null;
 		try {
@@ -65,9 +61,11 @@ public class HTTPSender extends CommonSender {
 			urlCon = (HttpURLConnection)url.openConnection();
 			
 			// 3. Set header to request
-			Header[] headers = request.getAllHeaders();
-			for ( int inx = 0 ; headers != null && inx < headers.length ; inx++ ) {
-				urlCon.addRequestProperty(headers[inx].getName(), headers[inx].getValue());
+			urlCon.setRequestMethod(request.getCommand());
+			ArrayList<String> headerNames = request.getHeaderNames();
+			ArrayList<String> headerValues = request.getHeaderValues();
+			for ( int cnt = 0 ; cnt < request.getHeaderCount() ; cnt++ ) {
+				urlCon.addRequestProperty(headerNames.get(cnt), headerValues.get(cnt));
 			}
 			urlCon.setDoOutput(true);
 			urlCon.connect();
@@ -76,15 +74,21 @@ public class HTTPSender extends CommonSender {
 			bos = new BufferedOutputStream(urlCon.getOutputStream());
 			byte buffer[] = new byte[1024];
 			int size = 0;
-			while( ( size = request.getEntity().getContent().read(buffer, 0, 1024) ) != -1 ) {
+			while( ( size = request.getBodyInputStream().read(buffer, 0, 1024) ) != -1 ) {
 				bos.write(buffer,0,size);
 			}
 			
 			// 5. flush & output stream close.
 			bos.flush();
-			// bos.close(); -- it doesn't need.
+			bos.close();
+
 			// 6. retrieving the response from the server.
-			
+			int status = urlCon.getResponseCode();
+			for (Entry<String, List<String>> header : urlCon.getHeaderFields().entrySet()) {
+				for (String value : header.getValue().toArray(new String[0]) )
+					response.addHeader(header.getKey(), value);
+			}
+			response.setBodyInputStream(urlCon.getInputStream());
 			
 		} finally {
 			if ( bos != null ) try { bos.close(); } catch ( Exception e1 ) {
@@ -94,7 +98,7 @@ public class HTTPSender extends CommonSender {
 				e1.printStackTrace();
 			}
 		}
-		*/
+
 		handler.processAfterSend(response);
 	}
 

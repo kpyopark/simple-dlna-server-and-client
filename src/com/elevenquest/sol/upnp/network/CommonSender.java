@@ -16,19 +16,15 @@ public abstract class CommonSender implements Observer {
 	}
 	
 	public void sendData() throws Exception {
-		Object rtnValue = handler.getSendObject();
+		HTTPRequest rtnValue = handler.getHTTPRequest();
 		send(rtnValue);
 	}
 	
 	/**
-	 * 실제로 network layer에 있는 자료를 보내주는 역활을 하는 메쏘드.
-	 * 
-	 * 주의 : 해당 메쏘드는 non-Blocking method로 간주한다.
-	 *       따라서, Event가 발생되는 경우에만, 자료를 보내는 역활을 하는 것으로 간주한다.
 	 * 
 	 * @throws Exception
 	 */
-	abstract protected void send(Object sendData) throws Exception;
+	abstract protected void send(HTTPRequest sendData) throws Exception;
 	
 	public void clear() {
 		clearHandler();

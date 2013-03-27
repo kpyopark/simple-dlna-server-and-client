@@ -24,9 +24,7 @@ public class HTTPResponse {
 
 	
 	// When to use same keys in one http connection, so we can't use HashMap class (in java)
-	
-	public HTTPResponse(String command) {
-		this.command = command;
+	public HTTPResponse() {
 		headerNames = new ArrayList<String>();
 		headerValues = new ArrayList<String>();
 		headerCount = 0;

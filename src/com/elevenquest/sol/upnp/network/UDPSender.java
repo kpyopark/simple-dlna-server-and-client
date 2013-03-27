@@ -22,19 +22,26 @@ public class UDPSender extends CommonSender {
 		this.targetAddr = targetAddr;
 	}
 	
-	public void send(byte[] sendData) throws Exception {
+	@Override
+	protected void send(HTTPRequest request) throws Exception {
 		SocketAddress addr = null;
 		DatagramSocket socket = null;
 		java.net.MulticastSocket multiSocket = null;
 		DatagramPacket packet = null;
 		try {
+			StringBuffer buffer = new StringBuffer();
+			buffer.append(request.getCommand()).append(" ").append(request.getUrlPath()).append(" ").append(request.getHttpVer()).append("\n\r");
+			for ( int cnt = 0 ; cnt < request.getHeaderCount() ; cnt++ )
+				buffer.append(request.getHeaderName(cnt)).append(":").append(request.getHeaderValue(cnt)).append("\n\r");
+			buffer.append("\n\r");
+			
 			if ( this.targetAddr.isMulticastAddress() ) {
 				Logger.println(Logger.DEBUG, "send by using multicasting.");
 				// Multicasting.
 				addr = new InetSocketAddress(this.targetAddr, port);
 				multiSocket = new MulticastSocket(port);
 				multiSocket.joinGroup(targetAddr);
-				packet = new DatagramPacket(sendData, sendData.length, addr);
+				packet = new DatagramPacket(, sendData.length, addr);
 				multiSocket.send(packet);
 			} else {
 				Logger.println(Logger.DEBUG, "send by using unicasting.");
@@ -59,11 +66,6 @@ public class UDPSender extends CommonSender {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	@Override
-	protected void send(Object sendData) throws Exception {
-		send((byte[])sendData);
 	}
 
 	public void update(Observable o, Object arg) {
