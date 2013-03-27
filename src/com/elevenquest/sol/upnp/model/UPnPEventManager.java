@@ -21,7 +21,7 @@ public class UPnPEventManager extends UPnPBase {
 		waitingQueue = new ArrayBlockingQueue<UPnPService>(10);
 	}
 	
-	public static UPnPEventManager getUPnPEventMaanger() {
+	public static UPnPEventManager getUPnPEventManager() {
 		if ( defaultManager == null )
 			defaultManager = new UPnPEventManager();
 		return defaultManager;
