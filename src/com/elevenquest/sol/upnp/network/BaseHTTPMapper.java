@@ -65,14 +65,11 @@ public class BaseHTTPMapper {
 
 	public HTTPRequest getHTTPRequest() throws Exception {
 		HTTPRequest request = new HTTPRequest();
-		StringBuffer fullMessage = new StringBuffer();
-		// append start header.
-		fullMessage.append(startLine).append('\n');
-		// append other header list.
-		for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
-			String key = keyIter.next();
-			fullMessage.append(key).append(':').append(headerList.get(key)).append('\n');
-		}
+		request.setCommand(HTTPRequest.)
+		ArrayList<String> headers = this.getHeaderNames();
+		ArrayList<String> values = this.getHeaderValues();
+		for ( int cnt = 0 ; cnt < headers.size(); cnt++ )
+			request.addHeader(headers.get(cnt), values.get(cnt));
 		return request;
 	}
 

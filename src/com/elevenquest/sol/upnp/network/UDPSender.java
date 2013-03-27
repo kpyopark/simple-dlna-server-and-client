@@ -34,14 +34,14 @@ public class UDPSender extends CommonSender {
 			for ( int cnt = 0 ; cnt < request.getHeaderCount() ; cnt++ )
 				buffer.append(request.getHeaderName(cnt)).append(":").append(request.getHeaderValue(cnt)).append("\n\r");
 			buffer.append("\n\r");
-			
+			byte[] bytesSend = buffer.toString().getBytes();
 			if ( this.targetAddr.isMulticastAddress() ) {
 				Logger.println(Logger.DEBUG, "send by using multicasting.");
 				// Multicasting.
 				addr = new InetSocketAddress(this.targetAddr, port);
 				multiSocket = new MulticastSocket(port);
 				multiSocket.joinGroup(targetAddr);
-				packet = new DatagramPacket(, sendData.length, addr);
+				packet = new DatagramPacket(bytesSend, bytesSend.length, addr);
 				multiSocket.send(packet);
 			} else {
 				Logger.println(Logger.DEBUG, "send by using unicasting.");
@@ -49,7 +49,7 @@ public class UDPSender extends CommonSender {
 				// TODO : MODIFY THE BELOW LINES. intf.getInetAddresses().nextElement()
 				addr = new InetSocketAddress(intf.getInetAddresses().nextElement(), port);
 				socket = new DatagramSocket(port, targetAddr);
-				packet = new DatagramPacket(sendData, sendData.length, addr);
+				packet = new DatagramPacket(bytesSend, bytesSend.length, addr);
 				socket.send(packet);
 			}
 		} catch (Exception e) {
