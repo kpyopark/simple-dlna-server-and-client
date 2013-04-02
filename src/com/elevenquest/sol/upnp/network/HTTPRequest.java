@@ -31,6 +31,18 @@ public class HTTPRequest {
 		this(HTTP_REQUEST_COMMAND_GET);
 	}
 	
+	public HTTPRequest(HTTPRequest oldOne) {
+		this.streamBody = oldOne.streamBody;
+		this.arrayBody = oldOne.arrayBody;
+		this.headerNames = oldOne.headerNames;
+		this.headerValues = oldOne.headerValues;
+		this.headerCount = oldOne.headerCount;
+		this.command = oldOne.command;
+		this.urlPath = oldOne.urlPath;
+		this.httpVer = oldOne.httpVer;
+		this.processingException = oldOne.processingException;
+	}
+	
 	public void setCommand(String command) {
 		this.command = command;
 	}
@@ -74,7 +86,7 @@ public class HTTPRequest {
 		return list.toArray(new String[0]);
 	}
 	
-	public String getHeader(String headerName) {
+	public String getHeaderValue(String headerName) {
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
 			if ( headerNames.get(cnt).equals(headerName) )
 				return headerValues.get(cnt);
@@ -150,6 +162,20 @@ public class HTTPRequest {
 
 	public void setHttpVer(String httpVer) {
 		this.httpVer = httpVer;
+	}
+	
+	public void setHeaderValue(String headerName, String headerValue) {
+		boolean isOverwrite = false;
+		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
+			if ( headerNames.get(cnt).equals(headerName) ) {
+				headerValues.set(cnt, headerValue);
+				isOverwrite = true;
+			}
+		}
+		if ( !isOverwrite ) {
+			headerNames.add(headerName);
+			headerValues.add(headerValue);
+		}
 	}
 	
 }

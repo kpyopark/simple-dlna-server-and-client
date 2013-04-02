@@ -48,7 +48,7 @@ public class HTTPResponse {
 		return list.toArray(new String[0]);
 	}
 	
-	public String getHeader(String headerName) {
+	public String getHeaderValue(String headerName) {
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
 			if ( headerNames.get(cnt).equals(headerName) )
 				return headerValues.get(cnt);
@@ -125,4 +125,20 @@ public class HTTPResponse {
 	public void setReasonPhrase(String reasonPhrase) {
 		this.reasonPhrase = reasonPhrase;
 	}
+
+	public void setHeaderValue(String headerName, String headerValue) {
+		boolean isOverwrite = false;
+		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
+			if ( headerNames.get(cnt).equals(headerName) ) {
+				headerValues.set(cnt, headerValue);
+				isOverwrite = true;
+			}
+		}
+		if ( !isOverwrite ) {
+			headerNames.add(headerName);
+			headerValues.add(headerValue);
+		}
+	}
+	
+
 }
