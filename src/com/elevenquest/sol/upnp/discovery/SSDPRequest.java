@@ -8,34 +8,15 @@ import com.elevenquest.sol.upnp.network.HTTPRequest;
 public class SSDPRequest extends HTTPRequest {
 	UPnPDevice device = null;
 	
-	public final static String ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG = "BOOTID.UPNP.ORG";
-	public final static String ID_UPNP_DISCOVERY_NEXTBOTID_UPNP_ORG = "NEXTBOOTID.UPNP.ORG";
-	public final static String ID_UPNP_DISCOVERY_CONFIGID_UPNP_ORG = "CONFIGID.UPNP.ORG";
-	public final static String ID_UPNP_DISCOVERY_SEARCHPORT_UPNP_ORG = "SEARCHPORT.UPNP.ORG";
-	public final static String ID_UPNP_DISCOVERY_HOST = "HOST";
-	public final static String ID_UPNP_DISCOVERY_CACHECONTROL = "CACHE-CONTROL";
-	public final static String ID_UPNP_DISCOVERY_LOCATION = "LOCATION";
-	public final static String ID_UPNP_DISCOVERY_NOTIFICATION_TYPE = "NT";
-	public final static String ID_UPNP_DISCOVERY_NT_SUBTYPE = "NTS";
-	public final static String ID_UPNP_DISCOVERY_SERVER = "SERVER";
-	public final static String ID_UPNP_DISCOVERY_USN = "USN";
-	
-	public final static String ID_START_LINE_COMMAND_NOTIFY = "NOTIFY";
-	public final static String ID_START_LINE_COMMAND_SEARCH = "M-SEARCH";
-	
-	public final static String ID_NT_SUBTYPE_SSDPALIVE = "ssdp:alive";
-	public final static String ID_NT_SUBTYPE_SSDPBYEBYE = "ssdp:byebye";
-	public final static String ID_NT_SUBTYPE_SSDPUPDATE = "ssdp:update";
-	
-	public final static String REQUIRED_ID_LIST[] = {
-		ID_UPNP_DISCOVERY_BOOTID_UPNP_ORG, ID_UPNP_DISCOVERY_CONFIGID_UPNP_ORG, ID_UPNP_DISCOVERY_SEARCHPORT_UPNP_ORG};
-	
 	public SSDPRequest() {
 		super();
 	}
 	
 	/**
-	 * 	This constructor will be used when to extract UPnPDevice info from HTTP Request sent by remote device.
+	 * This constructor will be used when to extract UPnPDevice info from HTTP Request sent by remote device.
+	 * 
+	 * ** We are going to make two constructors in all message wrapper classes related with HTTP Protocol in our package.
+	 * ** Because, all of them is used for two methods by constructing a message or extracting from a message. 
 	 * 
 	 * @param request
 	 */
@@ -52,7 +33,7 @@ public class SSDPRequest extends HTTPRequest {
 	public SSDPRequest(UPnPDevice device) {
 		super();
 		this.device = device;
-		this.setCommand(ID_START_LINE_COMMAND_NOTIFY);
+		this.setCommand(SSDPMessage.ID_START_LINE_COMMAND_NOTIFY);
 		this.setHttpVer("HTTP/1.1");
 		this.setUrlPath("*");
 		this.setHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_HOST, DefaultConfig.ID_UPNP_DISCOVERY_HOST_VALUE);
@@ -75,17 +56,17 @@ public class SSDPRequest extends HTTPRequest {
 	public UPnPDevice getDeviceBaseInfo() {
 		UPnPDevice device = new UPnPDevice();
 
-		device.setUsn(this.getHeaderValue(ID_UPNP_DISCOVERY_USN));
-		device.setHost(this.getHeaderValue(ID_UPNP_DISCOVERY_HOST));
-		device.setLocation(this.getHeaderValue(ID_UPNP_DISCOVERY_LOCATION));
+		device.setUsn(this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_USN));
+		device.setHost(this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_HOST));
+		device.setLocation(this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_LOCATION));
 		{
-			String cacheValue = this.getHeaderValue(ID_UPNP_DISCOVERY_CACHECONTROL);
+			String cacheValue = this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_CACHECONTROL);
 			device.setCacheControl(Integer.parseInt(cacheValue.substring(cacheValue.indexOf("max-age=")+8).trim()));
 		}
 		
-		device.setNts(this.getHeaderValue(ID_UPNP_DISCOVERY_NT_SUBTYPE));
-		device.setNt(this.getHeaderValue(ID_UPNP_DISCOVERY_NOTIFICATION_TYPE));
-		device.setServer(this.getHeaderValue(ID_UPNP_DISCOVERY_SERVER));
+		device.setNts(this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_NT_SUBTYPE));
+		device.setNt(this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_NOTIFICATION_TYPE));
+		device.setServer(this.getHeaderValue(SSDPMessage.ID_UPNP_DISCOVERY_SERVER));
 		device.setRemote(true);
 		device.setReadyToUse(false);
 		

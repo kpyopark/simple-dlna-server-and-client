@@ -16,6 +16,7 @@ import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.network.CommonSender;
+import com.elevenquest.sol.upnp.network.HTTPRequest;
 import com.elevenquest.sol.upnp.network.HTTPSender;
 import com.elevenquest.sol.upnp.network.ICommonSendHandler;
 import com.elevenquest.sol.upnp.xml.DDSXMLParser;
@@ -418,10 +419,10 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 				for ( int inx = 0 ; inx < services.size() ; inx++ ) {
 					UPnPService service = services.get(inx);
 					if ( service.isRemote() && !service.isReadyToUse() && !service.isProgressingToRetrieve() ) {
-						// ¿øÄ¢ÀûÀ¸·Î ¿©±â¿¡¼­ Service DescriptionÀ» °¡Áö°í ¿À´Â°ÍÀÌ ¾Æ´Ï¶ó,
-						// UPnPDevice¿¡¼­ »õ·ÎÀÌ µî·ÏµÈ Service°¡ ÀÖ´Â °æ¿ì, Serivce¸¦ UpdateÇÏ´Â°Ô ÀÌÄ¡ÀûÀ¸·Î ¸ÂÀ½
-						// But. ±¸Çö½Ã ¼­¹ö°¡ Ãß°¡µÇ¾î¾ß ÇÏ¹Ç·Î ¿©±â¼­ ¹Ù·Î ¾ò¾î¼­ UpdateÇÏ´Â °ÍÀ¸·Î ·ÎÁ÷ ±¸¼º
-						// ÀÌ·² °æ¿ì, Hang Çö»ó ¹ß»ý°¡´É.
+						// ï¿½ï¿½Ä¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¿¡ï¿½ï¿½ Service Descriptionï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â°ï¿½ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½,
+						// UPnPDeviceï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ïµï¿½ Serviceï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½, Serivceï¿½ï¿½ Updateï¿½Ï´Â°ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+						// But. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½Ç¾ï¿½ï¿½ ï¿½Ï¹Ç·ï¿½ ï¿½ï¿½ï¿½â¼­ ï¿½Ù·ï¿½ ï¿½ï¿½î¼­ Updateï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+						// ï¿½Ì·ï¿½ ï¿½ï¿½ï¿½, Hang ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ï¿½.
 						
 						class ServiceDescriptionSendThread extends Thread {
 							UPnPService inner = null;
@@ -520,6 +521,21 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 		if(this.presentationURL!="") Logger.println(Logger.INFO, this.presentationURL);
 		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
 		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
+	}
+
+	@Override
+	public HTTPRequest getHTTPRequest() throws Exception {
+		HTTPRequest request = new HTTPRequest();
+		request.setHttpVer("HTTP/1.1");
+		request.setCommand("GET");
+		request.setUrlPath(this.device.getLocation());
+		String osVersion = "WindowsNT";
+		String productVersion = "simpledlna/1.0";
+		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		request.setBodyArray(this.getRequestBody().getBytes("utf-8"));
+		if ( this.device.getAuthorizationStr() != null )
+			request.addHeader("Authorization", "Basic " + this.device.getAuthorizationStr() );
+		return request;
 	}
 	
 }

@@ -15,9 +15,12 @@ public class HTTPRequest {
 	ArrayList<String> headerValues = null;
 	int headerCount = 0;
 	
-	String command = "";
-	String urlPath = "";
-	String httpVer = "";
+	String command = null;
+	String urlPath = null;
+	String httpVer = null;
+	
+	String host = null;
+	String port = null;
 	
 	Exception processingException = null;
 	
