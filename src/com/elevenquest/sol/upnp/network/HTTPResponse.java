@@ -15,13 +15,11 @@ public class HTTPResponse {
 	ArrayList<String> headerValues = null;
 	int headerCount = 0;
 	
-	String command = "";
+	String httpVer = null;
+	String statusCode = null;
+	String reasonPhrase = null;
 	
 	Exception processingException = null;
-	
-	public static String HTTP_REQUEST_COMMAND_GET = "GET";
-	public static String HTTP_REQUEST_COMMAND_POST = "POST";
-
 	
 	// When to use same keys in one http connection, so we can't use HashMap class (in java)
 	public HTTPResponse() {
@@ -102,5 +100,29 @@ public class HTTPResponse {
 	
 	public void setBodyInputStream(InputStream is) {
 		this.streamBody = is;
+	}
+
+	public String getHttpVer() {
+		return httpVer;
+	}
+
+	public void setHttpVer(String httpVer) {
+		this.httpVer = httpVer;
+	}
+
+	public String getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	public String getReasonPhrase() {
+		return reasonPhrase;
+	}
+
+	public void setReasonPhrase(String reasonPhrase) {
+		this.reasonPhrase = reasonPhrase;
 	}
 }

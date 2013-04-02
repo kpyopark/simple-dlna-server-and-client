@@ -31,7 +31,7 @@ public class HTTPReceiver {
 			serverSoc = new ServerSocket(this.port);
 			clientSoc = serverSoc.accept();
 			reader = new HTTPParser(clientSoc.getInputStream());
-			request = reader.parse();
+			request = reader.parseHTTPRequest();
 		} finally {
 			if ( clientSoc != null) try { clientSoc.close(); } catch( Exception e1 ) {
 				e1.printStackTrace();

@@ -41,7 +41,7 @@ public class UDPReceiver extends CommonReceiver {
 		serverSocket.receive(packet);
 		Logger.println(Logger.DEBUG, "after.:" + Thread.currentThread() );
 		HTTPParser parser = new HTTPParser(packet.getData());
-		request = parser.parse();
+		request = parser.parseHTTPRequest();
 		return request;
 	}
 	

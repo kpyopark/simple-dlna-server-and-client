@@ -71,7 +71,7 @@ public class HTTPParser {
 		if ( inputStream != null ) try { inputStream.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
 	}
 
-	public HTTPRequest parse() throws Exception {
+	public HTTPRequest parseHTTPRequest() throws Exception {
 		
 		HTTPRequest request = new HTTPRequest();
 		String aLine = "";
@@ -119,5 +119,61 @@ public class HTTPParser {
 		}
 		return request;
 	}
-	
+
+	public HTTPResponse parseHTTPResponse() throws Exception {
+		
+		HTTPResponse response = new HTTPResponse();
+		String aLine = "";
+		boolean isHeader = true;
+		while ( ( aLine = readLine() ) != null ) {
+			if ( aLine.trim().length() == 0 ) {		// Header / Body separated by knew line character.
+				isHeader = false;
+			}
+			if ( isHeader) {
+				String key = "";
+				String value = "";
+				for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
+					if ( aLine.charAt(pos) == ':' )
+						key = aLine.substring(0,pos);
+						value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1) : ""; 
+				}
+				// status code line
+				if ( key.length() == 0 ) {
+					StringTokenizer st = new StringTokenizer(aLine, " ");
+					boolean isValidResponse = true;
+					if ( isValidResponse && st.hasMoreTokens() )
+						response.setHttpVer(st.nextToken());
+					else {
+						isValidResponse = false;
+						Logger.println(Logger.ERROR, "In http response, there is no http version. status line is " + aLine + "." );
+					}
+					if ( isValidResponse && st.hasMoreTokens() ) {
+						String strStatusCode = st.nextToken();
+						try {
+							int statusCode = Integer.parseInt(strStatusCode);
+							response.setStatusCode(strStatusCode);
+						} catch (NumberFormatException nfe) {
+							isValidResponse = false;
+							Logger.println(Logger.ERROR, "In http response, there is invalid status code. status code is "+ strStatusCode + ".");
+						}
+					}
+					else {
+						isValidResponse = false;
+						Logger.println(Logger.ERROR, "In http response, there is no status code. status line is " + aLine + "." );
+					}
+					if ( isValidResponse && st.hasMoreTokens() )
+						response.setReasonPhrase(st.nextToken());
+					else {
+						isValidResponse = false;
+						Logger.println(Logger.ERROR, "In http response, there is status reason. status line is " + aLine + "." );
+					}
+				} else if ( key.length() > 0 ) {
+					response.addHeader(key, value);
+				}
+			} else {
+				response.setBodyArray(this.getBody());
+			}
+		}
+		return response;
+	}
 }
