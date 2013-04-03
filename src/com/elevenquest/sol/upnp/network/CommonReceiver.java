@@ -1,18 +1,17 @@
 package com.elevenquest.sol.upnp.network;
 
-import java.util.Vector;
 
 
 public abstract class CommonReceiver {
 
-	Vector<ICommonReceiveHandler> handlerList = new Vector<ICommonReceiveHandler>();
+	ICommonReceiveHandler handler = null;
 
-	public void addReceiveHandler(ICommonReceiveHandler handler) {
-		this.handlerList.add(handler);
+	public void setReceiveHandler(ICommonReceiveHandler handler) {
+		this.handler = handler;
 	}
 	
 	public void clearHandler() {
-		this.handlerList.clear();
+		this.handler = null;
 	}
 	
 	/**
@@ -53,10 +52,8 @@ public abstract class CommonReceiver {
 	 * 
 	 * @param packet
 	 */
-	public void process(HTTPRequest request) {
-		for ( ICommonReceiveHandler handler : this.handlerList ) {
-			handler.process(request);
-		}
+	public HTTPResponse process(HTTPRequest request) {
+		return handler.process(request);
 	}
 
 }

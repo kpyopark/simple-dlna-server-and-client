@@ -33,7 +33,7 @@ public class SsdpControlPointServer {
 				CommonReceiver receiver = new UDPReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
 						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
 				ICommonReceiveHandler handler = new SSDPReceiveHandler();
-				receiver.addReceiveHandler(handler);
+				receiver.setReceiveHandler(handler);
 				// 2. Create Common server
 				CommonServer receiveServer = new CommonServer();
 				// 3. set receiver into server.

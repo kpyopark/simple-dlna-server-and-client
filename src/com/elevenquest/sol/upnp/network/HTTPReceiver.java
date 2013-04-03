@@ -1,12 +1,8 @@
 package com.elevenquest.sol.upnp.network;
 
-import java.io.InputStream;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.StringTokenizer;
 
 public class HTTPReceiver {
 	NetworkInterface intf;
@@ -42,4 +38,4 @@ public class HTTPReceiver {
 		}
 		return request;
 	}
-	}
+}
