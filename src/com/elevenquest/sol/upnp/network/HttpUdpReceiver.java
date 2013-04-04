@@ -9,21 +9,21 @@ import java.net.NetworkInterface;
 import com.elevenquest.sol.upnp.common.Logger;
 
 
-public class UDPReceiver extends CommonReceiver {
+public class HttpUdpReceiver extends HttpRequestReceiver {
 	NetworkInterface intf;
 	int port;
 	InetAddress listenAddr = null;
 	DatagramSocket serverSocket = null;
 	DatagramPacket packet = null;
 	
-	public UDPReceiver(NetworkInterface intf, InetAddress listenAddr, int port) {
+	public HttpUdpReceiver(NetworkInterface intf, InetAddress listenAddr, int port) {
 		this.intf = intf;
 		this.listenAddr = listenAddr;
 		this.port = port;
 	}
 	
-	public HTTPRequest listen() throws Exception {
-		HTTPRequest request = null;
+	public HttpRequest listen() throws Exception {
+		HttpRequest request = null;
 		DatagramPacket packet = null;
 		if ( serverSocket != null ) {
 			serverSocket.close();
@@ -40,7 +40,7 @@ public class UDPReceiver extends CommonReceiver {
 		Logger.println(Logger.DEBUG, "before.:" + Thread.currentThread() );
 		serverSocket.receive(packet);
 		Logger.println(Logger.DEBUG, "after.:" + Thread.currentThread() );
-		HTTPParser parser = new HTTPParser(packet.getData());
+		HttpParser parser = new HttpParser(packet.getData());
 		request = parser.parseHTTPRequest();
 		return request;
 	}

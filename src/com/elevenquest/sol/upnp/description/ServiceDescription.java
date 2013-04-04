@@ -3,11 +3,11 @@ package com.elevenquest.sol.upnp.description;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
-import com.elevenquest.sol.upnp.network.HTTPRequest;
-import com.elevenquest.sol.upnp.network.HTTPResponse;
+import com.elevenquest.sol.upnp.network.HttpRequest;
+import com.elevenquest.sol.upnp.network.HttpResponse;
 import com.elevenquest.sol.upnp.xml.SDSXMLParser;
 
-public class ServiceDescription implements com.elevenquest.sol.upnp.network.ICommonSendHandler {
+public class ServiceDescription implements com.elevenquest.sol.upnp.network.IHttpRequestSuplier {
 	
 	String specMajor;
 	String specMinor;
@@ -37,22 +37,6 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.ICom
 		return "";
 	}
 
-	public Object processAfterSend(Object returnValue) {
-		HTTPResponse response = (HTTPResponse)returnValue;
-		try {
-			if ( response.getStatusCode().equals("200") ) {
-				SDSXMLParser parser = new SDSXMLParser(this, response.getBodyInputStream());
-				parser.execute();
-				
-				if(this.service!=null)
-					this.service.printAllDescirption();
-			}
-		} catch ( Exception e ) {
-			
-		}
-		return null;
-	}
-	
 	public UPnPService getService() {
 		return service;
 	}
@@ -78,8 +62,8 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.ICom
 	}
 
 	@Override
-	public HTTPRequest getHTTPRequest() throws Exception {
-		HTTPRequest request = new HTTPRequest();
+	public HttpRequest getHTTPRequest() throws Exception {
+		HttpRequest request = new HttpRequest();
 		request.setHttpVer("HTTP/1.1");
 		request.setCommand("GET");
 		request.setUrlPath(this.service.getDevice().getLocation());
@@ -91,6 +75,22 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.ICom
 		if ( this.service.getDevice().getAuthorizationStr() != null )
 			request.addHeader("Authorization", "Basic " + this.service.getDevice().getAuthorizationStr() );
 		return request;
+	}
+
+	@Override
+	public void processAfterSend(HttpResponse returnValue) {
+		HttpResponse response = (HttpResponse)returnValue;
+		try {
+			if ( response.getStatusCode().equals(HttpResponse.HTTP_RESPONSE_STATUS_CODE_200) ) {
+				SDSXMLParser parser = new SDSXMLParser(this, response.getBodyInputStream());
+				parser.execute();
+				
+				if(this.service!=null)
+					this.service.printAllDescirption();
+			}
+		} catch ( Exception e ) {
+			
+		}
 	}
 
 }

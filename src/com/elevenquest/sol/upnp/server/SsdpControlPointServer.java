@@ -8,15 +8,15 @@ import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.discovery.SSDPReceiveHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
-import com.elevenquest.sol.upnp.network.CommonReceiver;
-import com.elevenquest.sol.upnp.network.CommonSender;
-import com.elevenquest.sol.upnp.network.UDPReceiver;
+import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
+import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
+import com.elevenquest.sol.upnp.network.HttpRequestSender;
+import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 
 public class SsdpControlPointServer {
 	
 	ArrayList<CommonServer> receiveServerList = null;
-	ArrayList<CommonSender> senderServerList = null;
+	ArrayList<HttpRequestSender> senderServerList = null;
 
 	public void start() {
 		startReceiveServer();
@@ -30,9 +30,9 @@ public class SsdpControlPointServer {
 		for ( NetworkInterface intf : interfaces ) {
 			try {
 				// 1. Next, create ssdp message receiver & handler instance.
-				CommonReceiver receiver = new UDPReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
+				HttpRequestReceiver receiver = new HttpUdpReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
 						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
-				ICommonReceiveHandler handler = new SSDPReceiveHandler();
+				IHttpRequestHandler handler = new SSDPReceiveHandler();
 				receiver.setReceiveHandler(handler);
 				// 2. Create Common server
 				CommonServer receiveServer = new CommonServer();

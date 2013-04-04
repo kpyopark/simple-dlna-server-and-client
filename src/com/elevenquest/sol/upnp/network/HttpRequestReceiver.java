@@ -2,11 +2,11 @@ package com.elevenquest.sol.upnp.network;
 
 
 
-public abstract class CommonReceiver {
+public abstract class HttpRequestReceiver {
 
-	ICommonReceiveHandler handler = null;
+	IHttpRequestHandler handler = null;
 
-	public void setReceiveHandler(ICommonReceiveHandler handler) {
+	public void setReceiveHandler(IHttpRequestHandler handler) {
 		this.handler = handler;
 	}
 	
@@ -25,7 +25,7 @@ public abstract class CommonReceiver {
 	 * 
 	 * @throws Exception
 	 */
-	abstract protected HTTPRequest listen() throws Exception;
+	abstract protected HttpRequest listen() throws Exception;
 	
 	public void beforeReceive() {
 		// TODO : API for hooking
@@ -37,7 +37,7 @@ public abstract class CommonReceiver {
 	
 	public void receiveData() throws Exception {
 		beforeReceive();
-		HTTPRequest rtnValue = listen();
+		HttpRequest rtnValue = listen();
 		process(rtnValue);
 		afterReceive();
 	}
@@ -52,7 +52,7 @@ public abstract class CommonReceiver {
 	 * 
 	 * @param packet
 	 */
-	public HTTPResponse process(HTTPRequest request) {
+	public HttpResponse process(HttpRequest request) {
 		return handler.process(request);
 	}
 

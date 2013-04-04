@@ -1,13 +1,14 @@
 package com.elevenquest.sol.upnp.discovery;
 
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
-import com.elevenquest.sol.upnp.network.HTTPRequest;
-import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
+import com.elevenquest.sol.upnp.network.HttpRequest;
+import com.elevenquest.sol.upnp.network.HttpResponse;
+import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 
-public class SSDPReceiveHandler implements ICommonReceiveHandler {
+public class SSDPReceiveHandler implements IHttpRequestHandler {
 
 	@Override
-	public void process(HTTPRequest packet) {
+	public HttpResponse process(HttpRequest packet) {
 		SSDPRequest message = new SSDPRequest(packet);
  		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
 		try {
@@ -24,6 +25,7 @@ public class SSDPReceiveHandler implements ICommonReceiveHandler {
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 }

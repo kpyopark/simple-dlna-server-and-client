@@ -11,19 +11,19 @@ import java.util.Observable;
 
 import com.elevenquest.sol.upnp.common.Logger;
 
-public class UDPSender extends CommonSender {
+public class HttpUdpSender extends HttpRequestSender {
 	NetworkInterface intf;
 	int port;
 	InetAddress targetAddr;
 	
-	public UDPSender(NetworkInterface intf, InetAddress targetAddr, int port) {
+	public HttpUdpSender(NetworkInterface intf, InetAddress targetAddr, int port) {
 		this.intf = intf;
 		this.port = port;
 		this.targetAddr = targetAddr;
 	}
 	
 	@Override
-	protected void send(HTTPRequest request) throws Exception {
+	protected void send(HttpRequest request) throws Exception {
 		SocketAddress addr = null;
 		DatagramSocket socket = null;
 		java.net.MulticastSocket multiSocket = null;
@@ -36,7 +36,7 @@ public class UDPSender extends CommonSender {
 			buffer.append("\n\r");
 			byte[] bytesSend = buffer.toString().getBytes();
 			if ( this.targetAddr.isMulticastAddress() ) {
-				Logger.println(Logger.DEBUG, "send by using multicasting.");
+				Logger.println(Logger.DEBUG, "sent by multicasting.");
 				// Multicasting.
 				addr = new InetSocketAddress(this.targetAddr, port);
 				multiSocket = new MulticastSocket(port);
@@ -44,7 +44,7 @@ public class UDPSender extends CommonSender {
 				packet = new DatagramPacket(bytesSend, bytesSend.length, addr);
 				multiSocket.send(packet);
 			} else {
-				Logger.println(Logger.DEBUG, "send by using unicasting.");
+				Logger.println(Logger.DEBUG, "sent by unicasting.");
 				// unicasting.
 				// TODO : MODIFY THE BELOW LINES. intf.getInetAddresses().nextElement()
 				addr = new InetSocketAddress(intf.getInetAddresses().nextElement(), port);

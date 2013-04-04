@@ -15,15 +15,15 @@ import com.elevenquest.sol.upnp.common.Logger;
  * @author kyungpyo.park
  *
  */
-public class HTTPParser {
+public class HttpParser {
 	
 	InputStream inputStream = null;
 	
-	public HTTPParser(InputStream is) {
+	public HttpParser(InputStream is) {
 		this.inputStream = is;
 	}
 	
-	public HTTPParser(byte[] contents) {
+	public HttpParser(byte[] contents) {
 		this.inputStream = new ByteArrayInputStream(contents);
 	}
 	
@@ -71,9 +71,9 @@ public class HTTPParser {
 		if ( inputStream != null ) try { inputStream.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
 	}
 
-	public HTTPRequest parseHTTPRequest() throws Exception {
+	public HttpRequest parseHTTPRequest() throws Exception {
 		
-		HTTPRequest request = new HTTPRequest();
+		HttpRequest request = new HttpRequest();
 		String aLine = "";
 		boolean isHeader = true;
 		while ( ( aLine = readLine() ) != null ) {
@@ -120,9 +120,9 @@ public class HTTPParser {
 		return request;
 	}
 
-	public HTTPResponse parseHTTPResponse() throws Exception {
+	public HttpResponse parseHTTPResponse() throws Exception {
 		
-		HTTPResponse response = new HTTPResponse();
+		HttpResponse response = new HttpResponse();
 		String aLine = "";
 		boolean isHeader = true;
 		while ( ( aLine = readLine() ) != null ) {

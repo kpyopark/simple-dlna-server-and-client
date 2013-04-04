@@ -7,17 +7,18 @@ import java.util.Vector;
 
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
+import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
-import com.elevenquest.sol.upnp.network.CommonReceiver;
-import com.elevenquest.sol.upnp.network.ICommonSendHandler;
-import com.elevenquest.sol.upnp.network.CommonSender;
-import com.elevenquest.sol.upnp.network.HTTPSender;
-import com.elevenquest.sol.upnp.network.UDPReceiver;
-import com.elevenquest.sol.upnp.network.UDPSender;
+import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
+import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
+import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
+import com.elevenquest.sol.upnp.network.HttpRequestSender;
+import com.elevenquest.sol.upnp.network.HttpTcpSender;
+import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
+import com.elevenquest.sol.upnp.network.HttpUdpSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
 import com.elevenquest.sol.upnp.server.SendEvent;
 import com.elevenquest.sol.upnp.server.SsdpControlPointServer;
@@ -109,8 +110,8 @@ public class ControlPoint {
 			CommonServer sendServer = null;
 			// Sample Code for sender.
 			{
-				CommonSender sender = new UDPSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
-				ICommonSendHandler handler = new SSDPMessage(device);
+				HttpRequestSender sender = new HttpUdpSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
+				IHttpRequestSuplier handler = new SSDPSearchSendHandler(this);
 				sender.setSenderHandler(handler);
 				
 				sendServer = new CommonServer();

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import com.elevenquest.sol.upnp.common.Logger;
 
-public class HTTPResponse {
+public class HttpRequest {
 	InputStream streamBody = null;
 	byte[] arrayBody = null;
 	
@@ -15,18 +15,53 @@ public class HTTPResponse {
 	ArrayList<String> headerValues = null;
 	int headerCount = 0;
 	
+	String command = null;
+	String urlPath = null;
 	String httpVer = null;
-	String statusCode = null;
-	String reasonPhrase = null;
+	
+	String host = null;
+	String port = null;
 	
 	Exception processingException = null;
 	
+	public static String HTTP_REQUEST_COMMAND_GET = "GET";
+	public static String HTTP_REQUEST_COMMAND_POST = "POST";
+
+	public static String HTTP_VERSION_1_0 = "HTTP/1.0";
+	public static String HTTP_VERSION_1_1 = "HTTP/1.1";
+	
 	// When to use same keys in one http connection, so we can't use HashMap class (in java)
-	public HTTPResponse() {
+	
+	public HttpRequest() {
+		this(HTTP_REQUEST_COMMAND_GET);
+	}
+	
+	public HttpRequest(HttpRequest oldOne) {
+		this.streamBody = oldOne.streamBody;
+		this.arrayBody = oldOne.arrayBody;
+		this.headerNames = oldOne.headerNames;
+		this.headerValues = oldOne.headerValues;
+		this.headerCount = oldOne.headerCount;
+		this.command = oldOne.command;
+		this.urlPath = oldOne.urlPath;
+		this.httpVer = oldOne.httpVer;
+		this.processingException = oldOne.processingException;
+	}
+	
+	public void setCommand(String command) {
+		this.command = command;
+	}
+	
+	public HttpRequest(String command) {
+		this.command = command;
 		headerNames = new ArrayList<String>();
 		headerValues = new ArrayList<String>();
 		headerCount = 0;
 		processingException = null;
+	}
+	
+	public String getCommand() {
+		return this.command;
 	}
 	
 	public void addHeader(String headerName, String headerValue) {
@@ -39,6 +74,14 @@ public class HTTPResponse {
 		return headerCount;
 	}
 	
+	public ArrayList<String> getHeaderNames() {
+		return this.headerNames;
+	}
+	
+	public ArrayList<String> getHeaderValues() {
+		return this.headerValues;
+	}
+
 	public String[] getHeaderList(String headerName) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
@@ -54,6 +97,14 @@ public class HTTPResponse {
 				return headerValues.get(cnt);
 		}
 		return null;
+	}
+	
+	public String getHeaderName(int cnt) {
+		return this.headerNames.get(cnt);
+	}
+	
+	public String getHeaderValue(int cnt) {
+		return this.headerValues.get(cnt);
 	}
 	
 	public byte[] getBodyArray() {
@@ -102,6 +153,14 @@ public class HTTPResponse {
 		this.streamBody = is;
 	}
 
+	public String getUrlPath() {
+		return urlPath;
+	}
+
+	public void setUrlPath(String urlPath) {
+		this.urlPath = urlPath;
+	}
+
 	public String getHttpVer() {
 		return httpVer;
 	}
@@ -109,23 +168,7 @@ public class HTTPResponse {
 	public void setHttpVer(String httpVer) {
 		this.httpVer = httpVer;
 	}
-
-	public String getStatusCode() {
-		return statusCode;
-	}
-
-	public void setStatusCode(String statusCode) {
-		this.statusCode = statusCode;
-	}
-
-	public String getReasonPhrase() {
-		return reasonPhrase;
-	}
-
-	public void setReasonPhrase(String reasonPhrase) {
-		this.reasonPhrase = reasonPhrase;
-	}
-
+	
 	public void setHeaderValue(String headerName, String headerValue) {
 		boolean isOverwrite = false;
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
@@ -140,5 +183,4 @@ public class HTTPResponse {
 		}
 	}
 	
-
 }

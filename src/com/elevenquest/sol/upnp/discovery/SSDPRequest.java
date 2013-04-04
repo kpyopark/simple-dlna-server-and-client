@@ -3,9 +3,9 @@ package com.elevenquest.sol.upnp.discovery;
 import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.HTTPRequest;
+import com.elevenquest.sol.upnp.network.HttpRequest;
 
-public class SSDPRequest extends HTTPRequest {
+public class SSDPRequest extends HttpRequest {
 	UPnPDevice device = null;
 	
 	public SSDPRequest() {
@@ -20,7 +20,7 @@ public class SSDPRequest extends HTTPRequest {
 	 * 
 	 * @param request
 	 */
-	public SSDPRequest(HTTPRequest request) {
+	public SSDPRequest(HttpRequest request) {
 		super(request);
 	}
 	

@@ -3,11 +3,11 @@ package com.elevenquest.sol.upnp.network;
 import java.util.Observer;
 
 
-public abstract class CommonSender implements Observer {
+public abstract class HttpRequestSender implements Observer {
 	
-	ICommonSendHandler handler = null;
+	IHttpRequestSuplier handler = null;
 	
-	public void setSenderHandler(ICommonSendHandler handler) {
+	public void setSenderHandler(IHttpRequestSuplier handler) {
 		this.handler = handler;
 	}
 	
@@ -16,7 +16,7 @@ public abstract class CommonSender implements Observer {
 	}
 	
 	public void sendData() throws Exception {
-		HTTPRequest rtnValue = handler.getHTTPRequest();
+		HttpRequest rtnValue = handler.getHTTPRequest();
 		send(rtnValue);
 	}
 	
@@ -24,7 +24,7 @@ public abstract class CommonSender implements Observer {
 	 * 
 	 * @throws Exception
 	 */
-	abstract protected void send(HTTPRequest sendData) throws Exception;
+	abstract protected void send(HttpRequest sendData) throws Exception;
 	
 	public void clear() {
 		clearHandler();

@@ -4,29 +4,29 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class HTTPReceiver {
+public class HttpTcpReceiver extends HttpRequestReceiver {
 	NetworkInterface intf;
 	int port;
-	
+
 	/**
 	 * @param intf
 	 * @param port
 	 * @param targetAddr
 	 */
-	public HTTPReceiver(NetworkInterface intf, int port) {
+	public HttpTcpReceiver(NetworkInterface intf, int port) {
 		this.intf = intf;
 		this.port = port;
 	}
 	
-	public HTTPRequest listen() throws Exception {
+	public HttpRequest listen() throws Exception {
 		ServerSocket serverSoc = null;
 		Socket clientSoc = null;
-		HTTPParser reader = null;
-		HTTPRequest request = null;
+		HttpParser reader = null;
+		HttpRequest request = null;
 		try {
 			serverSoc = new ServerSocket(this.port);
 			clientSoc = serverSoc.accept();
-			reader = new HTTPParser(clientSoc.getInputStream());
+			reader = new HttpParser(clientSoc.getInputStream());
 			request = reader.parseHTTPRequest();
 		} finally {
 			if ( clientSoc != null) try { clientSoc.close(); } catch( Exception e1 ) {
@@ -38,4 +38,5 @@ public class HTTPReceiver {
 		}
 		return request;
 	}
+
 }

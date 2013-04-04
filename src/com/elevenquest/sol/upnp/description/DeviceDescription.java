@@ -5,23 +5,17 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BasicHttpEntity;
-
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.network.CommonSender;
-import com.elevenquest.sol.upnp.network.HTTPRequest;
-import com.elevenquest.sol.upnp.network.HTTPSender;
-import com.elevenquest.sol.upnp.network.ICommonSendHandler;
+import com.elevenquest.sol.upnp.network.HttpRequestSender;
+import com.elevenquest.sol.upnp.network.HttpRequest;
+import com.elevenquest.sol.upnp.network.HttpResponse;
+import com.elevenquest.sol.upnp.network.HttpTcpSender;
+import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 import com.elevenquest.sol.upnp.xml.DDSXMLParser;
 
-public class DeviceDescription implements com.elevenquest.sol.upnp.network.ICommonSendHandler {
+public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttpRequestSuplier {
 	
 	static final String DEVICE_DESCRIPTION_CONFIG_NUMBER = "0";
 	static final String DEVICE_DESCRIPTION_SPECVER_MAJOR = "1";
@@ -378,88 +372,10 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 		this.setModelUrl(DEVICE_DESCRIPTION_MODEL_URL);
 	}
 
-	public Object getSendObject() throws Exception {
-		HttpGet request = new HttpGet(this.device.getLocation());
-		// TODO : modify below line which to retreive the version of OS.
-		String osVersion = "WindowsNT";
-		String productVersion = "simpledlna/1.0";
-		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
-		BasicHttpEntity entity = new BasicHttpEntity();
-		entity.setContent(new ByteArrayInputStream(this.getRequestBody().getBytes("utf-8")));
-		if ( this.device.getAuthorizationStr() != null )
-			request.addHeader("Authorization", "Basic " + this.device.getAuthorizationStr() );
-		return request;
-	}
-	
 	private String getRequestBody() {
 		return "";
 	}
 
-	public Object processAfterSend(Object receivedData) {
-		// Parsing DeviceDescription XML and fill full information of that device.
-		try {
-			HttpResponse response = (HttpResponse)receivedData;
-			System.out.println("Device Description Response Status value:" + response.getStatusLine().getStatusCode() );
-			if ( response.getStatusLine().getStatusCode() == HttpStatus.SC_OK ) {
-				HttpEntity entity = response.getEntity();
-				Header[] headers = response.getAllHeaders();
-				for ( int cnt = 0 ; cnt < headers.length; cnt++ ) {
-					System.out.println( headers[cnt].getName() + ":" + headers[cnt].getValue());
-				}
-				byte[] contentBytes = new byte[(int)entity.getContentLength()];
-				entity.getContent().read(contentBytes,0, (int)entity.getContentLength());
-				String trimmedContents = new String(contentBytes).trim();
-				ByteArrayInputStream ais = new ByteArrayInputStream(trimmedContents.getBytes());
-				DDSXMLParser parser = new DDSXMLParser(this, ais);
-				parser.execute();
-				PrintAllValue();
-				
-				Vector<UPnPService> services = this.getDevice().getSerivces();
-				
-				for ( int inx = 0 ; inx < services.size() ; inx++ ) {
-					UPnPService service = services.get(inx);
-					if ( service.isRemote() && !service.isReadyToUse() && !service.isProgressingToRetrieve() ) {
-						// ��Ģ������ ���⿡�� Service Description�� ������ ���°��� �ƴ϶�,
-						// UPnPDevice���� ������ ��ϵ� Service�� �ִ� ���, Serivce�� Update�ϴ°� ��ġ������ ����
-						// But. ������ ������ �߰��Ǿ�� �ϹǷ� ���⼭ �ٷ� �� Update�ϴ� ������ ���� ����
-						// �̷� ���, Hang ���� �߻��.
-						
-						class ServiceDescriptionSendThread extends Thread {
-							UPnPService inner = null;
-							public ServiceDescriptionSendThread(UPnPService outer) {
-								inner = outer;
-							}
-							public void run() {
-								try {
-									CommonSender sender = new HTTPSender(inner.getDevice().getNetworkInterface(),inner.getScpdUrl());
-									ICommonSendHandler handler = new ServiceDescription(inner);
-									sender.setSenderHandler(handler);
-									sender.sendData();
-								} catch ( Exception e ) {
-									e.printStackTrace();
-								}
-							}
-						}
-						
-						ServiceDescriptionSendThread thread = new ServiceDescriptionSendThread(service);
-						thread.run();
-						
-						
-					}
-				}
-			}
-			else
-			{
-				System.out.println("To retrieve Device Description failed. cause : " + response.toString() );
-			}
-		} catch ( Exception e ) {
-			// TODO : Exception processing is required.
-			e.printStackTrace();
-		}
-		this.device.setProgressingToRetrieve(false);
-		return null;
-	}
-	
 	public String getDeviceType() {
 		return deviceType;
 	}
@@ -524,8 +440,8 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 	}
 
 	@Override
-	public HTTPRequest getHTTPRequest() throws Exception {
-		HTTPRequest request = new HTTPRequest();
+	public HttpRequest getHTTPRequest() throws Exception {
+		HttpRequest request = new HttpRequest();
 		request.setHttpVer("HTTP/1.1");
 		request.setCommand("GET");
 		request.setUrlPath(this.device.getLocation());
@@ -536,6 +452,69 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IComm
 		if ( this.device.getAuthorizationStr() != null )
 			request.addHeader("Authorization", "Basic " + this.device.getAuthorizationStr() );
 		return request;
+	}
+
+	@Override
+	public void processAfterSend(
+			HttpResponse response) {
+		// TODO Auto-generated method stub
+		// Parsing DeviceDescription XML and fill full information of that device.
+		try {
+			System.out.println("Device Description Response Status value:" + response.getStatusCode() );
+			if ( response.getStatusCode().equals(HttpResponse.HTTP_RESPONSE_STATUS_CODE_200) ) {
+				ArrayList<String> headerNames = response.getHeaderNames();
+				for ( int cnt = 0 ; cnt < response.getHeaderCount(); cnt++ ) {
+					System.out.println( headerNames.get(cnt) + ":" + response.getHeaderValue(headerNames.get(cnt)));
+				}
+				String trimmedContents = new String(response.getBodyArray()).trim();
+				ByteArrayInputStream ais = new ByteArrayInputStream(trimmedContents.getBytes());
+				DDSXMLParser parser = new DDSXMLParser(this, ais);
+				parser.execute();
+				PrintAllValue();
+				
+				Vector<UPnPService> services = this.getDevice().getSerivces();
+				
+				for ( int inx = 0 ; inx < services.size() ; inx++ ) {
+					UPnPService service = services.get(inx);
+					if ( service.isRemote() && !service.isReadyToUse() && !service.isProgressingToRetrieve() ) {
+						// ��Ģ������ ���⿡�� Service Description�� ������ ���°��� �ƴ϶�,
+						// UPnPDevice���� ������ ��ϵ� Service�� �ִ� ���, Serivce�� Update�ϴ°� ��ġ������ ����
+						// But. ������ ������ �߰��Ǿ�� �ϹǷ� ���⼭ �ٷ� �� Update�ϴ� ������ ���� ����
+						// �̷� ���, Hang ���� �߻��.
+						
+						class ServiceDescriptionSendThread extends Thread {
+							UPnPService inner = null;
+							public ServiceDescriptionSendThread(UPnPService outer) {
+								inner = outer;
+							}
+							public void run() {
+								try {
+									HttpRequestSender sender = new HttpTcpSender(inner.getDevice().getNetworkInterface(),inner.getScpdUrl());
+									IHttpRequestSuplier handler = new ServiceDescription(inner);
+									sender.setSenderHandler(handler);
+									sender.sendData();
+								} catch ( Exception e ) {
+									e.printStackTrace();
+								}
+							}
+						}
+						
+						ServiceDescriptionSendThread thread = new ServiceDescriptionSendThread(service);
+						thread.run();
+						
+						
+					}
+				}
+			}
+			else
+			{
+				System.out.println("To retrieve Device Description failed. cause : " + response.toString() );
+			}
+		} catch ( Exception e ) {
+			// TODO : Exception processing is required.
+			e.printStackTrace();
+		}
+		this.device.setProgressingToRetrieve(false);
 	}
 	
 }

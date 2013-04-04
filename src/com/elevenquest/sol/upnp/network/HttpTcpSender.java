@@ -10,13 +10,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Observable;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-public class HTTPSender extends CommonSender {
+public class HttpTcpSender extends HttpRequestSender {
 	NetworkInterface intf;
 	int port;
 	InetAddress target;
@@ -30,7 +24,7 @@ public class HTTPSender extends CommonSender {
 	 * @param port
 	 * @param targetAddr
 	 */
-	public HTTPSender(NetworkInterface intf, int port, InetAddress targetAddr, String uri) {
+	public HttpTcpSender(NetworkInterface intf, int port, InetAddress targetAddr, String uri) {
 		this.intf = intf;
 		this.port = port;
 		this.target = targetAddr;
@@ -38,15 +32,15 @@ public class HTTPSender extends CommonSender {
 		this.targetURL = null;
 	}
 	
-	public HTTPSender(NetworkInterface intf, String url) {
+	public HttpTcpSender(NetworkInterface intf, String url) {
 		this.intf = intf;
 		this.targetURL = url;
 	}
 
 	@Override
-	protected void send(HTTPRequest request) throws Exception {
+	protected void send(HttpRequest request) throws Exception {
 
-		HTTPResponse response = new HTTPResponse();
+		HttpResponse response = new HttpResponse();
 		
 		// 1. At first, retrieving target URL.
 		if ( this.targetURL == null ) {

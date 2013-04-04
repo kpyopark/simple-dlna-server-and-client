@@ -9,9 +9,10 @@ import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPBase;
 import com.elevenquest.sol.upnp.model.UPnPService;
-import com.elevenquest.sol.upnp.network.HTTPRequest;
-import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
-import com.elevenquest.sol.upnp.network.ICommonSendHandler;
+import com.elevenquest.sol.upnp.network.HttpRequest;
+import com.elevenquest.sol.upnp.network.HttpResponse;
+import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
+import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 
 /**
  * 
@@ -20,7 +21,7 @@ import com.elevenquest.sol.upnp.network.ICommonSendHandler;
  * The event publisher should maintan a list of subscriber which has 4 attributes.
  * Refer to Page 86 in UPnP-arch_DeviceArchitecture-v1.1
  */
-public class Subscriber extends UPnPBase implements ICommonReceiveHandler, ICommonSendHandler  {
+public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRequestSuplier  {
 
 	HashMap<String, String> headerList = new HashMap<String, String>();
 
@@ -80,34 +81,50 @@ public class Subscriber extends UPnPBase implements ICommonReceiveHandler, IComm
 		return this.headerList.keySet().iterator();
 	}
 	@Override
-	public Object getSendObject() throws Exception {
-		StringBuffer fullMessage = new StringBuffer();
-		if ( this.wantToSubscribe ) {
-			fullMessage.append(ID_UPNP_SUBSCRIBE_SUBSCRIBE).append(" ");
-			
-			// append other header list.
-			for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
-				String key = keyIter.next();
-				fullMessage.append(key).append(':').append(headerList.get(key)).append('\n');
-			}
+	public HttpResponse process(HttpRequest request) {
+		HttpResponse response = new HttpResponse();
+		if (request.getCommand().equals(ID_UPNP_SUBSCRIBE_SUBSCRIBE)) {
+			response.setStatusCode(HttpResponse.HTTP_RESPONSE_STATUS_CODE_200);
+			response.setReasonPhrase(HttpResponse.HTTP_RESPONSE_REASON_PHRASE_200);
+			response.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
+			// TODO:
+		} else if (request.getCommand().equals(ID_UPNP_SUBSCRIBE_UNSUBSCRIBE)) {
+			response.setStatusCode(HttpResponse.HTTP_RESPONSE_STATUS_CODE_200);
+			response.setReasonPhrase(HttpResponse.HTTP_RESPONSE_REASON_PHRASE_200);
+			response.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
+			// TODO:
 		} else {
-			// append other header list.
-			for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
-				String key = keyIter.next();
-				fullMessage.append(key).append(':').append(headerList.get(key)).append('\n');
-			}
+			response.setStatusCode(HttpResponse.HTTP_RESPONSE_STATUS_CODE_401);
+			response.setReasonPhrase(HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401);
+			response.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
 		}
-		return fullMessage.toString().getBytes();
+		return response;
 	}
 	@Override
-	public Object processAfterSend(Object returnValue) {
-		// TODO Auto-generated method stub
+	public HttpRequest getHTTPRequest() throws Exception {
+		HttpRequest request = new HttpRequest();
+		if ( this.wantToSubscribe ) {
+			request.setCommand(ID_UPNP_SUBSCRIBE_SUBSCRIBE);
+			request.setUrlPath("*");
+			request.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
+			for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
+				String key = keyIter.next();
+				request.setHeaderValue(key, headerList.get(key));
+			}
+		} else {
+			request.setCommand(ID_UPNP_SUBSCRIBE_UNSUBSCRIBE);
+			request.setUrlPath("*");
+			request.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
+			for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
+				String key = keyIter.next();
+				request.setHeaderValue(key, headerList.get(key));
+			}
+		}
 		return null;
 	}
 	@Override
-	public void process(HTTPRequest request) {
-		// TODO Auto-generated method stub
-		
+	public void processAfterSend(HttpResponse returnValue) {
+		// TODO : Check UPnP Spec.
 	}
 	
 }

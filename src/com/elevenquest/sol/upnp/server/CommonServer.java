@@ -12,12 +12,12 @@ import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.ICommonReceiveHandler;
-import com.elevenquest.sol.upnp.network.CommonReceiver;
-import com.elevenquest.sol.upnp.network.ICommonSendHandler;
-import com.elevenquest.sol.upnp.network.CommonSender;
-import com.elevenquest.sol.upnp.network.UDPReceiver;
-import com.elevenquest.sol.upnp.network.UDPSender;
+import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
+import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
+import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
+import com.elevenquest.sol.upnp.network.HttpRequestSender;
+import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
+import com.elevenquest.sol.upnp.network.HttpUdpSender;
 
 public class CommonServer {
 
@@ -26,8 +26,8 @@ public class CommonServer {
 	static int KEEP_ALIVE_TIME = 5;	// 5 sec.
 	static TimeUnit BASE_TIME_UNIT = TimeUnit.SECONDS;  
 
-	CommonReceiver receiver = null;
-	CommonSender sender = null;
+	HttpRequestReceiver receiver = null;
+	HttpRequestSender sender = null;
 	BlockingQueue<Runnable> queue = null;
 	ThreadPoolExecutor threadPool = null;
 	
@@ -40,11 +40,11 @@ public class CommonServer {
 		threadPool = new ThreadPoolExecutor(CORE_INI_THREAD, CORE_MAX_THREAD, KEEP_ALIVE_TIME, BASE_TIME_UNIT, queue);
 	}
 	
-	public void setReceiver(CommonReceiver receiver) {
+	public void setReceiver(HttpRequestReceiver receiver) {
 		this.receiver = receiver;
 	}
 	
-	public void setSender(CommonSender sender, SendEvent event) {
+	public void setSender(HttpRequestSender sender, SendEvent event) {
 		this.sender = sender;
 		this.event = event;
 	}
