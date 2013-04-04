@@ -31,21 +31,26 @@ public class HttpParser {
 		int curByte = -1;
 		String rtn = null;
 		ByteArrayOutputStream baos = null;
+		boolean isPrevCharCr = false;
 		try {
 			baos = new ByteArrayOutputStream();
 			while( ( curByte = this.inputStream.read() ) != -1 ) {
-				Logger.println(Logger.DEBUG,  curByte );
-				if ( curByte != '\n' )
+				if ( curByte == '\n' && isPrevCharCr )
 					break;
+				if ( curByte == '\r' )
+					isPrevCharCr = true;
+				else
+					isPrevCharCr = false;
 				baos.write(curByte);
 			}
 			if ( baos.size() == 0 && curByte == -1 )
 				rtn = null;
 			else
-				rtn = baos.toString();
+				rtn = baos.toString().trim();
 		} finally {
 			if ( baos != null ) try { baos.close(); } catch ( Exception e1 ) { e1.printStackTrace(); } 
 		}
+		Logger.println(Logger.DEBUG, "a line read from packet.:" + rtn);
 		return rtn;
 	}
 
@@ -117,6 +122,7 @@ public class HttpParser {
 				request.setBodyArray(this.getBody());
 			}
 		}
+		this.close();
 		return request;
 	}
 
@@ -174,6 +180,7 @@ public class HttpParser {
 				response.setBodyArray(this.getBody());
 			}
 		}
+		this.close();
 		return response;
 	}
 }

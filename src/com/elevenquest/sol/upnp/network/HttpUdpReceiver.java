@@ -37,9 +37,9 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 			serverSocket = new DatagramSocket(port);
 			packet = new DatagramPacket(new byte[4096],4096, listenAddr, port);
 		}
-		Logger.println(Logger.DEBUG, "before.:" + Thread.currentThread() );
+		Logger.println(Logger.DEBUG, "waiting for udp packet.:" + Thread.currentThread() );
 		serverSocket.receive(packet);
-		Logger.println(Logger.DEBUG, "after.:" + Thread.currentThread() );
+		Logger.println(Logger.DEBUG, "accept one packet.:" + Thread.currentThread() );
 		HttpParser parser = new HttpParser(packet.getData());
 		request = parser.parseHTTPRequest();
 		return request;
