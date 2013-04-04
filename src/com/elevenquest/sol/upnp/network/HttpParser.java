@@ -2,8 +2,10 @@ package com.elevenquest.sol.upnp.network;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import com.elevenquest.sol.upnp.common.Logger;
@@ -27,7 +29,7 @@ public class HttpParser {
 		this.inputStream = new ByteArrayInputStream(contents);
 	}
 	
-	private String readLine() throws Exception {
+	private String readLine() throws IOException {
 		int curByte = -1;
 		String rtn = null;
 		ByteArrayOutputStream baos = null;
@@ -54,7 +56,7 @@ public class HttpParser {
 		return rtn;
 	}
 
-	private byte[] getBody() throws Exception {
+	private byte[] getBody() throws IOException {
 		ByteArrayOutputStream baos = null;
 		byte[] rtn = null;
 		try {
@@ -75,110 +77,123 @@ public class HttpParser {
 	private void close() {
 		if ( inputStream != null ) try { inputStream.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
 	}
-
-	public HttpRequest parseHTTPRequest() throws Exception {
-		
-		HttpRequest request = new HttpRequest();
+	
+	class HttpBaseStructure {
+		String startLine = null;
+		ArrayList<String> headerNames = new ArrayList<String>();
+		ArrayList<String> headerValues = new ArrayList<String>();
+		byte[] body = null;
+	}
+	
+	public HttpBaseStructure parseHttpLines() throws IOException {
+		HttpBaseStructure baseStruct = new HttpBaseStructure();
 		String aLine = "";
+		String key = "";
+		String value = "";
 		boolean isHeader = true;
+		boolean isStartLine = true;
 		while ( ( aLine = readLine() ) != null ) {
 			if ( aLine.trim().length() == 0 ) {		// Header / Body separated by knew line character.
 				isHeader = false;
 			}
 			if ( isHeader) {
-				String key = "";
-				String value = "";
-				for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
-					if ( aLine.charAt(pos) == ':' )
-						key = aLine.substring(0,pos);
-						value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1) : ""; 
-				}
 				// start line
-				if ( key.length() == 0 ) {
-					StringTokenizer st = new StringTokenizer(aLine, " ");
-					boolean isValidRequest = true;
-					if ( isValidRequest && st.hasMoreTokens() )
-						request.setCommand(st.nextToken());
-					else {
-						isValidRequest = false;
-						Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
-					}
-					if ( isValidRequest && st.hasMoreTokens() )
-						request.setUrlPath(st.nextToken());
-					else {
-						isValidRequest = false;
-						Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
-					}
-					if ( isValidRequest && st.hasMoreTokens() )
-						request.setHttpVer(st.nextToken());
-					else {
-						isValidRequest = false;
-						Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
-					}
+				if ( isStartLine ) {
+					isStartLine = false;
+					baseStruct.startLine = aLine;
 				} else if ( key.length() > 0 ) {
-					request.addHeader(key, value);
+					boolean isValid = false;
+					if ( aLine.length() > 0 && ( aLine.charAt(0) == ' ' || aLine.charAt(0) == '\t' ) ) {
+						// It's a value line.
+						value = aLine;
+					} else {
+						for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
+							if ( aLine.charAt(pos) == ':' ) {
+								key = aLine.substring(0,pos);
+								value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1) : ""; 
+								isValid = true;
+								break;
+							}
+						}
+					}
+					if (isValid) {
+						baseStruct.headerNames.add(key);
+						baseStruct.headerValues.add(value);
+					} else {
+						key = "";
+						value = "";
+					}
 				}
 			} else {
-				request.setBodyArray(this.getBody());
+				baseStruct.body = this.getBody();
 			}
 		}
 		this.close();
+		return baseStruct;
+	}
+
+	public HttpRequest parseHTTPRequest() throws Exception {
+		
+		HttpRequest request = new HttpRequest();
+		HttpBaseStructure baseInfo = parseHttpLines();
+		request.headerNames = baseInfo.headerNames;
+		request.headerValues = baseInfo.headerValues;
+		StringTokenizer st = new StringTokenizer(baseInfo.startLine, " ");
+		boolean isValidRequest = true;
+		if ( isValidRequest && st.hasMoreTokens() )
+			request.setCommand(st.nextToken());
+		else {
+			isValidRequest = false;
+			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
+		}
+		if ( isValidRequest && st.hasMoreTokens() )
+			request.setUrlPath(st.nextToken());
+		else {
+			isValidRequest = false;
+			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
+		}
+		if ( isValidRequest && st.hasMoreTokens() )
+			request.setHttpVer(st.nextToken());
+		else {
+			isValidRequest = false;
+			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
+		}
 		return request;
 	}
 
 	public HttpResponse parseHTTPResponse() throws Exception {
 		
 		HttpResponse response = new HttpResponse();
-		String aLine = "";
-		boolean isHeader = true;
-		while ( ( aLine = readLine() ) != null ) {
-			if ( aLine.trim().length() == 0 ) {		// Header / Body separated by knew line character.
-				isHeader = false;
+		HttpBaseStructure baseInfo = parseHttpLines();
+		response.headerNames = baseInfo.headerNames;
+		response.headerValues = baseInfo.headerValues;
+		StringTokenizer st = new StringTokenizer(baseInfo.startLine, " ");
+		boolean isValidResponse = true;
+		if ( isValidResponse && st.hasMoreTokens() )
+			response.setHttpVer(st.nextToken());
+		else {
+			isValidResponse = false;
+			Logger.println(Logger.ERROR, "In http response, there is no http version. status line is " + baseInfo.startLine + "." );
+		}
+		if ( isValidResponse && st.hasMoreTokens() ) {
+			String strStatusCode = st.nextToken();
+			try {
+				int statusCode = Integer.parseInt(strStatusCode);
+				response.setStatusCode(strStatusCode);
+			} catch (NumberFormatException nfe) {
+				isValidResponse = false;
+				Logger.println(Logger.ERROR, "In http response, there is invalid status code. status code is "+ strStatusCode + ".");
 			}
-			if ( isHeader) {
-				String key = "";
-				String value = "";
-				for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
-					if ( aLine.charAt(pos) == ':' )
-						key = aLine.substring(0,pos);
-						value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1) : ""; 
-				}
-				// status code line
-				if ( key.length() == 0 ) {
-					StringTokenizer st = new StringTokenizer(aLine, " ");
-					boolean isValidResponse = true;
-					if ( isValidResponse && st.hasMoreTokens() )
-						response.setHttpVer(st.nextToken());
-					else {
-						isValidResponse = false;
-						Logger.println(Logger.ERROR, "In http response, there is no http version. status line is " + aLine + "." );
-					}
-					if ( isValidResponse && st.hasMoreTokens() ) {
-						String strStatusCode = st.nextToken();
-						try {
-							int statusCode = Integer.parseInt(strStatusCode);
-							response.setStatusCode(strStatusCode);
-						} catch (NumberFormatException nfe) {
-							isValidResponse = false;
-							Logger.println(Logger.ERROR, "In http response, there is invalid status code. status code is "+ strStatusCode + ".");
-						}
-					}
-					else {
-						isValidResponse = false;
-						Logger.println(Logger.ERROR, "In http response, there is no status code. status line is " + aLine + "." );
-					}
-					if ( isValidResponse && st.hasMoreTokens() )
-						response.setReasonPhrase(st.nextToken());
-					else {
-						isValidResponse = false;
-						Logger.println(Logger.ERROR, "In http response, there is status reason. status line is " + aLine + "." );
-					}
-				} else if ( key.length() > 0 ) {
-					response.addHeader(key, value);
-				}
-			} else {
-				response.setBodyArray(this.getBody());
-			}
+		}
+		else {
+			isValidResponse = false;
+			Logger.println(Logger.ERROR, "In http response, there is no status code. status line is " + baseInfo.startLine + "." );
+		}
+		if ( isValidResponse && st.hasMoreTokens() )
+			response.setReasonPhrase(st.nextToken());
+		else {
+			isValidResponse = false;
+			Logger.println(Logger.ERROR, "In http response, there is status reason. status line is " + baseInfo.startLine + "." );
 		}
 		this.close();
 		return response;
