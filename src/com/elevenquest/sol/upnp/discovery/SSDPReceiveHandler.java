@@ -1,5 +1,6 @@
 package com.elevenquest.sol.upnp.discovery;
 
+import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.network.HttpRequest;
 import com.elevenquest.sol.upnp.network.HttpResponse;
@@ -8,8 +9,8 @@ import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 public class SSDPReceiveHandler implements IHttpRequestHandler {
 
 	@Override
-	public HttpResponse process(HttpRequest packet) {
-		SSDPRequest message = new SSDPRequest(packet);
+	public HttpResponse process(HttpRequest request) {
+		SSDPRequest message = new SSDPRequest(request);
  		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
 		try {
 			if ( SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE.equalsIgnoreCase(

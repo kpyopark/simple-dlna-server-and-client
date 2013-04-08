@@ -14,18 +14,24 @@ public class Logger {
 			(level == ERROR ) ? "[ERROR]" : "[DEBUG]";
 	}
 	
+	private static boolean isLoggingTarget(int level) {
+		return (level >= DEBUG);
+	}
+	
 	public static void println(int level, String msg) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(getLevelTitle(level));
 		sb.append(msg);
-		System.out.println(sb.toString());
+		if ( isLoggingTarget(level) )
+			System.out.println(sb.toString());
 	}
 
 	public static void println(int level, int msg) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(getLevelTitle(level));
 		sb.append(msg);
-		System.out.println(sb.toString());
+		if ( isLoggingTarget(level) )
+			System.out.println(sb.toString());
 	}
 
 	public static void println(int level, Object msg) {
@@ -35,13 +41,15 @@ public class Logger {
 			sb.append(getLevelTitle(level));
 			sb.append(getLevelTitle(ERROR));
 			sb.append(error.getMessage());
-			System.out.println(sb.toString());
+			if ( isLoggingTarget(level) )
+				System.out.println(sb.toString());
 			error.printStackTrace();
 		} else {
 			StringBuffer sb = new StringBuffer();
 			sb.append(getLevelTitle(level));
 			sb.append(msg);
-			System.out.println(sb.toString());
+			if ( isLoggingTarget(level) )
+				System.out.println(sb.toString());
 		}
 	}
 }

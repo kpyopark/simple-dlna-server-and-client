@@ -3,11 +3,17 @@ package com.elevenquest.sol.upnp.network;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import com.elevenquest.sol.upnp.common.Logger;
+import com.elevenquest.sol.upnp.model.UPnPBase;
+import com.elevenquest.sol.upnp.model.UPnPDevice;
 
-public class HttpRequest {
+public class HttpRequest extends UPnPBase {
 	InputStream streamBody = null;
 	byte[] arrayBody = null;
 	

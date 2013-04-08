@@ -35,18 +35,22 @@ public class HttpParser {
 		ByteArrayOutputStream baos = null;
 		boolean isPrevCharCr = false;
 		try {
-			baos = new ByteArrayOutputStream();
 			while( ( curByte = this.inputStream.read() ) != -1 ) {
-				if ( curByte == '\n' && isPrevCharCr )
+				if ( baos == null )
+					baos = new ByteArrayOutputStream();
+				if ( curByte == '\n' && isPrevCharCr ) {
 					break;
+				}
 				if ( curByte == '\r' )
 					isPrevCharCr = true;
 				else
 					isPrevCharCr = false;
 				baos.write(curByte);
 			}
-			if ( baos.size() == 0 && curByte == -1 )
-				rtn = null;
+			if ( baos == null )
+				return null;
+			else if ( curByte == -1 )
+				rtn = "";
 			else
 				rtn = baos.toString().trim();
 		} finally {
@@ -85,7 +89,7 @@ public class HttpParser {
 		byte[] body = null;
 	}
 	
-	public HttpBaseStructure parseHttpLines() throws IOException {
+	protected HttpBaseStructure parseHttpLines() throws IOException {
 		HttpBaseStructure baseStruct = new HttpBaseStructure();
 		String aLine = "";
 		String key = "";
@@ -101,11 +105,15 @@ public class HttpParser {
 				if ( isStartLine ) {
 					isStartLine = false;
 					baseStruct.startLine = aLine;
-				} else if ( key.length() > 0 ) {
+				} else {
 					boolean isValid = false;
 					if ( aLine.length() > 0 && ( aLine.charAt(0) == ' ' || aLine.charAt(0) == '\t' ) ) {
-						// It's a value line.
-						value = aLine;
+						// It's a line of multiline text.
+						value += "\n" + aLine;
+						if ( key != null && key.length() > 0 ) {
+							int pos = baseStruct.headerNames.indexOf(key);
+							baseStruct.headerValues.set(pos, value);
+						}
 					} else {
 						for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
 							if ( aLine.charAt(pos) == ':' ) {
@@ -115,13 +123,13 @@ public class HttpParser {
 								break;
 							}
 						}
-					}
-					if (isValid) {
-						baseStruct.headerNames.add(key);
-						baseStruct.headerValues.add(value);
-					} else {
-						key = "";
-						value = "";
+						if (isValid) {
+							baseStruct.headerNames.add(key);
+							baseStruct.headerValues.add(value);
+						} else {
+							key = "";
+							value = "";
+						}
 					}
 				}
 			} else {

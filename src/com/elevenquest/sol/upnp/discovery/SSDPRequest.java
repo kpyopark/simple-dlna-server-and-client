@@ -75,4 +75,7 @@ public class SSDPRequest extends HttpRequest {
 		return device;
 	}
 	
+	public String toString() {
+		return super.toString();
+	}
 }
