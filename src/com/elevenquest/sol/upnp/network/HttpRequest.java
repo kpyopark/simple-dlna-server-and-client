@@ -39,7 +39,7 @@ public class HttpRequest extends UPnPBase {
 	// When to use same keys in one http connection, so we can't use HashMap class (in java)
 	
 	public HttpRequest() {
-		this(HTTP_REQUEST_COMMAND_GET);
+		this(HTTP_REQUEST_COMMAND_POST);
 	}
 	
 	public HttpRequest(HttpRequest oldOne) {
@@ -91,7 +91,7 @@ public class HttpRequest extends UPnPBase {
 	public String[] getHeaderList(String headerName) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
-			if ( headerNames.get(cnt).equals(headerName) )
+			if ( headerNames.get(cnt).equalsIgnoreCase(headerName) )
 				list.add(headerValues.get(cnt));
 		}
 		return list.toArray(new String[0]);
@@ -99,7 +99,7 @@ public class HttpRequest extends UPnPBase {
 	
 	public String getHeaderValue(String headerName) {
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
-			if ( headerNames.get(cnt).equals(headerName) )
+			if ( headerNames.get(cnt).equalsIgnoreCase(headerName) )
 				return headerValues.get(cnt);
 		}
 		return null;
@@ -178,7 +178,7 @@ public class HttpRequest extends UPnPBase {
 	public void setHeaderValue(String headerName, String headerValue) {
 		boolean isOverwrite = false;
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
-			if ( headerNames.get(cnt).equals(headerName) ) {
+			if ( headerNames.get(cnt).equalsIgnoreCase(headerName) ) {
 				headerValues.set(cnt, headerValue);
 				isOverwrite = true;
 			}

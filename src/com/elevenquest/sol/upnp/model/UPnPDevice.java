@@ -146,6 +146,10 @@ public class UPnPDevice extends UPnPBase {
 	}
 	
 	public void setHost(String host) {
+		if ( host == null ) {
+			Logger.println(Logger.WARNING, "Invalid value(null) is passed into host parameter. Its uuid is [" + this.uuid + "]");
+			return;
+		}
 		StringTokenizer st = new StringTokenizer(host.trim(),":");
 		String address, port;
 		if ( st.hasMoreTokens() && (address = st.nextToken()) != null ) {

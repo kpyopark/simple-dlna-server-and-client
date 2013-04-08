@@ -49,7 +49,7 @@ public class HttpResponse {
 	public String[] getHeaderList(String headerName) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
-			if ( headerNames.get(cnt).equals(headerName) )
+			if ( headerNames.get(cnt).equalsIgnoreCase(headerName) )
 				list.add(headerValues.get(cnt));
 		}
 		return list.toArray(new String[0]);
@@ -57,7 +57,7 @@ public class HttpResponse {
 	
 	public String getHeaderValue(String headerName) {
 		for (int cnt = 0; cnt < headerNames.size() ; cnt++ ) {
-			if ( headerNames.get(cnt).equals(headerName) )
+			if ( headerNames.get(cnt).equalsIgnoreCase(headerName) )
 				return headerValues.get(cnt);
 		}
 		return null;

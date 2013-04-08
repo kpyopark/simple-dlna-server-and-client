@@ -78,12 +78,15 @@ public class HttpTcpSender extends HttpRequestSender {
 
 			// 6. retrieving the response from the server.
 			int status = urlCon.getResponseCode();
+			response.setStatusCode(status+"");
 			for (Entry<String, List<String>> header : urlCon.getHeaderFields().entrySet()) {
 				for (String value : header.getValue().toArray(new String[0]) )
 					response.addHeader(header.getKey(), value);
 			}
-			response.setBodyInputStream(urlCon.getInputStream());
-			
+			if (status != 500)
+				response.setBodyInputStream(urlCon.getInputStream());
+			else
+				response.setBodyArray(new byte[0]);
 		} finally {
 			if ( bos != null ) try { bos.close(); } catch ( Exception e1 ) {
 				e1.printStackTrace();
