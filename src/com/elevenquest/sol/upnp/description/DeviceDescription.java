@@ -443,6 +443,7 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	public HttpRequest getHTTPRequest() throws Exception {
 		HttpRequest request = new HttpRequest();
 		request.setHttpVer("HTTP/1.1");
+		request.setUrlPath("*");
 		request.setCommand("GET");
 		request.setUrlPath(this.device.getLocation());
 		String osVersion = "WindowsNT";
