@@ -33,6 +33,14 @@ public class UPnPService extends UPnPBase {
 		this.device = device;
 	}
 	
+	private String getAbsoluteURL(String pathOrUrl) {
+		if (pathOrUrl.startsWith("http"))
+			return pathOrUrl;
+		else {
+			return "http://" + this.device.getBaseHost() + (pathOrUrl.charAt(0) == '/' ? "" : "/" ) + pathOrUrl;
+		}
+	}
+	
 	// We use HashMap instead of Vector cause of performance issue.
 	HashMap<String /* action name */, UPnPAction> actionList = new HashMap<String, UPnPAction>();
 	HashMap<String /* state variable name */, UPnPStateVariable> variableList = new HashMap<String, UPnPStateVariable>();
@@ -50,19 +58,19 @@ public class UPnPService extends UPnPBase {
 		this.serviceId = serviceId;
 	}
 	public String getScpdUrl() {
-		return scpdUrl;
+		return getAbsoluteURL(this.scpdUrl);
 	}
 	public void setScpdUrl(String scpdUrl) {
 		this.scpdUrl = scpdUrl;
 	}
 	public String getControlUrl() {
-		return controlUrl;
+		return getAbsoluteURL(this.controlUrl);
 	}
 	public void setControlUrl(String controlUrl) {
 		this.controlUrl = controlUrl;
 	}
 	public String getEventsubUrl() {
-		return eventsubUrl;
+		return getAbsoluteURL(this.eventsubUrl);
 	}
 	public void setEventsubUrl(String eventsubUrl) {
 		this.eventsubUrl = eventsubUrl;

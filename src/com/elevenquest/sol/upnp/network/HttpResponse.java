@@ -95,9 +95,7 @@ public class HttpResponse {
 	}
 	
 	public InputStream getBodyInputStream() {
-		if ( this.streamBody != null ) {
-			return this.streamBody;
-		} else if ( arrayBody != null ) {
+		if ( arrayBody != null ) {
 			this.streamBody =  new ByteArrayInputStream(this.arrayBody);
 		} else {
 			this.streamBody = new ByteArrayInputStream(new byte[0]);
@@ -111,6 +109,7 @@ public class HttpResponse {
 	
 	public void setBodyInputStream(InputStream is) {
 		this.streamBody = is;
+		this.getBodyArray();
 	}
 
 	public String getHttpVer() {
