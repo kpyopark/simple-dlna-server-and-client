@@ -10,7 +10,7 @@ public class SSDPReceiveHandler implements IHttpRequestHandler {
 
 	@Override
 	public HttpResponse process(HttpRequest request) {
-		SSDPRequest message = new SSDPRequest(request);
+		SSDPNotifyRequest message = new SSDPNotifyRequest(request);
  		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
 		try {
 			if ( SSDPMessage.ID_NT_SUBTYPE_SSDPALIVE.equalsIgnoreCase(

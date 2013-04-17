@@ -18,12 +18,33 @@ public class Logger {
 		return (level >= DEBUG);
 	}
 	
+	/*
+	private static void android_log(int level, String msg) {
+		String tag = "ANONY";
+		switch ( level ) {
+		case 0 :
+			Log.d(tag, msg);
+			break;
+		case 1 :
+			Log.i(tag, msg);
+			break;
+		case 2 :
+			Log.w(tag, msg);
+			break;
+		case 3 :
+			Log.e(tag, msg);
+			break;
+		}
+	}
+	*/
+	
 	public static void println(int level, String msg) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(getLevelTitle(level));
 		sb.append(msg);
 		if ( isLoggingTarget(level) )
 			System.out.println(sb.toString());
+			//android_log(level, msg);
 	}
 
 	public static void println(int level, int msg) {
@@ -32,6 +53,7 @@ public class Logger {
 		sb.append(msg);
 		if ( isLoggingTarget(level) )
 			System.out.println(sb.toString());
+			//android_log(level, msg + "");
 	}
 
 	public static void println(int level, Object msg) {
@@ -43,6 +65,7 @@ public class Logger {
 			sb.append(error.getMessage());
 			if ( isLoggingTarget(level) )
 				System.out.println(sb.toString());
+				//android_log(level, msg.toString());
 			error.printStackTrace();
 		} else {
 			StringBuffer sb = new StringBuffer();

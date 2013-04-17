@@ -14,6 +14,9 @@ public class SSDPMessage {
 	public final static String ID_UPNP_DISCOVERY_NT_SUBTYPE = "NTS";
 	public final static String ID_UPNP_DISCOVERY_SERVER = "SERVER";
 	public final static String ID_UPNP_DISCOVERY_USN = "USN";
+	public final static String ID_UPNP_DISCOVERY_MAN = "MAN";
+	public final static String ID_UPNP_DISCOVERY_MX = "MX";
+	public final static String ID_UPNP_DISCOVERY_ST = "ST";
 	
 	public final static String ID_START_LINE_COMMAND_NOTIFY = "NOTIFY";
 	public final static String ID_START_LINE_COMMAND_SEARCH = "M-SEARCH";
@@ -25,6 +28,7 @@ public class SSDPMessage {
 	public final static String ID_NT_SUBTYPE_SSDPALIVE = "ssdp:alive";
 	public final static String ID_NT_SUBTYPE_SSDPBYEBYE = "ssdp:byebye";
 	public final static String ID_NT_SUBTYPE_SSDPUPDATE = "ssdp:update";
+	public final static String ID_NT_SUBTYPE_SSDPDISCOVER = "ssdp:discover";
 	
 	public final static String STARTLINE_ID_LIST[] = {
 		ID_START_LINE_NOTIFY, ID_START_LINE_SEARCH, ID_START_LINE_NORMAL

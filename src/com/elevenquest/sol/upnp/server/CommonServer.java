@@ -91,11 +91,13 @@ public class CommonServer {
 					try {
 						threadPool.execute(new Runnable() {
 							public void run() {
+								int cnt = 0;
 								do {
 									try {
 										sender.sendData();
 										if ( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED )
 											Thread.sleep(event.getDelayTimeInMillisec());
+										Logger.println(Logger.DEBUG, "Repeating count:" + cnt++);
 									} catch ( Exception e ) {
 										numberOfErrors++;
 										Logger.println(Logger.ERROR, "Sender can't send.");

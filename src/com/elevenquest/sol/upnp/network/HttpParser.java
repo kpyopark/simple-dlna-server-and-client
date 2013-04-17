@@ -118,7 +118,7 @@ public class HttpParser {
 						for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
 							if ( aLine.charAt(pos) == ':' ) {
 								key = aLine.substring(0,pos);
-								value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1) : ""; 
+								value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1).trim() : ""; 
 								isValid = true;
 								break;
 							}
