@@ -4,28 +4,22 @@ import java.net.NetworkInterface;
 import java.util.ArrayList;
 
 import com.elevenquest.sol.upnp.common.UPnPUtils;
-import com.elevenquest.sol.upnp.control.ControlPoint;
 import com.elevenquest.sol.upnp.discovery.SSDPReceiveHandler;
 import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.HttpHeaderName;
-import com.elevenquest.sol.upnp.network.HttpUdpSender;
-import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
+import com.elevenquest.sol.upnp.network.HttpTcpReceiver;
 import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
+import com.elevenquest.sol.upnp.network.HttpUdpSender;
+import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 
-public class SsdpControlPointServer {
+public class GenaServer {
 	
 	ArrayList<CommonServer> receiveServerList = null;
 	ArrayList<CommonServer> senderServerList = null;
-	ControlPoint cp = null;
-
-	public void SsdpControlPointServer(ControlPoint cp) {
-		this.cp = cp;
-	}
 	
 	public void start() {
 		startReceiveServer();
@@ -39,9 +33,8 @@ public class SsdpControlPointServer {
 		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
 		for ( NetworkInterface intf : interfaces ) {
 			try {
-				// 1. Next, create ssdp message receiver & handler instance.
-				HttpRequestReceiver receiver = new HttpUdpReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
-						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
+				// 1. Normal HTTP Request
+				HttpRequestReceiver receiver = new HttpTcpReceiver(intf, 80);
 				IHttpRequestHandler handler = new SSDPReceiveHandler();
 				receiver.setReceiveHandler(handler);
 				// 2. Create Common server
@@ -65,6 +58,7 @@ public class SsdpControlPointServer {
 			stopSendServer();
 		senderServerList = new ArrayList<CommonServer>();
 		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
+		/*
 		for ( NetworkInterface intf : interfaces ) {
 			try {
 				// 1. Next, create ssdp message supplier
@@ -80,13 +74,13 @@ public class SsdpControlPointServer {
 				sendServer.startServer();
 				
 				senderServerList.add(sendServer);
-				
 			} catch ( AbnormalException abe ) {
 				abe.printStackTrace();
 			} catch ( Exception e ) {
 				e.printStackTrace();
 			}
 		}
+		*/
 	}
 	
 	public void stop() {
@@ -104,6 +98,5 @@ public class SsdpControlPointServer {
 		if ( senderServerList != null )
 			for ( CommonServer server : senderServerList ) server.stopServer();
 		senderServerList = null;
-	}
-	
+	}	
 }

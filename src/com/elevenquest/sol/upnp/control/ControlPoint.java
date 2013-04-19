@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.elevenquest.sol.upnp.common.Logger;
-import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
+import com.elevenquest.sol.upnp.network.HttpHeaderName;
 import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;

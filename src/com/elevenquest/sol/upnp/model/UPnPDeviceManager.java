@@ -5,8 +5,8 @@ import java.util.Set;
 
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.description.DeviceDescription;
-import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
+import com.elevenquest.sol.upnp.network.HttpHeaderName;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpTcpSender;

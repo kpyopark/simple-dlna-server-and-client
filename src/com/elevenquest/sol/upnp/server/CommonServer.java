@@ -9,9 +9,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.elevenquest.sol.upnp.common.Logger;
-import com.elevenquest.sol.upnp.discovery.SSDPMessage;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
+import com.elevenquest.sol.upnp.network.HttpHeaderName;
 import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
