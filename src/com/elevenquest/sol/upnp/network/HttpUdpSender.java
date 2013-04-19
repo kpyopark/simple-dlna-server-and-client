@@ -32,8 +32,8 @@ public class HttpUdpSender extends HttpRequestSender {
 			StringBuffer buffer = new StringBuffer();
 			buffer.append(request.getCommand()).append(" ").append(request.getUrlPath()).append(" ").append(request.getHttpVer()).append("\n\r");
 			for ( int cnt = 0 ; cnt < request.getHeaderCount() ; cnt++ )
-				buffer.append(request.getHeaderName(cnt)).append(":").append(request.getHeaderValue(cnt)).append("\n\r");
-			buffer.append("\n\r");
+				buffer.append(request.getHeaderName(cnt)).append(":").append(request.getHeaderValue(cnt)).append("\r\n");
+			buffer.append("\r\n");
 			byte[] bytesSend = buffer.toString().getBytes();
 			if ( this.targetAddr.isMulticastAddress() ) {
 				Logger.println(Logger.DEBUG, "sent by multicasting.");

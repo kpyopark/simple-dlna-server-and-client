@@ -19,7 +19,6 @@ public class HttpRequest extends UPnPBase {
 	
 	ArrayList<String> headerNames = null;
 	ArrayList<String> headerValues = null;
-	int headerCount = 0;
 	
 	String command = null;
 	String urlPath = null;
@@ -47,7 +46,6 @@ public class HttpRequest extends UPnPBase {
 		this.arrayBody = oldOne.arrayBody;
 		this.headerNames = oldOne.headerNames;
 		this.headerValues = oldOne.headerValues;
-		this.headerCount = oldOne.headerCount;
 		this.command = oldOne.command;
 		this.urlPath = oldOne.urlPath;
 		this.httpVer = oldOne.httpVer;
@@ -62,7 +60,6 @@ public class HttpRequest extends UPnPBase {
 		this.command = command;
 		headerNames = new ArrayList<String>();
 		headerValues = new ArrayList<String>();
-		headerCount = 0;
 		processingException = null;
 	}
 	
@@ -73,11 +70,10 @@ public class HttpRequest extends UPnPBase {
 	public void addHeader(String headerName, String headerValue) {
 		headerNames.add(headerName);
 		headerValues.add(headerValue);
-		headerCount++;
 	}
 	
 	public int getHeaderCount() {
-		return headerCount;
+		return this.headerNames.size();
 	}
 	
 	public ArrayList<String> getHeaderNames() {
