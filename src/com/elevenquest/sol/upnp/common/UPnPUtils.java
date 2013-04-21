@@ -104,7 +104,6 @@ public class UPnPUtils {
 	}
 	
 	public static String escapeXML(String s) {
-		/*
 		StringBuffer str = new StringBuffer();
 		int len = (s != null) ? s.length() : 0;
 		for (int i=0; i<len; i++) {
@@ -119,13 +118,50 @@ public class UPnPUtils {
 			}
 		}
 		return str.toString();
-		*/
 		// replaced with apache's common utils.
-		return org.apache.commons.lang.StringEscapeUtils.escapeXml(s);
+		// return org.apache.commons.lang.StringEscapeUtils.escapeXml(s);
 	}
 	
 	public static String unescapeXML(String s) {
-		return org.apache.commons.lang.StringEscapeUtils.unescapeXml(s);
+		//return org.apache.commons.lang.StringEscapeUtils.unescapeXml(s);
+		StringBuffer str = new StringBuffer();
+		int len =  (s != null) ? s.length() : 0;
+		for (int i = 0; i < len; i++) {
+			char ch = s.charAt(i);
+			if ( ch == '&' ) {
+				if ( ( len - i ) > 5 ) {
+					if ( s.charAt(i+1) == 'a' && s.charAt(i+2) == 'p' && s.charAt(i+3) == 'o' && s.charAt(i+4) == 's' && s.charAt(i+5) == ';') {
+						str.append('\'');
+						i += 6;
+					} else if ( s.charAt(i+1) == 'q' && s.charAt(i+2) == 'u' && s.charAt(i+3) == 'o' && s.charAt(i+4) == 't' && s.charAt(i+5) == ';') {
+						str.append('"');
+						i += 6;
+					} else {
+						str.append(ch);
+					}
+				} else if ( ( len - i ) > 4 ) {
+					if ( s.charAt(i+1) == 'a' && s.charAt(i+2) == 'm' && s.charAt(i+3) == 'p' && s.charAt(i+4) == ';' ) {
+						str.append('&');
+						i += 5;
+					} else {
+						str.append(ch);
+					}
+				} else if ( ( len - i ) > 3 ) {
+					if ( s.charAt(i+1) == 'l' && s.charAt(i+2) == 't' && s.charAt(i+3) == ';' ) {
+						str.append('<');
+						i += 4;
+					} else if ( s.charAt(i+1) == 'g' && s.charAt(i+2) == 't' && s.charAt(i+3) == ';' ) {
+						str.append('>');
+						i += 4;
+					} else {
+						str.append(ch);
+					}
+				} else {
+					str.append(ch);
+				}
+			}
+		}
+		return str.toString();
 	}
 	
 	public static String base64encode(String org) {
