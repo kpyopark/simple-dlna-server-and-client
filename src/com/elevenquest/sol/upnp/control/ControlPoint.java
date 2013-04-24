@@ -2,6 +2,8 @@ package com.elevenquest.sol.upnp.control;
 
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.Vector;
 
@@ -126,17 +128,35 @@ public class ControlPoint {
 			e.printStackTrace();
 		}
 	}
-	
+
+	static class TestCP implements Observer {
+
+		ControlPoint cp = null;
+		
+		public TestCP(final ControlPoint cp) {
+			this.cp = cp;
+		}
+		@Override
+		public void update(Observable arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			Logger.println(Logger.INFO, "DeviceManager is updated.");
+			cp.printDeviceState();
+		}
+		
+	}
 	/**
 	 * For Testing.
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		ControlPoint cp = new ControlPoint();
+		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
+		manager.addObserver(new TestCP(cp));
 		cp.start();
-		for ( int count = 0; count < 1000 ; count++ )
-		{
-			cp.printDeviceState();
+		try {
+			Thread.sleep(60 * 1000000);
+		} catch ( Exception e ) {
+			e.printStackTrace();
 		}
 		cp.stop();
 	}

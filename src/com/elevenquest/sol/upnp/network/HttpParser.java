@@ -20,13 +20,24 @@ import com.elevenquest.sol.upnp.common.Logger;
 public class HttpParser {
 	
 	InputStream inputStream = null;
+	int length = 0;
 	
 	public HttpParser(InputStream is) {
 		this.inputStream = is;
+		try {
+			this.length = this.inputStream.available();
+		} catch ( Exception e ) {
+			Logger.println(Logger.ERROR, "To retrieve availiable bytes size from input stream failed.");
+		}
 	}
 	
 	public HttpParser(byte[] contents) {
 		this.inputStream = new ByteArrayInputStream(contents);
+		try {
+			this.length = this.inputStream.available();
+		} catch ( Exception e ) {
+			Logger.println(Logger.ERROR, "To retrieve availiable bytes size from input stream failed.");
+		}
 	}
 	
 	private String readLine() throws IOException {
@@ -56,7 +67,7 @@ public class HttpParser {
 		} finally {
 			if ( baos != null ) try { baos.close(); } catch ( Exception e1 ) { e1.printStackTrace(); } 
 		}
-		Logger.println(Logger.DEBUG, "a line read from packet.:" + rtn);
+		//Logger.println(Logger.DEBUG, "a line read from packet.:" + rtn);
 		return rtn;
 	}
 
@@ -105,6 +116,7 @@ public class HttpParser {
 				if ( isStartLine ) {
 					isStartLine = false;
 					baseStruct.startLine = aLine;
+					Logger.println(Logger.DEBUG, "current time : [" + System.currentTimeMillis() + "] start line:" + aLine + " length :" + this.length);
 				} else {
 					boolean isValid = false;
 					if ( aLine.length() > 0 && ( aLine.charAt(0) == ' ' || aLine.charAt(0) == '\t' ) ) {

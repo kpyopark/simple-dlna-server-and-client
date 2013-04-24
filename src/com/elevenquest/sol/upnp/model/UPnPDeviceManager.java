@@ -1,6 +1,8 @@
 package com.elevenquest.sol.upnp.model;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Observable;
 import java.util.Set;
 
 import com.elevenquest.sol.upnp.common.Logger;
@@ -13,7 +15,7 @@ import com.elevenquest.sol.upnp.network.HttpTcpSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
 import com.elevenquest.sol.upnp.server.SendEvent;
 
-public class UPnPDeviceManager {
+public class UPnPDeviceManager extends Observable {
 	
 	private static UPnPDeviceManager singletone = null;
 	
@@ -43,6 +45,7 @@ public class UPnPDeviceManager {
 		} else {
 			this.deviceList.put(device.getUuid(), device);
 			this.updateRemoteDeviceInfo();
+			notifyObservers();
 		}
 	}
 	
@@ -56,6 +59,7 @@ public class UPnPDeviceManager {
 	
 	public void removeDevice(String uuid) {
 		this.deviceList.remove(uuid);
+		notifyObservers();
 		//this.updateRemoteDeviceInfo();
 	}
 	
@@ -70,6 +74,10 @@ public class UPnPDeviceManager {
 	
 	public Set<String> getUuidList() {
 		return this.deviceList.keySet();
+	}
+	
+	public Collection<UPnPDevice> getDeviceList() {
+		return this.deviceList.values();
 	}
 	
 	static class SampleTread extends Thread {

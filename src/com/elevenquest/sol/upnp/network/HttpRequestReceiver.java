@@ -25,7 +25,7 @@ public abstract class HttpRequestReceiver {
 	 * 
 	 * @throws Exception
 	 */
-	abstract protected HttpRequest listen() throws Exception;
+	abstract public HttpRequest listen() throws Exception;
 	
 	public void beforeReceive() {
 		// TODO : API for hooking

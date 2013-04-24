@@ -10,6 +10,7 @@ import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.network.HttpHeaderName;
+import com.elevenquest.sol.upnp.network.HttpSimpleServer;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
 import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
@@ -19,7 +20,7 @@ import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 
 public class SsdpControlPointServer {
 	
-	ArrayList<CommonServer> receiveServerList = null;
+	ArrayList<HttpSimpleServer> receiveServerList = null;
 	ArrayList<CommonServer> senderServerList = null;
 	ControlPoint cp = null;
 
@@ -35,7 +36,7 @@ public class SsdpControlPointServer {
 	public void startReceiveServer() {
 		if ( receiveServerList != null ) 
 			stopReceiveServer();
-		receiveServerList = new ArrayList<CommonServer>();
+		receiveServerList = new ArrayList<HttpSimpleServer>();
 		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
 		for ( NetworkInterface intf : interfaces ) {
 			try {
@@ -45,7 +46,7 @@ public class SsdpControlPointServer {
 				IHttpRequestHandler handler = new SSDPReceiveHandler();
 				receiver.setReceiveHandler(handler);
 				// 2. Create Common server
-				CommonServer receiveServer = new CommonServer();
+				HttpSimpleServer receiveServer = new HttpSimpleServer();
 				// 3. set receiver into server.
 				receiveServer.setReceiver(receiver);
 				// 4. start server.
@@ -96,7 +97,7 @@ public class SsdpControlPointServer {
 	
 	public void stopReceiveServer() {
 		if ( receiveServerList != null )
-			for ( CommonServer server : receiveServerList ) server.stopServer();
+			for ( HttpSimpleServer server : receiveServerList ) server.stopServer();
 		receiveServerList = null;
 	}
 	
