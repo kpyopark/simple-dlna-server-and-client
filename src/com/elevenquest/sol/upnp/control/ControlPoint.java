@@ -2,6 +2,7 @@ package com.elevenquest.sol.upnp.control;
 
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -10,6 +11,9 @@ import java.util.Vector;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
+import com.elevenquest.sol.upnp.model.IUPnPDeviceListChangeListener;
+import com.elevenquest.sol.upnp.model.IUPnPDeviceServiceListChangeListener;
+import com.elevenquest.sol.upnp.model.UPnPChangeStatusValue;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
@@ -51,6 +55,10 @@ public class ControlPoint {
 		ssdpServer.start();
 	}
 	
+	public void startGenaServer() {
+		
+	}
+	
 	private void testBrowseRecursively(ContentDirectoryService cds, ContentDirectoryItem parent,int depth) throws Exception {
 		String padding = "";
 		for ( int cnt = 0 ; cnt < depth ; cnt++ ) {
@@ -65,13 +73,8 @@ public class ControlPoint {
 		}
 	}
 	
-	public void startGenaServer() {
-		
-	}
-	
 	private void printDeviceState() {
 		try {
-			Thread.sleep(10 * 1000);	// After 10 sec.
 			Set<String> uuids = UPnPDeviceManager.getDefaultDeviceManager().getUuidList();
 			for ( String uuid : uuids ) {
 				Logger.println(Logger.INFO, "--->>>uuid:" + uuid);
@@ -129,20 +132,57 @@ public class ControlPoint {
 		}
 	}
 
-	static class TestCP implements Observer {
+	static class PrintDeviceInfo implements IUPnPDeviceServiceListChangeListener, IUPnPDeviceListChangeListener {
 
 		ControlPoint cp = null;
+		Collection<UPnPDevice> deviceList = null;
 		
-		public TestCP(final ControlPoint cp) {
+		public PrintDeviceInfo(final ControlPoint cp) {
 			this.cp = cp;
-		}
-		@Override
-		public void update(Observable arg0, Object arg1) {
-			// TODO Auto-generated method stub
-			Logger.println(Logger.INFO, "DeviceManager is updated.");
-			cp.printDeviceState();
+			this.deviceList = new ArrayList<UPnPDevice>();
 		}
 		
+		@Override
+		public void updateDeviceList(UPnPChangeStatusValue value, UPnPDevice device) {
+			Logger.println(Logger.INFO, "DeviceManager is updated.");
+			if ( !deviceList.contains(device) ) {
+				deviceList.add(device);
+				device.addServiceChangeListener(PrintDeviceInfo.this);
+			}
+		}
+		
+		private void testBrowseRecursively(ContentDirectoryService cds, ContentDirectoryItem parent,int depth) throws Exception {
+			String padding = "";
+			for ( int cnt = 0 ; cnt < depth ; cnt++ ) {
+				padding += "--";
+			}
+			System.out.println(padding + parent);
+			if ( parent.getType() == ContentDirectoryItem.CDS_TYPE_CONTAINER ) {
+				ArrayList<ContentDirectoryItem> items = cds.browse(parent.getId() , "BrowseDirectChildren", "*", 0, 0, "");
+				for ( ContentDirectoryItem child : items ) {
+					testBrowseRecursively(cds, child, depth+1);
+				}
+			}
+		}
+		
+		@Override
+		public void updateServiceList(UPnPChangeStatusValue value, UPnPDevice device, UPnPService serviceUpdated) {
+			Logger.println(Logger.INFO, "Device is updated. updated service [" + serviceUpdated + "] status :[" + value + "]" );
+			if ( value == UPnPChangeStatusValue.CHANGE_ADD || value == UPnPChangeStatusValue.CHANGE_UPDATE ) {
+				if ( serviceUpdated.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_CDS) ) {
+					ContentDirectoryService cds = (ContentDirectoryService)serviceUpdated;
+					try {
+						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 0, 0, "");
+						for ( ContentDirectoryItem item : list ) {
+							testBrowseRecursively(cds,item,0);
+						}
+					} catch ( Exception e ) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
 	}
 	/**
 	 * For Testing.
@@ -151,7 +191,7 @@ public class ControlPoint {
 	public static void main(String[] args) {
 		ControlPoint cp = new ControlPoint();
 		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
-		manager.addObserver(new TestCP(cp));
+		manager.addDeviceListChangeListener(new PrintDeviceInfo(cp));
 		cp.start();
 		try {
 			Thread.sleep(60 * 1000000);

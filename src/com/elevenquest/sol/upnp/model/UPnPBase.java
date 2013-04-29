@@ -40,20 +40,27 @@ public class UPnPBase {
 							)
 							&& methods[inx].getName().indexOf("get") == 0 ) {
 						if ( Modifier.isPublic(methods[inx].getModifiers()) || Modifier.isProtected(methods[inx].getModifiers()) ) {
-							Collection<Object> vec = (Collection<Object>) methods[inx].invoke(this, null);
-							try {
+							Class[] parameters = methods[inx].getParameterTypes();
+							if ( parameters != null && parameters.length > 0 ) {
+								// It need parameters. So it should be skipped.
 								sb.append(className).append(":").append(
-										methods[inx].getName()).append(":");
-								if ( vec == null ) {
-									sb.append("null");
-								} else {
-									for (Iterator<Object> iter = vec.iterator(); iter.hasNext() ; ) {
-										sb.append("[").append(toString(iter.next(),depth))
-												.append("]");
+										methods[inx].getName()).append(":skipped.");
+							} else {
+								Collection<Object> vec = (Collection<Object>) methods[inx].invoke(this, null);
+								try {
+									sb.append(className).append(":").append(
+											methods[inx].getName()).append(":");
+									if ( vec == null ) {
+										sb.append("null");
+									} else {
+										for (Iterator<Object> iter = vec.iterator(); iter.hasNext() ; ) {
+											sb.append("[").append(toString(iter.next(),depth))
+													.append("]");
+										}
 									}
+								} catch (Exception e1) {
+									Logger.println(Logger.ERROR, e1.getMessage());
 								}
-							} catch (Exception e1) {
-								Logger.println(Logger.ERROR, e1.getMessage());
 							}
 						} else {
 							Logger.println(Logger.DEBUG, "method[" + methods[inx].getName() + "] is not public or protected.");

@@ -29,8 +29,11 @@ public class UPnPService extends UPnPBase {
 	boolean isReadyToUse = false;
 	boolean isProgressingToRetrieve = false;
 	
+	ArrayList<IUPnPServiceStatusChangeListener> listeners = null;
+	
 	public UPnPService(UPnPDevice device) {
 		this.device = device;
+		this.listeners = new ArrayList<IUPnPServiceStatusChangeListener>();
 	}
 	
 	private String getAbsoluteURL(String pathOrUrl) {
@@ -77,7 +80,9 @@ public class UPnPService extends UPnPBase {
 	}
 	
 	public void registerAction(UPnPAction action) {
-		this.actionList.put(action.getActionName(), action);
+		synchronized(action) {
+			this.actionList.put(action.getActionName(), action);
+		}
 	}
 	
 	public UPnPAction getAction(String actionName) {
@@ -89,7 +94,9 @@ public class UPnPService extends UPnPBase {
 	}
 	
 	public void registerStateVariable(UPnPStateVariable variable) {
-		this.variableList.put(variable.getName(), variable);
+		synchronized(variable) {
+			this.variableList.put(variable.getName(), variable);
+		}
 	}
 	
 	public UPnPStateVariable getStateVariable(String variableName) {
@@ -98,6 +105,20 @@ public class UPnPService extends UPnPBase {
 	
 	public Collection<UPnPStateVariable> getStateVariableList() {
 		return this.variableList.values();
+	}
+	
+	public void addServiceStateChangeListener(IUPnPServiceStatusChangeListener listener) {
+		if ( !this.listeners.contains(listener) ) {
+			synchronized(listeners) {
+				this.listeners.add(listener);
+			}
+		}
+	}
+	
+	public void removeServiceStatusChangeListener(IUPnPServiceStatusChangeListener listener) {
+		synchronized(listeners) {
+			this.listeners.remove(listener);
+		}
 	}
 	
 	public boolean isRemote() {
@@ -111,6 +132,14 @@ public class UPnPService extends UPnPBase {
 	}
 	public void setReadyToUse(boolean isReadyToUse) {
 		this.isReadyToUse = isReadyToUse;
+		if ( isReadyToUse ) {
+			synchronized ( listeners ) {
+				IUPnPServiceStatusChangeListener[] listenerList = listeners.toArray(new IUPnPServiceStatusChangeListener[0]);
+				for ( int cnt = 0; ( listenerList != null ) && ( cnt < listenerList.length ) ; cnt++) {
+					listenerList[cnt].updateServiceStatus(UPnPChangeStatusValue.CHANGE_UPDATE, this);
+				}
+			}
+		}
 	}
 	public boolean isProgressingToRetrieve() {
 		return isProgressingToRetrieve;
@@ -135,5 +164,9 @@ public class UPnPService extends UPnPBase {
 		Logger.println(Logger.INFO, "isRemote Service:"+this.isRemote);
 		Logger.println(Logger.INFO, "isReadyToUse :"+this.isReadyToUse);
 		Logger.println(Logger.INFO, "isProgressingToRetrieve :"+this.isProgressingToRetrieve);
+	}
+	
+	public String toString() {
+		return getServiceId() + ":" + super.toString();
 	}
 }

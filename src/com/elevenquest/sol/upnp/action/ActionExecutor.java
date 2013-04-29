@@ -67,7 +67,7 @@ public class ActionExecutor {
 		    String reqStr = makeSoapBody();  
 		    int len = reqStr.length();   
 		    conn.setRequestProperty("Content-Length", Integer.toString( len ) );   
-		    conn.setRequestProperty("SOAPAction", action.getService().getServiceType() + "#" + action.getActionName() );   
+		    conn.setRequestProperty("SOAPAction", "\"" + action.getService().getServiceType() + "#" + action.getActionName() + "\"" );   
 		    
 		    Map<String,List<String>> props = conn.getRequestProperties();
 		    Iterator<String> keyIter = props.keySet().iterator();

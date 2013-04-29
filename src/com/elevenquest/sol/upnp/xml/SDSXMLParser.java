@@ -46,7 +46,7 @@ public class SDSXMLParser {
 			ioe.printStackTrace();
 		}
 		this.xmlInputStream = new ByteArrayInputStream(baos.toByteArray());
-		Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
+		//Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
 	}
 
 	public void execute() {
@@ -199,7 +199,8 @@ public class SDSXMLParser {
 				}
 			}
 			/* ActionList */
-
+			this.description.getService().setReadyToUse(true);
+			this.description.getService().setProgressingToRetrieve(false);
 
 		} catch (Exception e) {
 			e.printStackTrace();

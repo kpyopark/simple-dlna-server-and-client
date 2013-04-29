@@ -3,6 +3,7 @@ package com.elevenquest.sol.upnp.model;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -10,7 +11,7 @@ import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 
 
-public class UPnPDevice extends UPnPBase {
+public class UPnPDevice extends UPnPBase implements IUPnPServiceStatusChangeListener {
 
 	public static int DEFAULT_UPNP_MULTICAST_PORT = 1900;
 	public static InetAddress DEFAULT_UPNP_MULTICAST_ADDRESS = null;
@@ -27,6 +28,7 @@ public class UPnPDevice extends UPnPBase {
 	private Vector<NetworkInterface> interfaces = new Vector<NetworkInterface>();
 	
 	private Vector<UPnPService> services = new Vector<UPnPService>();
+	private ArrayList<IUPnPDeviceServiceListChangeListener> serviceChangeListeners = new ArrayList<IUPnPDeviceServiceListChangeListener>();
 	
 	// private UDPReceiver multicastReceiver;
 	String modelSerial;
@@ -70,6 +72,15 @@ public class UPnPDevice extends UPnPBase {
 	public String getUsn() {
 		return usn;
 	}
+	
+	public void addServiceChangeListener(IUPnPDeviceServiceListChangeListener listener) {
+		if ( !this.serviceChangeListeners.contains(listener) )
+			this.serviceChangeListeners.add(listener);
+	}
+	
+	public void removeServiceChangeListener(IUPnPDeviceServiceListChangeListener listener) {
+		this.serviceChangeListeners.remove(listener);
+	}
 
 	public void setUsn(String usn) {
 		this.usn = usn;
@@ -80,7 +91,10 @@ public class UPnPDevice extends UPnPBase {
 	}
 
 	public void addService(UPnPService service) {
-		services.add(service);
+		if ( !services.contains(service) ) {
+			services.add(service);
+			service.addServiceStateChangeListener(this);
+		}
 	}
 	
 	public Vector<UPnPService> getSerivces() {
@@ -254,6 +268,22 @@ public class UPnPDevice extends UPnPBase {
 	
 	public String getBaseHost() {
 		return this.baseHost;
+	}
+	
+	public String toString() {
+		return this.getUuid() + ":" + this.getLocation();
+	}
+
+	@Override
+	public void updateServiceStatus(UPnPChangeStatusValue value, UPnPService service) {
+		if ( service.isReadyToUse ) {
+			synchronized( serviceChangeListeners ) {
+				for ( IUPnPDeviceServiceListChangeListener listener : serviceChangeListeners ) {
+					listener.updateServiceList(value, this, service);
+				}
+			}
+		}
+		service.removeServiceStatusChangeListener(this);
 	}
 	
 }

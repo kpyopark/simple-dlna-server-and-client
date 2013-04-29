@@ -190,7 +190,11 @@ public class ContentDirectoryService extends UPnPService {
 			// 2. execute SOAP Action & SOAP response parsing and saving.
 			ActionExecutor executor = new ActionExecutor(targetAction);
 			executor.execute();
-			int numberOfReturned = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_NumberReturned).getValue());
+			try {
+				int numberOfReturned = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_NumberReturned).getValue());
+			} catch ( NumberFormatException nfe ) {
+				Logger.println(Logger.ERROR, "There is no count of return result.");
+			}
 			String result = targetAction.getOutArgument(ACTION_ARG_NAME_Result).getValue();
 			int totalMatches = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_TotalMatches).getValue());
 

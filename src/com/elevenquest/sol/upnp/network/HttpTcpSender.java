@@ -147,7 +147,7 @@ public class HttpTcpSender extends HttpRequestSender {
 			}
 			if (status == 200) {
 				response.setBodyInputStream(urlCon.getInputStream());
-				Logger.println(Logger.INFO, "BODY:" + new String(response.getBodyArray()));
+				//Logger.println(Logger.INFO, "BODY:" + new String(response.getBodyArray()));
 			} else {
 				response.setBodyInputStream(urlCon.getErrorStream());
 				Logger.println(Logger.WARNING, "ERROR BODY:" + new String(response.getBodyArray()));

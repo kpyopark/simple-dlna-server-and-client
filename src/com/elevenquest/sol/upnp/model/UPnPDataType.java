@@ -12,6 +12,7 @@ public class UPnPDataType extends UPnPBase {
 	public static final String UPNP_DATATYPE_NAME_URI = "uri";
 	public static final String UPNP_DATATYPE_NAME_INT = "int";
 	public static final String UPNP_DATATYPE_NAME_BIN_BASE64 = "bin.base64";
+	public static final String UPNP_DATATYPE_NAME_BOOLEAN = "boolean";
 	
 	static {
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_STRING, new UPnPDataType(UPNP_DATATYPE_NAME_STRING,String.class));
@@ -20,6 +21,7 @@ public class UPnPDataType extends UPnPBase {
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_URI, new UPnPDataType(UPNP_DATATYPE_NAME_URI,String.class));
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_INT, new UPnPDataType(UPNP_DATATYPE_NAME_INT,Integer.class));
 		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_BIN_BASE64, new UPnPDataType(UPNP_DATATYPE_NAME_BIN_BASE64,String.class));
+		DEFAULT_TYPE_MAPPER.put(UPNP_DATATYPE_NAME_BOOLEAN, new UPnPDataType(UPNP_DATATYPE_NAME_BOOLEAN,Boolean.class));
 	};
 	
 	String xmlType;

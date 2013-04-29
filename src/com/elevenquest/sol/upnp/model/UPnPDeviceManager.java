@@ -1,5 +1,6 @@
 package com.elevenquest.sol.upnp.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Observable;
@@ -15,7 +16,7 @@ import com.elevenquest.sol.upnp.network.HttpTcpSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
 import com.elevenquest.sol.upnp.server.SendEvent;
 
-public class UPnPDeviceManager extends Observable {
+public class UPnPDeviceManager {
 	
 	private static UPnPDeviceManager singletone = null;
 	
@@ -28,13 +29,32 @@ public class UPnPDeviceManager extends Observable {
 	
 	// private attributes;
 	HashMap<String, UPnPDevice> deviceList = null;
+	ArrayList<IUPnPDeviceListChangeListener> listenerList = null;
 	
 	private UPnPDeviceManager() {
 		deviceList = new HashMap<String,UPnPDevice>();
+		listenerList = new ArrayList<IUPnPDeviceListChangeListener>();
 	}
 	
 	public void clearAll() {
 		this.deviceList.clear();
+	}
+	
+	public void notifyDeviceListChangeListeners(UPnPChangeStatusValue value, UPnPDevice device) {
+		synchronized( listenerList ) {
+			for (IUPnPDeviceListChangeListener listener : listenerList) {
+				listener.updateDeviceList(value, device);
+			}
+		}
+	}
+	
+	public void addDeviceListChangeListener(IUPnPDeviceListChangeListener listener) {
+		if ( !this.listenerList.contains(listener) )
+			this.listenerList.add(listener);
+	}
+	
+	public void removeDeviceListChangeListener(IUPnPDeviceListChangeListener listener) {
+		this.listenerList.remove(listener);
 	}
 	
 	public void addDevice(UPnPDevice device) {
@@ -43,9 +63,10 @@ public class UPnPDeviceManager extends Observable {
 			// 1. Replace the device info.
 			Logger.println(Logger.WARNING, "Same UUID[" + device.getUuid() + "] is used.");
 		} else {
+			Logger.println(Logger.WARNING, "Add device UUID[" + device.getUuid() + "] is used.");
 			this.deviceList.put(device.getUuid(), device);
 			this.updateRemoteDeviceInfo();
-			notifyObservers();
+			notifyDeviceListChangeListeners(UPnPChangeStatusValue.CHANGE_ADD, device);
 		}
 	}
 	
@@ -58,9 +79,9 @@ public class UPnPDeviceManager extends Observable {
 	}
 	
 	public void removeDevice(String uuid) {
+		UPnPDevice device = this.getDevice(uuid);
 		this.deviceList.remove(uuid);
-		notifyObservers();
-		//this.updateRemoteDeviceInfo();
+		this.notifyDeviceListChangeListeners(UPnPChangeStatusValue.CHANGE_REMOVE, device);
 	}
 	
 	public void updateDevice(String uuid) {
@@ -80,9 +101,9 @@ public class UPnPDeviceManager extends Observable {
 		return this.deviceList.values();
 	}
 	
-	static class SampleTread extends Thread {
+	static class UpdateRemoteDeviceInfoThread extends Thread {
 		UPnPDevice innerDevice = null;
-		public SampleTread(UPnPDevice outerDevice) {
+		public UpdateRemoteDeviceInfoThread(UPnPDevice outerDevice) {
 			innerDevice = outerDevice;
 		}
 		
@@ -107,10 +128,10 @@ public class UPnPDeviceManager extends Observable {
 				// So, we need to support simple http authorization.
 				//device.setUserAndPassword("user_id", "password");
 				device.setProgressingToRetrieve(true);
-				Thread oneTimeThread = new SampleTread(device);
+				Thread oneTimeThread = new UpdateRemoteDeviceInfoThread(device);
 				oneTimeThread.start();
 			}
 		}
 	}
-	
+
 }

@@ -44,7 +44,7 @@ public class DDSXMLParser {
 			ioe.printStackTrace();
 		}
 		this.xmlInputStream = new ByteArrayInputStream(baos.toByteArray());
-		Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
+		//Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
 	}
 
 	public UPnPDevice getDeviceDescription() {
