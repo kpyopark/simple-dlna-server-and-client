@@ -192,11 +192,11 @@ public class ContentDirectoryService extends UPnPService {
 			executor.execute();
 			try {
 				int numberOfReturned = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_NumberReturned).getValue());
+				int totalMatches = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_TotalMatches).getValue());
 			} catch ( NumberFormatException nfe ) {
 				Logger.println(Logger.ERROR, "There is no count of return result.");
 			}
 			String result = targetAction.getOutArgument(ACTION_ARG_NAME_Result).getValue();
-			int totalMatches = Integer.parseInt(targetAction.getOutArgument(ACTION_ARG_NAME_TotalMatches).getValue());
 
 			// TODO : UpdateID variable should be used. when ? idon't know.
 			String updateID = targetAction.getOutArgument(ACTION_ARG_NAME_UpdateID).getValue();

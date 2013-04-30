@@ -48,28 +48,32 @@ public class HttpSimpleServer {
 		if ( receiver == null ) {
 			throw new AbnormalException("A listener or a Sender isn't set. Before use this api, you should set listener or sender in this class.");
 		}
-		needStop = false;
-		while( !needStop ) {
-			try {
-				final HttpRequest request = receiver.listen();
-				new Thread(new Runnable() {
-					public void run() {
-						receiver.process(request);
+		new Thread(new Runnable(){
+			public void run() {
+				needStop = false;
+				while( !needStop ) {
+					try {
+						final HttpRequest request = receiver.listen();
+						new Thread(new Runnable() {
+							public void run() {
+								receiver.process(request);
+							}
+						}).start();
+						/*
+						threadPool.execute(new Runnable() {
+							public void run() {
+								receiver.process(request);
+							}
+						});
+						*/
+					} catch ( Exception e ) {
+						numberOfErrors++;
+						Logger.println(Logger.ERROR, "Listener can't Listen. error count:" + numberOfErrors);
+						e.printStackTrace();
 					}
-				}).start();
-				/*
-				threadPool.execute(new Runnable() {
-					public void run() {
-						receiver.process(request);
-					}
-				});
-				*/
-			} catch ( Exception e ) {
-				numberOfErrors++;
-				Logger.println(Logger.ERROR, "Listener can't Listen. error count:" + numberOfErrors);
-				e.printStackTrace();
+				}
 			}
-		}
+		}).start();
 	}
 	
 	public void stopServer() {

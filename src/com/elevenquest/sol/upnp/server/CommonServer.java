@@ -56,52 +56,56 @@ public class CommonServer {
 		if ( receiver == null && sender == null ) {
 			throw new AbnormalException("A listener or a Sender isn't set. Before use this api, you should set listener or sender in this class.");
 		}
-		if ( receiver != null ) {
-			needStop = false;
-			threadPool.execute(new Runnable() {
-				public void run() {
-					try {
-						while( !needStop ) {
+		new Thread(new Runnable() {
+			public void run() {
+				if ( receiver != null ) {
+					needStop = false;
+					threadPool.execute(new Runnable() {
+						public void run() {
 							try {
-								receiver.receiveData();
-								//Thread.sleep(1000);
+								while( !needStop ) {
+									try {
+										receiver.receiveData();
+										//Thread.sleep(1000);
+									} catch ( Exception e ) {
+										numberOfErrors++;
+										Logger.println(Logger.ERROR, "Listener can't Listen.");
+										e.printStackTrace();
+									}
+									if ( numberOfErrors > 3 )
+										needStop = true;
+								}
 							} catch ( Exception e ) {
-								numberOfErrors++;
-								Logger.println(Logger.ERROR, "Listener can't Listen.");
+								Logger.println(Logger.ERROR, "There are some errors in Thread Pool.");
 								e.printStackTrace();
 							}
-							if ( numberOfErrors > 3 )
-								needStop = true;
 						}
-					} catch ( Exception e ) {
-						Logger.println(Logger.ERROR, "There are some errors in Thread Pool.");
-						e.printStackTrace();
-					}
+					});
 				}
-			});
-		}
-		if ( sender != null ) {
-			needStop = false;
-			threadPool.execute(new Runnable() {
-				public void run() {
-					int cnt = 0;
-					do {
-						try {
-							sender.sendData();
-							if ( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED )
-								Thread.sleep(event.getDelayTimeInMillisec());
-							Logger.println(Logger.DEBUG, "Repeating count:" + cnt++);
-						} catch ( Exception e ) {
-							numberOfErrors++;
-							Logger.println(Logger.ERROR, "Sender can't send.");
-							e.printStackTrace();
+				if ( sender != null ) {
+					needStop = false;
+					threadPool.execute(new Runnable() {
+						public void run() {
+							int cnt = 0;
+							do {
+								try {
+									sender.sendData();
+									if ( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED )
+										Thread.sleep(event.getDelayTimeInMillisec());
+									Logger.println(Logger.DEBUG, "Repeating count:" + cnt++);
+								} catch ( Exception e ) {
+									numberOfErrors++;
+									Logger.println(Logger.ERROR, "Sender can't send.");
+									e.printStackTrace();
+								}
+								if ( numberOfErrors > 3 )
+									needStop = true;
+							} while( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED );
 						}
-						if ( numberOfErrors > 3 )
-							needStop = true;
-					} while( !needStop && event.getType() == SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED );
+					});
 				}
-			});
-		}
+			}
+		}).start();
 	}
 	
 	public void stopServer() {

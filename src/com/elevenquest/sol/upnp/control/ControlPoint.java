@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Vector;
 
@@ -184,22 +185,5 @@ public class ControlPoint {
 		}
 
 	}
-	/**
-	 * For Testing.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		ControlPoint cp = new ControlPoint();
-		UPnPDeviceManager manager = UPnPDeviceManager.getDefaultDeviceManager();
-		manager.addDeviceListChangeListener(new PrintDeviceInfo(cp));
-		cp.start();
-		try {
-			Thread.sleep(60 * 1000000);
-		} catch ( Exception e ) {
-			e.printStackTrace();
-		}
-		cp.stop();
-	}
-
 	
 }
