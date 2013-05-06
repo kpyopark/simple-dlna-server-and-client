@@ -14,6 +14,8 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.IHtt
 	
 	UPnPService service = null;
 	
+	//static final String SERVICE_DESCRIPTION_TEMPLATE = 
+	
 	public ServiceDescription(UPnPService service) {
 		if ( service != null )
 			this.service = service;
@@ -91,6 +93,11 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.IHtt
 		} catch ( Exception e ) {
 			
 		}
+	}
+	
+	public String getServiceDescription() {
+		// TODO : Should implement this.
+		return "";
 	}
 
 }

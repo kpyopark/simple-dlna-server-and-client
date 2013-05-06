@@ -6,8 +6,6 @@ import com.elevenquest.sol.upnp.network.HttpRequest;
 
 public class EventNotify extends HttpRequest {
 
-	public
-	
 	UPnPDeviceManager manager = null;
 	
 	public EventNotify() {
@@ -24,4 +22,5 @@ public class EventNotify extends HttpRequest {
 		return null;
 		
 	}
+	
 }

@@ -29,6 +29,7 @@ public class UPnPDeviceManager {
 	
 	// private attributes;
 	HashMap<String, UPnPDevice> deviceList = null;
+	HashMap<String, Integer> deviceStatus = null;
 	ArrayList<IUPnPDeviceListChangeListener> listenerList = null;
 	
 	private UPnPDeviceManager() {
