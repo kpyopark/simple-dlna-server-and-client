@@ -11,6 +11,7 @@ import com.elevenquest.sol.upnp.control.ControlPoint.PrintDeviceInfo;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
+import com.elevenquest.sol.upnp.model.UPnPEventManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
 
@@ -28,6 +29,7 @@ public class ControlPointTester {
 		System.out.println("9. print usage");
 		System.out.println("10. list up services");
 		System.out.println("11. execute a service");
+		System.out.println("12. activate GENA");
 	}
 	
 	/**
@@ -106,6 +108,13 @@ public class ControlPointTester {
 					}
 					status = 0;
 					break;
+				case 12 :
+					if ( selDev == null || selServ == null ) {
+						System.out.println("There is no selected service.");
+					} else {
+						UPnPEventManager.getUPnPEventManager().addServiceToBeRegistered(selServ);
+						System.out.println("Activate GENA for the service[" + selServ.getServiceId() + "]");
+					}
 				default :
 					switch (choiceNumber) {
 					case 0 :
@@ -179,6 +188,10 @@ public class ControlPointTester {
 					case 11 :
 						System.out.println("input parameters.");
 						status = 11;
+						break;
+					case 12 :
+						System.out.println("choose sevice.");
+						status = 12;
 						break;
 					default :
 						break;

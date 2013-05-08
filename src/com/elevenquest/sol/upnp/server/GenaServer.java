@@ -243,7 +243,17 @@ public class GenaServer {
 			} else if ( request.getUrlPath().contains("subscribe.do")) {
 				// TODO :
 			} else if ( request.getUrlPath().contains("notify.do")) {
-				
+				String responseCode = HttpResponse.HTTP_RESPONSE_STATUS_CODE_200;
+				if ( !request.getCommand().equalsIgnoreCase("NOTIFY")) {
+					Logger.println(Logger.WARNING, "[WEB SERVER] There is no such command[" + request.getCommand() + "] in this url.");
+					responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+				} else if ( !request.getHeaderValue("NT").equals("upnp:event") ) {
+					Logger.println(Logger.WARNING, "[WEB SERVER] There is no handler to deal with nt value[" + request.getHeaderValue("NT") + "] in this request.");
+					responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+				} else if ( !request.getHeaderValue("NTS").equals("upnp:propchange") ) {
+				} else {
+					
+				}
 			} else if ( request.getUrlPath().contains("mail.html")) {
 				// TODO :
 			}

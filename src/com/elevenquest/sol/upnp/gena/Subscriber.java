@@ -28,7 +28,7 @@ public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRe
 	public static String ID_UPNP_SUBSCRIBE_SUBSCRIBE = "SUBSCRIBE";
 	public static String ID_UPNP_SUBSCRIBE_HOST = "HOST";
 	public static String ID_UPNP_SUBSCRIBE_USER_AGENT = "USER-AGENT";
-	public static String ID_UPNP_SUBSCRIBE_CALLBAC = "CALLBACK";
+	public static String ID_UPNP_SUBSCRIBE_CALLBACK = "CALLBACK";
 	public static String ID_UPNP_SUBSCRIBE_NT = "NT";
 	public static String ID_UPNP_SUBSCRIBE_TIMEOUT = "TIMEOUT";
 	
@@ -103,18 +103,20 @@ public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRe
 	@Override
 	public HttpRequest getHTTPRequest() throws Exception {
 		HttpRequest request = new HttpRequest();
+		request.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
+		request.setUrlPath("*");
+		String osVersion = "WindowsNT";
+		String productVersion = "simpledlna/1.0";
+		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		request.setHeaderValue(ID_UPNP_SUBSCRIBE_CALLBACK, "http://" + this.service.getDevice().getLocalIP() + "/notify.do" );
 		if ( this.wantToSubscribe ) {
 			request.setCommand(ID_UPNP_SUBSCRIBE_SUBSCRIBE);
-			request.setUrlPath("*");
-			request.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
 			for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
 				String key = keyIter.next();
 				request.setHeaderValue(key, headerList.get(key));
 			}
 		} else {
 			request.setCommand(ID_UPNP_SUBSCRIBE_UNSUBSCRIBE);
-			request.setUrlPath("*");
-			request.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
 			for ( Iterator<String> keyIter = headerList.keySet().iterator() ; keyIter.hasNext() ;) {
 				String key = keyIter.next();
 				request.setHeaderValue(key, headerList.get(key));

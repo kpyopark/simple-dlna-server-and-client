@@ -32,7 +32,7 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 				serverSocket = new MulticastSocket(port);
 				((MulticastSocket)serverSocket).joinGroup(listenAddr);
 			} else {
-				serverSocket = new DatagramSocket(port);
+				serverSocket = new DatagramSocket(port, listenAddr);
 				packet = new DatagramPacket(new byte[4096],4096, listenAddr, port);
 			}
 		} catch (Exception e) {

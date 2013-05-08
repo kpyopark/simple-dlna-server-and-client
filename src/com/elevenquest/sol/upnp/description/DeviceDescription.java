@@ -499,10 +499,9 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 								}
 							}
 						}
-						
 						ServiceDescriptionSendThread thread = new ServiceDescriptionSendThread(service);
 						thread.run();
-						
+					} else {
 						
 					}
 				}

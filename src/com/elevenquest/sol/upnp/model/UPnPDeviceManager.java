@@ -1,8 +1,17 @@
 package com.elevenquest.sol.upnp.model;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Set;
 
@@ -64,7 +73,7 @@ public class UPnPDeviceManager {
 			// 1. Replace the device info.
 			Logger.println(Logger.WARNING, "Same UUID[" + device.getUuid() + "] is used.");
 		} else {
-			Logger.println(Logger.WARNING, "Add device UUID[" + device.getUuid() + "] is used.");
+			Logger.println(Logger.INFO, "Add device UUID[" + device.getUuid() + "] is used.");
 			this.deviceList.put(device.getUuid(), device);
 			this.updateRemoteDeviceInfo();
 			notifyDeviceListChangeListeners(UPnPChangeStatusValue.CHANGE_ADD, device);
@@ -102,18 +111,85 @@ public class UPnPDeviceManager {
 		return this.deviceList.values();
 	}
 	
+	static class IpNicPair {
+		InetAddress localIp;
+		NetworkInterface nic;
+	}
+	
 	static class UpdateRemoteDeviceInfoThread extends Thread {
 		UPnPDevice innerDevice = null;
+
+		static HashMap<InetAddress, NetworkInterface> localIpNicMap = null;
+		
+		static void listUpLocalIp() {
+			localIpNicMap = new HashMap<InetAddress, NetworkInterface>();
+			try {
+				Enumeration<NetworkInterface> interfaceList = NetworkInterface.getNetworkInterfaces();
+				while( interfaceList.hasMoreElements() ) {
+					NetworkInterface intf = interfaceList.nextElement();
+					Enumeration<InetAddress> ipList = intf.getInetAddresses();
+					while( ipList.hasMoreElements() ) {
+						InetAddress localIp = ipList.nextElement();
+						if ( localIp.isAnyLocalAddress() ) {
+							// skip. such like 0.0.0.0
+						//} else if ( localIp.isLoopbackAddress() ) {
+							// skip. such like 127.0.0.1
+						} else if ( localIp.isMulticastAddress() ) {
+							// skip. such like 239.255.255.250
+						} else {
+							Logger.println(Logger.INFO, "usalbe local ip:" + localIp.getCanonicalHostName() + " usable interface :" + intf.getDisplayName());
+							localIpNicMap.put(localIp, intf);
+						}
+					}
+				}
+			} catch ( SocketException se ) {
+				Logger.println(Logger.ERROR, "There is no hardware interfaces to connect with other devices.");
+			}
+		}
+		
 		public UpdateRemoteDeviceInfoThread(UPnPDevice outerDevice) {
 			innerDevice = outerDevice;
+			if ( localIpNicMap == null ) {
+				listUpLocalIp();
+			}
+		}
+		
+		public IpNicPair getLocalInetAddressToTargetHost(InetAddress remoteHost, int port) {
+			InetAddress localIpUsed = null;
+			NetworkInterface nicUsed = null;
+			Socket soc = null;
+			try {
+				soc = new Socket(remoteHost, port);
+				localIpUsed = soc.getLocalAddress();
+				nicUsed = localIpNicMap.get(localIpUsed);
+			} catch ( IOException ioe ) {
+				Logger.println(Logger.WARNING, "The remote host[" + remoteHost.getCanonicalHostName() + "," + port + "] can't be rechable.");
+			} finally {
+				if ( soc != null ) try { soc.close(); } catch ( Exception e ) { }
+			}
+			if ( localIpUsed == null || nicUsed == null )
+				return null;
+			IpNicPair pair = new IpNicPair();
+			pair.localIp = localIpUsed;
+			pair.nic = nicUsed;
+			return pair;
 		}
 		
 		public void run() {
 			try {
-				HttpRequestSender sender = new HttpTcpSender(innerDevice.getNetworkInterface(),innerDevice.getLocation());
-				IHttpRequestSuplier handler = new DeviceDescription(innerDevice);
-				sender.setSenderHandler(handler);
-				sender.sendData();
+				URL url = new URL(innerDevice.getLocation());
+				IpNicPair ipAndNic= getLocalInetAddressToTargetHost(InetAddress.getByName(url.getHost()), url.getPort());
+				if ( ipAndNic == null ) {
+					Logger.println( Logger.WARNING, "<Device Manager> This device[ip:" + url.getHost() + ":" + innerDevice.getUuid() + "] exists in unreachable network." );
+				} else {
+					innerDevice.setLocalIP(ipAndNic.localIp);
+					innerDevice.setNetworkInterface(ipAndNic.nic);
+					Logger.println( Logger.DEBUG, "<Device Manager> Looking for a deivce[sid:" + innerDevice.getUuid() + "] using nic[" + innerDevice.getNetworkInterface().getDisplayName() + "] with local ip[" + innerDevice.getLocalIP().getCanonicalHostName() + "]");
+					HttpRequestSender sender = new HttpTcpSender(innerDevice.getNetworkInterface(),innerDevice.getLocation());
+					IHttpRequestSuplier handler = new DeviceDescription(innerDevice);
+					sender.setSenderHandler(handler);
+					sender.sendData();
+				}
 			} catch ( Exception e ) {
 				e.printStackTrace();
 			}
@@ -131,6 +207,9 @@ public class UPnPDeviceManager {
 				device.setProgressingToRetrieve(true);
 				Thread oneTimeThread = new UpdateRemoteDeviceInfoThread(device);
 				oneTimeThread.start();
+			} else {
+				Logger.println(Logger.DEBUG, "Skipped device:" + device.getUuid());
+				Logger.println(Logger.DEBUG, "isReadyToUse:[" + device.isReadyToUse + "] isRemote:[" + device.isRemote + "] isProgressingToRetrieve[" + device.isProgressingToRetrieve + "]" );
 			}
 		}
 	}

@@ -28,9 +28,28 @@ public class UPnPService extends UPnPBase {
 	boolean isRemote = true;
 	boolean isReadyToUse = false;
 	boolean isProgressingToRetrieve = false;
+	boolean isSubscribed = false;
 	
+	public boolean isSubscribed() {
+		return isSubscribed;
+	}
+
+	public void setSubscribed(boolean isSubscribed) {
+		this.isSubscribed = isSubscribed;
+	}
+
 	ArrayList<IUPnPServiceStatusChangeListener> listeners = null;
 	
+	String subscribeId;
+	
+	public String getSubscribeId() {
+		return subscribeId;
+	}
+
+	public void setSubscribeId(String subscribeId) {
+		this.subscribeId = subscribeId;
+	}
+
 	public UPnPService(UPnPDevice device) {
 		this.device = device;
 		this.listeners = new ArrayList<IUPnPServiceStatusChangeListener>();

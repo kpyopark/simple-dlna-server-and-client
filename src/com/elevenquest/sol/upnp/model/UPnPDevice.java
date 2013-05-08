@@ -46,7 +46,16 @@ public class UPnPDevice extends UPnPBase implements IUPnPServiceStatusChangeList
 	boolean isReadyToUse = false;
 	boolean isProgressingToRetrieve = false;
 	NetworkInterface networkInterface = null; 
+	InetAddress localIP = null;
 	
+	public InetAddress getLocalIP() {
+		return localIP;
+	}
+
+	public void setLocalIP(InetAddress localIP) {
+		this.localIP = localIP;
+	}
+
 	String user;
 	String password;
 	

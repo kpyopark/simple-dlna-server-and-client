@@ -1,8 +1,11 @@
 package com.elevenquest.sol.upnp.common;
 
+import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class UPnPUtils {
@@ -181,6 +184,42 @@ public class UPnPUtils {
 			//AVAIL_INTERFACES.addAll(NetworkInterface.getNetworkInterfaces());
 		}
 		return AVAIL_INTERFACES;
+	}
+	
+	static HashMap<InetAddress, NetworkInterface> localIpNicMap = null;
+	
+	public static void listupLocalIpAndNic() {
+		localIpNicMap.clear();
+		try {
+			Enumeration<NetworkInterface> interfaceList = NetworkInterface.getNetworkInterfaces();
+			while( interfaceList.hasMoreElements() ) {
+				NetworkInterface intf = interfaceList.nextElement();
+				Enumeration<InetAddress> ipList = intf.getInetAddresses();
+				while( ipList.hasMoreElements() ) {
+					InetAddress localIp = ipList.nextElement();
+					if ( localIp.isAnyLocalAddress() ) {
+						// skip. such like 0.0.0.0
+					//} else if ( localIp.isLoopbackAddress() ) {
+						// skip. such like 127.0.0.1
+					} else if ( localIp.isMulticastAddress() ) {
+						// skip. such like 239.255.255.250
+					} else {
+						Logger.println(Logger.INFO, "usalbe local ip:" + localIp.getCanonicalHostName() + " usable interface :" + intf.getDisplayName());
+						localIpNicMap.put(localIp, intf);
+					}
+				}
+			}
+		} catch ( SocketException se ) {
+			Logger.println(Logger.ERROR, se.getLocalizedMessage());
+		}
+	}
+	
+	public static HashMap<InetAddress, NetworkInterface> getAvailiableIpAndNicList() {
+		if ( localIpNicMap == null ) {
+			localIpNicMap = new HashMap<InetAddress, NetworkInterface>();
+			listupLocalIpAndNic();
+		}
+		return localIpNicMap;
 	}
 	
 }

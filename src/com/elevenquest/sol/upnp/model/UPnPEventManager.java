@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import com.elevenquest.sol.upnp.common.Logger;
+import com.elevenquest.sol.upnp.description.DeviceDescription;
+import com.elevenquest.sol.upnp.gena.Subscriber;
+import com.elevenquest.sol.upnp.network.HttpRequestSender;
+import com.elevenquest.sol.upnp.network.HttpTcpSender;
+import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 
 public class UPnPEventManager extends UPnPBase {
 	
@@ -28,6 +32,8 @@ public class UPnPEventManager extends UPnPBase {
 	}
 	
 	public void addServiceToBeRegistered(UPnPService service) {
+		service.setSubscribed(true);
+		service.setSubscribeId(null);
 		waitingQueue.offer(service);
 	}
 	
@@ -54,5 +60,23 @@ public class UPnPEventManager extends UPnPBase {
 			}
 		}
 	}
-	
+
+	static class SubscribeEventThread extends Thread {
+		UPnPService innerService = null;
+		public SubscribeEventThread(UPnPService outerService) {
+			innerService = outerService;
+		}
+		
+		public void run() {
+			try {
+				HttpRequestSender sender = new HttpTcpSender(innerService.getDevice().getNetworkInterface(),
+						innerService.getEventsubUrl() );
+				IHttpRequestSuplier handler = new Subscriber(innerService, true);
+				sender.setSenderHandler(handler);
+				sender.sendData();
+			} catch ( Exception e ) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
