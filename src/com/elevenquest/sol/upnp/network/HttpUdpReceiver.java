@@ -15,12 +15,14 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 	NetworkInterface intf;
 	int port;
 	InetAddress listenAddr = null;
+	InetAddress bindAddr = null;
 	DatagramSocket serverSocket = null;
 	DatagramPacket packet = null;
 	
-	public HttpUdpReceiver(NetworkInterface intf, InetAddress listenAddr, int port) {
+	public HttpUdpReceiver(NetworkInterface intf, InetAddress listenAddr, InetAddress bindAddress, int port) {
 		this.intf = intf;
 		this.listenAddr = listenAddr;
+		this.bindAddr = bindAddress;
 		this.port = port;
 	}
 	
@@ -29,9 +31,11 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 			if ( listenAddr.isMulticastAddress() ) {
 				packet = new DatagramPacket(new byte[4096],4096);
 				//SocketAddress address = new InetSocketAddress(port);
-				serverSocket = new MulticastSocket(port);
+				SocketAddress socBindAddr = new InetSocketAddress(bindAddr, port);
+				serverSocket = new MulticastSocket(socBindAddr);
 				((MulticastSocket)serverSocket).joinGroup(listenAddr);
 			} else {
+				// in unicast. windows system has weak host model for listening packet. so we don't need to use inetaddress to bind.
 				serverSocket = new DatagramSocket(port, listenAddr);
 				packet = new DatagramPacket(new byte[4096],4096, listenAddr, port);
 			}

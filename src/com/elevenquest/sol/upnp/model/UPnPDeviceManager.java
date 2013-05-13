@@ -16,6 +16,7 @@ import java.util.Observable;
 import java.util.Set;
 
 import com.elevenquest.sol.upnp.common.Logger;
+import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.description.DeviceDescription;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.network.HttpHeaderName;
@@ -119,45 +120,16 @@ public class UPnPDeviceManager {
 	static class UpdateRemoteDeviceInfoThread extends Thread {
 		UPnPDevice innerDevice = null;
 
-		static HashMap<InetAddress, NetworkInterface> localIpNicMap = null;
-		
-		static void listUpLocalIp() {
-			localIpNicMap = new HashMap<InetAddress, NetworkInterface>();
-			try {
-				Enumeration<NetworkInterface> interfaceList = NetworkInterface.getNetworkInterfaces();
-				while( interfaceList.hasMoreElements() ) {
-					NetworkInterface intf = interfaceList.nextElement();
-					Enumeration<InetAddress> ipList = intf.getInetAddresses();
-					while( ipList.hasMoreElements() ) {
-						InetAddress localIp = ipList.nextElement();
-						if ( localIp.isAnyLocalAddress() ) {
-							// skip. such like 0.0.0.0
-						//} else if ( localIp.isLoopbackAddress() ) {
-							// skip. such like 127.0.0.1
-						} else if ( localIp.isMulticastAddress() ) {
-							// skip. such like 239.255.255.250
-						} else {
-							Logger.println(Logger.INFO, "usalbe local ip:" + localIp.getCanonicalHostName() + " usable interface :" + intf.getDisplayName());
-							localIpNicMap.put(localIp, intf);
-						}
-					}
-				}
-			} catch ( SocketException se ) {
-				Logger.println(Logger.ERROR, "There is no hardware interfaces to connect with other devices.");
-			}
-		}
 		
 		public UpdateRemoteDeviceInfoThread(UPnPDevice outerDevice) {
 			innerDevice = outerDevice;
-			if ( localIpNicMap == null ) {
-				listUpLocalIp();
-			}
 		}
 		
 		public IpNicPair getLocalInetAddressToTargetHost(InetAddress remoteHost, int port) {
 			InetAddress localIpUsed = null;
 			NetworkInterface nicUsed = null;
 			Socket soc = null;
+			HashMap<InetAddress, NetworkInterface> localIpNicMap = UPnPUtils.getAvailiableIpAndNicList();
 			try {
 				soc = new Socket(remoteHost, port);
 				localIpUsed = soc.getLocalAddress();

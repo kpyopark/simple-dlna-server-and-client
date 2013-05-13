@@ -1,7 +1,11 @@
 package com.elevenquest.sol.upnp.server;
 
+import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.control.ControlPoint;
@@ -37,11 +41,14 @@ public class SsdpControlPointServer {
 		if ( receiveServerList != null ) 
 			stopReceiveServer();
 		receiveServerList = new ArrayList<HttpSimpleServer>();
-		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
-		for ( NetworkInterface intf : interfaces ) {
+		//ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
+		HashMap<InetAddress, NetworkInterface> ipAndNic = UPnPUtils.getAvailiableIpAndNicList();
+		Set<InetAddress> ips = ipAndNic.keySet();
+		for ( InetAddress bindIp : ips ) {
 			try {
 				// 1. Next, create ssdp message receiver & handler instance.
-				HttpRequestReceiver receiver = new HttpUdpReceiver(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
+				HttpRequestReceiver receiver = new HttpUdpReceiver(ipAndNic.get(bindIp), UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS,
+						bindIp,
 						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
 				IHttpRequestHandler handler = new SSDPReceiveHandler();
 				receiver.setReceiveHandler(handler);
