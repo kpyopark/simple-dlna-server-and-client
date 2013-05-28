@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.StringTokenizer;
 
+import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 
 public class HttpTcpSender extends HttpRequestSender {
@@ -181,7 +182,7 @@ public class HttpTcpSender extends HttpRequestSender {
 			// 3. Set header to request
 			urlCon.setRequestMethod("GET");
 			urlCon.addRequestProperty("Content-Type", "text/html;charset=UTF8");
-			urlCon.addRequestProperty("User-Agent", "Simple DLNA Server");
+			urlCon.addRequestProperty("USER-AGENT", DefaultConfig.ID_UPNP_DISCOVERY_SERVER_VALUE );
 			//urlCon.setDoOutput(true);
 			//urlCon.setDoInput(true);
 			urlCon.setUseCaches(false);

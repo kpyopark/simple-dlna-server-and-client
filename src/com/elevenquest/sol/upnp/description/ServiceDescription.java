@@ -1,5 +1,6 @@
 package com.elevenquest.sol.upnp.description;
 
+import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.model.UPnPAction;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
@@ -69,9 +70,7 @@ public class ServiceDescription implements com.elevenquest.sol.upnp.network.IHtt
 		request.setHttpVer("HTTP/1.1");
 		request.setCommand("GET");
 		request.setUrlPath(this.service.getDevice().getLocation());
-		String osVersion = "WindowsNT";
-		String productVersion = "simpledlna/1.0";
-		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		request.addHeader("USER-AGENT", DefaultConfig.ID_UPNP_DISCOVERY_SERVER_VALUE);
 		request.addHeader("HOST", this.service.getDevice().getBaseHost() );
 		request.setBodyArray(this.getRequestBody().getBytes("utf-8"));
 		if ( this.service.getDevice().getAuthorizationStr() != null )

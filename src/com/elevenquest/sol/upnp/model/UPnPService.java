@@ -1,10 +1,14 @@
 package com.elevenquest.sol.upnp.model;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import com.elevenquest.sol.upnp.common.Logger;
+import com.elevenquest.sol.upnp.common.UPnPUtils;
 
 public class UPnPService extends UPnPBase {
 	
@@ -187,5 +191,21 @@ public class UPnPService extends UPnPBase {
 	
 	public String toString() {
 		return getServiceId() + ":" + super.toString();
+	}
+	
+	public String getDeliveryUrl() {
+		// It should be used for local service. not for remote service.
+		HashMap<InetAddress, NetworkInterface> ipAndNic = UPnPUtils.getAvailiableIpAndNicList();
+		Set<InetAddress> ips = ipAndNic.keySet();
+		InetAddress mainIp = null;
+		for ( InetAddress ip : ips ) {
+			NetworkInterface nic = ipAndNic.get(ip);
+			if ( nic.equals(this.device.getNetworkInterface()) ) {
+				mainIp = ip;
+			}
+		}
+		if ( mainIp == null )
+			return null;
+		return "http://" + mainIp + "/notify.do?device_id=" + this.device.getUuid() + "&service_id=" + this.getServiceId();
 	}
 }

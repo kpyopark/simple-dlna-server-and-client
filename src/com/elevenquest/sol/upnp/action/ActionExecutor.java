@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.exception.ProcessableException;
@@ -51,15 +52,13 @@ public class ActionExecutor {
 			// 1. find target URL.
 			findTargetUrl();
 			// 2. Open connection and make Http Header.
-			String osVersion = "WindowsNT";
-			String productVersion = "simpledlna/1.0";
 		    conn = (HttpURLConnection)url.openConnection();   
 		    conn.setRequestMethod("POST");   
 		    conn.setDoOutput( true );   
 		    conn.setDoInput( true );    
 			conn.setRequestProperty("HOST", this.action.getService().getDevice().getBaseHost() );
 		    conn.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"" );   
-		    conn.setRequestProperty("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		    conn.setRequestProperty("USER-AGENT", DefaultConfig.ID_UPNP_DISCOVERY_SERVER_VALUE );
 			if ( this.action.getService().getDevice().getAuthorizationStr() != null )
 				conn.setRequestProperty("Authorization", "Basic " + this.action.getService().getDevice().getAuthorizationStr() );
 

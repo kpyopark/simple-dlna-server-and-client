@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
@@ -446,9 +447,7 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 		request.setUrlPath("*");
 		request.setCommand("GET");
 		request.setUrlPath(this.device.getLocation());
-		String osVersion = "WindowsNT";
-		String productVersion = "simpledlna/1.0";
-		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
+		request.addHeader("USER-AGENT", DefaultConfig.ID_UPNP_DISCOVERY_SERVER_VALUE);
 		request.setBodyArray(this.getRequestBody().getBytes("utf-8"));
 		if ( this.device.getAuthorizationStr() != null )
 			request.addHeader("Authorization", "Basic " + this.device.getAuthorizationStr() );
@@ -458,7 +457,6 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	@Override
 	public void processAfterSend(
 			HttpResponse response) {
-		// TODO Auto-generated method stub
 		// Parsing DeviceDescription XML and fill full information of that device.
 		try {
 			System.out.println("Device Description Response Status value:" + response.getStatusCode() );
