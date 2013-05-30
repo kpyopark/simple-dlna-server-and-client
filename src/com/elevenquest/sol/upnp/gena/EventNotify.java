@@ -8,6 +8,9 @@ public class EventNotify extends HttpRequest {
 
 	UPnPDeviceManager manager = null;
 	
+	String propertyName = null;
+	String propertyValue = null;
+	
 	public EventNotify() {
 		super();
 		manager = UPnPDeviceManager.getDefaultDeviceManager();
@@ -22,5 +25,21 @@ public class EventNotify extends HttpRequest {
 		return null;
 		
 	}
-	
+
+	public String getPropertyName() {
+		return propertyName;
+	}
+
+	public void setPropertyName(String propertyName) {
+		this.propertyName = propertyName;
+	}
+
+	public String getPropertyValue() {
+		return propertyValue;
+	}
+
+	public void setPropertyValue(String propertyValue) {
+		this.propertyValue = propertyValue;
+	}
+
 }

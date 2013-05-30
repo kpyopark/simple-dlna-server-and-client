@@ -40,7 +40,7 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 				packet = new DatagramPacket(new byte[4096],4096, listenAddr, port);
 			}
 		} catch (Exception e) {
-			Logger.println(Logger.ERROR, "To init multicast socket failed.\n");
+			Logger.println(Logger.ERROR, "To init multicast socket failed. listenAddr[" + listenAddr.getCanonicalHostName() + "] bindAddr[" + bindAddr.getCanonicalHostName() + "] port[" + port + "].\n");
 		}
 	}
 	

@@ -182,7 +182,7 @@ public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRe
 			}
 			else
 			{
-				System.out.println("To retrieve Device Description failed. cause : " + response.toString() );
+				System.out.println("To subscribe to device[" + this.host + "] failed. cause : " + response.toString() );
 			}
 		} catch ( Exception e ) {
 			// TODO : Exception processing is required.

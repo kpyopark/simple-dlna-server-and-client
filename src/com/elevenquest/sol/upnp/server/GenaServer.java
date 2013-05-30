@@ -2,8 +2,10 @@ package com.elevenquest.sol.upnp.server;
 
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
+import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 import com.elevenquest.sol.upnp.description.DeviceDescription;
@@ -11,9 +13,12 @@ import com.elevenquest.sol.upnp.description.ServiceDescription;
 import com.elevenquest.sol.upnp.discovery.SSDPReceiveHandler;
 import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
+import com.elevenquest.sol.upnp.gena.EventNotify;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
+import com.elevenquest.sol.upnp.model.UPnPEventManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
+import com.elevenquest.sol.upnp.model.UPnPStateVariable;
 import com.elevenquest.sol.upnp.network.HttpRequest;
 import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
@@ -23,6 +28,7 @@ import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
 import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
+import com.elevenquest.sol.upnp.xml.NotifyXMLParser;
 
 public class GenaServer {
 	
@@ -239,21 +245,47 @@ public class GenaServer {
 					response.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
 				}
 			} else if ( request.getUrlPath().contains("action.do")) {
-				// TODO :
+				// TODO : For response to the SOAP action control.
 			} else if ( request.getUrlPath().contains("subscribe.do")) {
-				// TODO :
+				// TODO : For response to the subscription from a CP.
 			} else if ( request.getUrlPath().contains("notify.do")) {
 				String responseCode = HttpResponse.HTTP_RESPONSE_STATUS_CODE_200;
+				String responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_200;
 				if ( !request.getCommand().equalsIgnoreCase("NOTIFY")) {
 					Logger.println(Logger.WARNING, "[WEB SERVER] There is no such command[" + request.getCommand() + "] in this url.");
 					responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+					responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 				} else if ( !request.getHeaderValue("NT").equals("upnp:event") ) {
 					Logger.println(Logger.WARNING, "[WEB SERVER] There is no handler to deal with nt value[" + request.getHeaderValue("NT") + "] in this request.");
 					responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+					responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 				} else if ( !request.getHeaderValue("NTS").equals("upnp:propchange") ) {
+					Logger.println(Logger.WARNING, "[WEB SERVER] There is no handler to deal with nts value[" + request.getHeaderValue("NTS") + "] in this request.");
+					responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+					responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 				} else {
-					
+					UPnPEventManager manager = UPnPEventManager.getUPnPEventManager();
+					EventNotify notify = new EventNotify(request);
+					NotifyXMLParser parser = new NotifyXMLParser(notify, request.getBodyInputStream());
+					parser.execute();
+					UPnPService service = manager.getActiveGenaService(sid);
+					if ( service != null ) {
+						if ( service.getDevice().getUuid().equals(did) ) {
+							UPnPStateVariable variable = service.getStateVariable(notify.getPropertyName());
+							variable.setValue(notify.getPropertyValue());
+						} else {
+							Logger.println(Logger.WARNING, "[WEB SERVER] There is no service matched with device id[" + did +"] and service_id [" + sid + "]");
+							responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+							responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+						}
+					} else {
+						Logger.println(Logger.WARNING, "[WEB SERVER] There is no service to deal with service_id[" + sid + "] in this request.");
+						responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+						responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+					}
 				}
+				response.setStatusCode(responseCode);
+				response.setReasonPhrase(responsePhrase);
 			} else if ( request.getUrlPath().contains("mail.html")) {
 				// TODO :
 			}

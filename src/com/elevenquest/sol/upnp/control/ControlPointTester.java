@@ -190,6 +190,15 @@ public class ControlPointTester {
 						status = 11;
 						break;
 					case 12 :
+						if ( selDev == null ) {
+							System.out.println("There is no selected device.");
+						} else {
+							System.out.println("--- services ---");
+							Vector<UPnPService> services = selDev.getSerivces();
+							for ( cnt = 0 ; cnt < services.size() ; cnt++) {
+								System.out.println( cnt + ":" + services.get(cnt).getServiceId() );
+							}
+						}
 						System.out.println("choose sevice.");
 						status = 12;
 						break;
