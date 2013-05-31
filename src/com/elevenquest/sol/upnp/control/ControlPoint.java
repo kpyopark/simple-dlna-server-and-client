@@ -27,6 +27,7 @@ import com.elevenquest.sol.upnp.network.HttpTcpSender;
 import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
 import com.elevenquest.sol.upnp.server.CommonServer;
+import com.elevenquest.sol.upnp.server.GenaServer;
 import com.elevenquest.sol.upnp.server.SendEvent;
 import com.elevenquest.sol.upnp.server.SsdpControlPointServer;
 import com.elevenquest.sol.upnp.service.directory.ContentDirectoryItem;
@@ -43,6 +44,7 @@ import com.elevenquest.sol.upnp.service.directory.ContentDirectoryService;
 public class ControlPoint {
 	
 	SsdpControlPointServer ssdpServer = null;
+	GenaServer genaServer = null;
 
 	public void start() {
 		startSsdpServer();
@@ -57,7 +59,10 @@ public class ControlPoint {
 	}
 	
 	public void startGenaServer() {
-		
+		if ( genaServer != null )
+			genaServer.stop();
+		genaServer = new GenaServer();
+		genaServer.start();
 	}
 	
 	private void testBrowseRecursively(ContentDirectoryService cds, ContentDirectoryItem parent,int depth) throws Exception {
@@ -104,6 +109,8 @@ public class ControlPoint {
 	public void stop() {
 		if ( ssdpServer != null )
 			ssdpServer.stop();
+		if ( genaServer != null )
+			genaServer.stop();
 	}
 	
 	public void sendDeviceSearchMessage() {
