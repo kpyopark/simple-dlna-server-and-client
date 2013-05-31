@@ -169,8 +169,9 @@ public class UPnPDeviceManager {
 	}
 	
 	public void updateRemoteDeviceInfo() {
-		for ( int inx = 0 ; inx < this.deviceList.size() ; inx++ ) {
-			UPnPDevice device = this.deviceList.values().iterator().next();
+		Set<String> uuidList = this.deviceList.keySet();
+		for ( String uuid : uuidList ) {
+			UPnPDevice device = this.deviceList.get(uuid);
 			if ( !device.isReadyToUse() && device.isRemote() && device.isProgressingToRetrieve() == false ) {
 				Logger.println(Logger.INFO, "Update Remote Device..[" + device.getUuid() + "]" );
 				// TODO : Some DMS product need user id & password for authorization.
