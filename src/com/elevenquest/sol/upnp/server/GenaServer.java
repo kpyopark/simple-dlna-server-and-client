@@ -325,30 +325,7 @@ public class GenaServer {
 		if ( senderServerList != null )
 			stopSendServer();
 		senderServerList = new ArrayList<CommonServer>();
-		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
-		/*
-		for ( NetworkInterface intf : interfaces ) {
-			try {
-				// 1. Next, create ssdp message supplier
-				HttpRequestSender sender = new HttpUdpSender(intf, UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS, 
-						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
-				IHttpRequestSuplier suplier = new SSDPSearchSendHandler(cp);
-				sender.setSenderHandler(suplier);
-				// 2. Create Common server
-				CommonServer sendServer = new CommonServer();
-				// 3. set sender into server.
-				sendServer.setSender(sender, new SendEvent(3000, SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED));
-				// 4. start server.
-				sendServer.startServer();
-				
-				senderServerList.add(sendServer);
-			} catch ( AbnormalException abe ) {
-				abe.printStackTrace();
-			} catch ( Exception e ) {
-				e.printStackTrace();
-			}
-		}
-		*/
+		
 	}
 	
 	public void stop() {

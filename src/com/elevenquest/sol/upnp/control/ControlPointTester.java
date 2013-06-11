@@ -113,8 +113,11 @@ public class ControlPointTester {
 						System.out.println("There is no selected service.");
 					} else {
 						UPnPEventManager.getUPnPEventManager().addServiceToBeRegistered(selServ);
+						UPnPEventManager.getUPnPEventManager().startGenaThread();
 						System.out.println("Activate GENA for the service[" + selServ.getServiceId() + "]");
 					}
+					status = 0;
+					break;
 				default :
 					switch (choiceNumber) {
 					case 0 :
