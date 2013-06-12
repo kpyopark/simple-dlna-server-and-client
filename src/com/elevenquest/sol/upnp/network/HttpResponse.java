@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import com.elevenquest.sol.upnp.common.Logger;
 
@@ -150,5 +151,37 @@ public class HttpResponse {
 		}
 	}
 	
+	public void setHeaderField(String nameAndValue) {
+		if ( nameAndValue.indexOf(':') > 0 ) {
+			String name = nameAndValue.substring(0, nameAndValue.indexOf(':'));
+			String value = nameAndValue.substring(name.length() + 1).trim();
+			this.setHeaderValue(name, value);
+		} else {
+			Logger.println(Logger.WARNING, "[HTTP RESPONSE] There is no colon mark in header fields.["+ nameAndValue + "]");
+		}
+	}
+	
+	public void setStatusLine(String statusLine) {
+		StringTokenizer st = new StringTokenizer(statusLine);
+		
+		if ( st.hasMoreElements() ) {
+			this.httpVer = st.nextToken();
+		} else {
+			Logger.println(Logger.WARNING, "[HTTP RESPONSE] There is no http version info.");
+			return;
+		}
+		if ( st.hasMoreElements() ) {
+			this.statusCode = st.nextToken();
+		} else {
+			Logger.println(Logger.WARNING, "[HTTP RESPONSE] There is no status code info.");
+			return;
+		}
+		if ( st.hasMoreElements() ) {
+			this.reasonPhrase = st.nextToken();
+		} else {
+			Logger.println(Logger.WARNING, "[HTTP RESPONSE] There is no reason phrase info.");
+			return;
+		}
+	}
 
 }
