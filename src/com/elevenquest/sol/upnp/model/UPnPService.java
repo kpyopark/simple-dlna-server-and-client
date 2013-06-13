@@ -206,6 +206,6 @@ public class UPnPService extends UPnPBase {
 		}
 		if ( mainIp == null )
 			return null;
-		return "http://" + mainIp + "/notify.do?device_id=" + this.device.getUuid() + "&service_id=" + this.getServiceId();
+		return "http://" + mainIp.getHostAddress() + "/notify.do?device_id=" + this.device.getUuid() + "&service_id=" + this.getServiceId();
 	}
 }

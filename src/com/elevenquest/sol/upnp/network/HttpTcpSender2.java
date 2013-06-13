@@ -93,17 +93,22 @@ public class HttpTcpSender2 extends HttpRequestSender {
 				}
 			}
 			urlCon = new HttpConnection(this.targetURL, request);
-			
-			// 3. Set header to request
-			
-			if ( request.getCommand().equals(HttpRequest.HTTP_REQUEST_COMMAND_POST) ) {
-				urlCon.setDoOutput(true);
-				urlCon.setDoInput(true);
-			}
-			urlCon.connect();
+			if ( urlCon.openConnection() ) {
+				// 3. Set header to request
+				
+				if ( request.getCommand().equals(HttpRequest.HTTP_REQUEST_COMMAND_POST) ) {
+					urlCon.setDoOutput(true);
+					urlCon.setDoInput(true);
+				}
+				
+				urlCon.connect();
 
-			// 6. retrieving the response from the server.
-			response = urlCon.getHttpResponse();
+				// 6. retrieving the response from the server.
+				response = urlCon.getHttpResponse();
+			} else {
+				Logger.println(Logger.WARNING, "[HTTP TCP SENDER] Open connection failed.[" + this.uri + "]");
+			}
+			
 		} finally {
 			if ( bos != null ) try { bos.close(); } catch ( Exception e1 ) {
 				e1.printStackTrace();

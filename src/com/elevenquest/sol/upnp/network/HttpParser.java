@@ -145,6 +145,7 @@ public class HttpParser {
 					}
 				}
 			} else {
+				// TODO : Need to be modified for preparation of chunked contents.
 				baseStruct.body = this.getBody();
 			}
 		}
@@ -181,7 +182,7 @@ public class HttpParser {
 		return request;
 	}
 
-	public HttpResponse parseHTTPResponse() throws Exception {
+	public HttpResponse parseHTTPResponse() throws IOException {
 		
 		HttpResponse response = new HttpResponse();
 		HttpBaseStructure baseInfo = parseHttpLines();

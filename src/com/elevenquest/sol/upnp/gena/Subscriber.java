@@ -113,10 +113,6 @@ public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRe
 		HttpRequest request = new HttpRequest();
 		request.setHttpVer(HttpRequest.HTTP_VERSION_1_1);
 		request.setUrlPath("*");
-		String osVersion = "WindowsNT";
-		String productVersion = "simpledlna/1.0";
-		request.addHeader("USER-AGENT", osVersion + " UPnP/1.1 " + productVersion );
-		request.setHeaderValue(ID_UPNP_SUBSCRIBE_CALLBACK, "http://" + this.service.getDevice().getLocalIP() + "/notify.do" );
 		if ( this.wantToSubscribe ) {
 			request.setCommand(ID_UPNP_SUBSCRIBE_SUBSCRIBE);
 			if ( this.service.isRemote() && !this.service.isProgressingToRetrieve() ) {
@@ -142,9 +138,10 @@ public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRe
 						Logger.println(Logger.ERROR, e.getLocalizedMessage());
 					}
 					request.setHeaderValue("USER-AGENT", DefaultConfig.ID_UPNP_DISCOVERY_SERVER_VALUE);
-					request.setHeaderValue("CALLBACK", this.service.getDeliveryUrl());
+					request.setHeaderValue(ID_UPNP_SUBSCRIBE_CALLBACK, "<" + this.service.getDeliveryUrl() + ">");
 					request.setHeaderValue("NT", "upnp:event");
-					//request.setHeaderValue("TIMEOUT", "Second-180");
+					request.setHeaderValue("TIMEOUT", "Second-180");
+					Logger.println(Logger.DEBUG, "[SUBSCRIBER] Callback :[" + request.getHeaderValue(ID_UPNP_SUBSCRIBE_CALLBACK) + "]");
 				}
 			} else {
 				throw new AbnormalException("This service[" + this.service.getServiceType() + ":" + this.service.getServiceId() + "] isn't availiable service to listen event request.");
@@ -172,7 +169,7 @@ public class Subscriber extends UPnPBase implements IHttpRequestHandler, IHttpRe
 			for ( String header : headers ) Logger.println(Logger.INFO, "<GENA> response [" + header + "]:[" + response.getHeaderValue(header) + "]");
 			/*           */
 			if ( response.getStatusCode().equals(HttpResponse.HTTP_RESPONSE_STATUS_CODE_200) ) {
-				if ( response.getHeaderValue("SID") != null || response.getHeaderValue("SID").length() > 5 ) {
+				if ( response.getHeaderValue("SID") != null && response.getHeaderValue("SID").length() > 5 ) {
 					this.service.setSubscribeId(response.getHeaderValue("SID"));
 					this.service.setSubscribed(true);
 				} else {

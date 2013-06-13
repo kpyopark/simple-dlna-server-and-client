@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import com.elevenquest.sol.upnp.common.Logger;
+import com.elevenquest.sol.upnp.network.HttpParser;
 import com.elevenquest.sol.upnp.network.HttpRequest;
 import com.elevenquest.sol.upnp.network.HttpResponse;
 
@@ -30,8 +31,6 @@ public class HttpConnection {
 	
 	String path;
 
-	String method = null;
-	
 	HttpRequest request = null;
 	HttpResponse response = null;
 	ArrayList<String> headerNames = null;
@@ -69,14 +68,16 @@ public class HttpConnection {
 	private boolean parseURL() {
 		
 		boolean result = true;
-		
+		Logger.println(Logger.DEBUG, "[HTTP Connection] parse url :" + this.url);
 		if ( this.url.indexOf("http://") != 0 )
 			return false;
 		String addressPortPath = this.url.substring(7);
-		String addressPort = addressPortPath.substring(addressPortPath.indexOf('/'));
+		Logger.println(Logger.DEBUG, "[HTTP Connection] addressPortPath :" + addressPortPath);
+		String addressPort = addressPortPath.substring(0,addressPortPath.indexOf('/'));
+		Logger.println(Logger.DEBUG, "[HTTP Connection] addressPort :" + addressPort);
 		String address = null;
 		if ( addressPort.indexOf(':') > 0 ) {
-			address = addressPort.substring(addressPort.indexOf(':'));
+			address = addressPort.substring(0,addressPort.indexOf(':'));
 			this.targetPort = Integer.parseInt(addressPort.substring(address.length() + 1));
 		} else {
 			address = addressPort;
@@ -90,10 +91,6 @@ public class HttpConnection {
 			result = false;
 		}
 		return result;
-	}
-	
-	public void setRequestMethod(String method) {
-		this.method = method;
 	}
 	
 	public void addRequestProperty(String name, String value) {
@@ -138,7 +135,7 @@ public class HttpConnection {
 		try {
 			// 1. Send parameters in Http request.
 			bos = new BufferedOutputStream(this.clientSoc.getOutputStream());
-			String requestLine = this.method + " " + this.url + " " + this.request.getHttpVer() + "\r\n";
+			String requestLine = this.request.getCommand() + " " + this.url + " " + this.request.getHttpVer() + "\r\n";
 			bos.write(requestLine.getBytes());
 			String headerAndValue = null;
 			ArrayList<String> names = request.getHeaderNames();
@@ -159,37 +156,12 @@ public class HttpConnection {
 				bos.write(this.request.getBodyArray());
 			}
 			bos.flush();
-			bos.close();
 			
 			// 2. Receive fields in Http Response.
 			
 			is = this.clientSoc.getInputStream();
-			response = new HttpResponse();
-			String statusLine = readLine(is);
-			response.setStatusLine(statusLine);
-			String aLine = null;
-			while ( !( aLine == null || aLine.length() == 0 || aLine.equalsIgnoreCase("\r\n")) ) {
-				response.setHeaderField(aLine);
-			}
-			// end of header fields.
-			String contentLength = null;
-			String transferCoding = null;
-			if ( (contentLength = response.getHeaderValue("Content-length")) != null ) {
-				int targetLength = Integer.parseInt(contentLength);
-				int downloadLength = 0;
-				int length = -1;
-				byte[] buffer = new byte[1024];
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				while ( ( length = is.read(buffer, 0, 1024) ) != -1 && ( downloadLength < targetLength ) ) {
-					downloadLength += length;
-					baos.write(buffer, 0, length);
-				}
-				response.setBodyArray(baos.toByteArray());
-			} else if ( ( transferCoding = response.getHeaderValue("Transfer-Encoding") ) != null && transferCoding.equalsIgnoreCase("chunked") ) {
-				// chunked transfering.
-				// ToDO :
-				Logger.println(Logger.ERROR, "[HTTP RESPONSE] There is no implementation for chunked tranfering.");
-			}
+			HttpParser parser = new HttpParser(is);
+			this.response = parser.parseHTTPResponse();
 		} finally {
 			if ( bos != null ) try { bos.close(); } catch ( Exception e ) { e.printStackTrace(); }
 			if ( is != null ) try { is.close(); } catch ( Exception e ) { e.printStackTrace(); }
@@ -223,7 +195,8 @@ public class HttpConnection {
 	
 	public void disconnect() {
 		try {
-			clientSoc.close();
+			if ( clientSoc != null )
+				clientSoc.close();
 		} catch ( IOException ioe ) {
 			ioe.printStackTrace();
 			Logger.println(Logger.WARNING, "[HTTP CONNECTION] There is some issues during disconnecting with server.[" + this.url + "]");

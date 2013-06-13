@@ -15,6 +15,7 @@ import com.elevenquest.sol.upnp.description.DeviceDescription;
 import com.elevenquest.sol.upnp.gena.Subscriber;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpTcpSender;
+import com.elevenquest.sol.upnp.network.HttpTcpSender2;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 
 public class UPnPEventManager extends UPnPBase {
@@ -62,8 +63,9 @@ public class UPnPEventManager extends UPnPBase {
 		
 		public void run() {
 			try {
-				HttpRequestSender sender = new HttpTcpSender(innerService.getDevice().getNetworkInterface(),
+				HttpRequestSender sender = new HttpTcpSender2(innerService.getDevice().getNetworkInterface(),
 						innerService.getEventsubUrl() );
+				Logger.println(Logger.DEBUG, "[UPNP Event Manager] event sub url:" + innerService.getEventsubUrl());
 				Subscriber handler = new Subscriber(innerService, true);
 				sender.setSenderHandler(handler);
 				sender.sendData();
@@ -99,7 +101,7 @@ public class UPnPEventManager extends UPnPBase {
 					while( iter.hasNext() ) {
 						UPnPSubscribeEvent event = iter.next();
 						if ( ( currentTime - event.updateTimeStamp ) > 150 * 1000 ) {
-							HttpRequestSender sender = new HttpTcpSender(event.service.getDevice().getNetworkInterface(),
+							HttpRequestSender sender = new HttpTcpSender2(event.service.getDevice().getNetworkInterface(),
 									event.service.getEventsubUrl() );
 							Subscriber handler = new Subscriber(event.service, true);
 							sender.setSenderHandler(handler);
@@ -192,10 +194,14 @@ public class UPnPEventManager extends UPnPBase {
 	}
 	
 	public UPnPService getActiveGenaService(String serviceId) {
-		return getActiveEventList(serviceId).service;
+		UPnPSubscribeEvent eventService = getActiveEventList(serviceId);
+		return ( eventService == null ) ? null : eventService.service;
 	}
 	
 	protected UPnPSubscribeEvent getActiveEventList(String serviceId) {
+		Logger.println(Logger.DEBUG, "[UPNP Event Manager] Looking for service which'id is [" + serviceId + "]");
+		for ( String key : this.activeServiceList.keySet() )
+			Logger.println(Logger.DEBUG, "[UPNP Event Manager] service id[" + key + "] exists in active event list.");
 		return this.activeServiceList.get(serviceId);
 	}
 	
