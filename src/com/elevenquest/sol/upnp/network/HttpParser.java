@@ -107,49 +107,52 @@ public class HttpParser {
 		String value = "";
 		boolean isHeader = true;
 		boolean isStartLine = true;
-		while ( ( aLine = readLine() ) != null ) {
-			if ( aLine.trim().length() == 0 ) {		// Header / Body separated by knew line character.
-				isHeader = false;
-			}
-			if ( isHeader) {
-				// start line
-				if ( isStartLine ) {
-					isStartLine = false;
-					baseStruct.startLine = aLine;
-					Logger.println(Logger.DEBUG, "current time : [" + System.currentTimeMillis() + "] start line:" + aLine + " length :" + this.length);
-				} else {
-					boolean isValid = false;
-					if ( aLine.length() > 0 && ( aLine.charAt(0) == ' ' || aLine.charAt(0) == '\t' ) ) {
-						// It's a line of multiline text.
-						value += "\n" + aLine;
-						if ( key != null && key.length() > 0 ) {
-							int pos = baseStruct.headerNames.indexOf(key);
-							baseStruct.headerValues.set(pos, value);
-						}
+		try {
+			while ( ( aLine = readLine() ) != null ) {
+				if ( aLine.trim().length() == 0 ) {		// Header / Body separated by knew line character.
+					isHeader = false;
+				}
+				if ( isHeader) {
+					// start line
+					if ( isStartLine ) {
+						isStartLine = false;
+						baseStruct.startLine = aLine;
+						Logger.println(Logger.DEBUG, "current time : [" + System.currentTimeMillis() + "] start line:" + aLine + " length :" + this.length);
 					} else {
-						for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
-							if ( aLine.charAt(pos) == ':' ) {
-								key = aLine.substring(0,pos);
-								value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1).trim() : ""; 
-								isValid = true;
-								break;
+						boolean isValid = false;
+						if ( aLine.length() > 0 && ( aLine.charAt(0) == ' ' || aLine.charAt(0) == '\t' ) ) {
+							// It's a line of multiline text.
+							value += "\n" + aLine;
+							if ( key != null && key.length() > 0 ) {
+								int pos = baseStruct.headerNames.indexOf(key);
+								baseStruct.headerValues.set(pos, value);
+							}
+						} else {
+							for ( int pos = 0 ; pos < aLine.length() ; pos++ ) {
+								if ( aLine.charAt(pos) == ':' ) {
+									key = aLine.substring(0,pos);
+									value = (pos + 1 < aLine.length()) ? aLine.substring(pos+1).trim() : ""; 
+									isValid = true;
+									break;
+								}
+							}
+							if (isValid) {
+								baseStruct.headerNames.add(key);
+								baseStruct.headerValues.add(value);
+							} else {
+								key = "";
+								value = "";
 							}
 						}
-						if (isValid) {
-							baseStruct.headerNames.add(key);
-							baseStruct.headerValues.add(value);
-						} else {
-							key = "";
-							value = "";
-						}
 					}
+				} else {
+					// TODO : Need to be modified for preparation of chunked contents.
+					baseStruct.body = this.getBody();
 				}
-			} else {
-				// TODO : Need to be modified for preparation of chunked contents.
-				baseStruct.body = this.getBody();
 			}
+		} finally {
+			this.close();
 		}
-		this.close();
 		return baseStruct;
 	}
 

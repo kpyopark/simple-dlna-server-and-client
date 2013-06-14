@@ -4,6 +4,7 @@ import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
@@ -151,26 +152,27 @@ public class GenaServer {
 		
 		void parseParameters(HttpRequest request) {
 			String keyValuePairs = null;
-			if ( request.getCommand().equals(HttpRequest.HTTP_REQUEST_COMMAND_GET) ) {
-				int startPosition = request.getUrlPath().indexOf('?');
-				if ( startPosition < 1 ) {
-					Logger.println(Logger.WARNING, "Request from client doesn't have parameters.");
-					keyValuePairs = "";
+			int startPosition = request.getUrlPath().indexOf('?');
+			if ( startPosition < 1 ) {
+				Logger.println(Logger.WARNING, "Request from client doesn't have parameters.");
+				if ( request.getCommand().equals(HttpRequest.HTTP_REQUEST_COMMAND_POST) ) {
+					keyValuePairs = new String(request.getBodyArray());
 				} else {
-					keyValuePairs = request.getUrlPath().substring(startPosition);
+					keyValuePairs = "";
 				}
-			} else if ( request.getCommand().equals(HttpRequest.HTTP_REQUEST_COMMAND_POST) ) {
-				keyValuePairs = new String(request.getBodyArray());
+			} else {
+				keyValuePairs = request.getUrlPath().substring(startPosition);
 			}
 			String key = null;
 			String value = null;
+			boolean isParameterRegion = false;
 			int lastTokenPosition = 0;
 			for ( int position = 0 ; position < keyValuePairs.length() ; position ++ ) {
-				if ( keyValuePairs.charAt(position) == '=' ) {
-					key = keyValuePairs.substring(lastTokenPosition, ( position - lastTokenPosition));
+				if ( isParameterRegion && keyValuePairs.charAt(position) == '=' ) {
+					key = keyValuePairs.substring(lastTokenPosition, position );
 					lastTokenPosition = position + 1;
-				} else if ( keyValuePairs.charAt(position) == '&' ) {
-					value = keyValuePairs.substring(lastTokenPosition, ( position - lastTokenPosition));
+				} else if ( isParameterRegion && keyValuePairs.charAt(position) == '&' ) {
+					value = keyValuePairs.substring(lastTokenPosition, position );
 					lastTokenPosition = position + 1;
 					if ( key != null && key.length() > 0 ) {
 						value = decodePercent(value);
@@ -180,6 +182,9 @@ public class GenaServer {
 					}
 					key = null;
 					value = null;
+				} else if ( keyValuePairs.charAt(position) == '?' ) {
+					lastTokenPosition = position + 1;
+					isParameterRegion = true;
 				}
 			}
 			if ( key != null && key.length() > 0 ) {
@@ -197,6 +202,7 @@ public class GenaServer {
 				response.setStatusCode("401");
 				response.setReasonPhrase("Header field dones't have user-agent field.");
 			}
+			parseParameters(request);
 			// TODO : Should be modified
 			String did = parameters.get("device_id");
 			String sid = parameters.get("service_id");
@@ -343,5 +349,19 @@ public class GenaServer {
 		if ( senderServerList != null )
 			for ( CommonServer server : senderServerList ) server.stopServer();
 		senderServerList = null;
-	}	
+	}
+	
+	public static void main(String[] args) {
+		GenaServer.CommonHttpRequestHandler handler = new GenaServer.CommonHttpRequestHandler();
+		HttpRequest request = new HttpRequest();
+		request.setCommand("NOTIFY");
+		request.setUrlPath("/notify.do?device_id=05765fc0-cbde-41ef-8859-a7a0766d0759&service_id=urn:upnp-org:serviceId:ConnectionManager");
+		request.setHttpVer("HTTP/1.1");
+		handler.parseParameters(request);
+		HashMap<String, String>  headers = handler.parameters;
+		for( Iterator<String> iter = headers.keySet().iterator() ; iter != null && iter.hasNext() ; ) {
+			String name = iter.next();
+			System.out.println( name + ":" + headers.get(name));
+		}
+	}
 }
