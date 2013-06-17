@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -45,30 +46,33 @@ public class NotifyXMLParser {
 			ioe.printStackTrace();
 		}
 		this.xmlInputStream = new ByteArrayInputStream(baos.toByteArray());
-		//Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
+		Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
 	}
 
 	public void execute() {
 		try {
 
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+			//dbf.setIgnoringElementContentWhitespace(true);
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(xmlInputStream);
 			doc.getDocumentElement().normalize();
 			Logger.println(Logger.DEBUG, "Root element "
 					+ doc.getDocumentElement().getNodeName());
-
-			NodeList nodeProperty = doc.getElementsByTagName("property");
-			if (nodeProperty.getLength() > 0) {
-				Node fstNodeProperty = nodeProperty.item(0);
+			
+			NodeList nodeProperty = doc.getDocumentElement().getChildNodes();
+			for ( int cnt = 0; cnt < nodeProperty.getLength() ; cnt++) {
+				Logger.println(Logger.DEBUG, "[Notify Parser] child of root element:" + nodeProperty.item(cnt));
+				Node fstNodeProperty = nodeProperty.item(cnt);
+				Logger.println(Logger.DEBUG, "fstNodeProperty node type:" + fstNodeProperty.getNodeType());
 				if (fstNodeProperty.getNodeType() == Node.ELEMENT_NODE) {
 					Element propertyElement = (Element)fstNodeProperty;
 					NodeList propertyChildren = propertyElement.getChildNodes();
-					for ( int cnt = 0 ; cnt < propertyChildren.getLength() ; cnt++ ) {
-						Node propertyChild = propertyChildren.item(cnt);
+					for ( int subcnt = 0 ; subcnt < propertyChildren.getLength() ; subcnt++ ) {
+						Node propertyChild = propertyChildren.item(subcnt);
 						if ( propertyChild.getNodeType() == Node.ELEMENT_NODE ) {
-							event.setPropertyName(propertyChild.getNodeName());
-							event.setPropertyValue(XMLParserUtility.getFirstNodeValue(propertyElement, event.getPropertyName()));
+							String propertyName =  propertyChild.getNodeName();
+							event.setPropertyNameAndValue(propertyName, XMLParserUtility.getFirstNodeValue(propertyElement, propertyName));
 						}
 					}
 				}
@@ -78,5 +82,25 @@ public class NotifyXMLParser {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public static void main(String[] args) {
+		EventNotify event = new EventNotify();
+		String xml = "<e:propertyset xmlns:e=\"urn:schemas-upnp-org:event-1-0\">\n\r" +
+"<e:property>\n\r" +
+"<SystemUpdateID>0</SystemUpdateID>\n\r" +
+"</e:property>\n\r" +
+"<e:property>\n\r" +
+"<ContainerUpdateIDs></ContainerUpdateIDs>\n\r" +
+"</e:property>\n\r" +
+"</e:propertyset>\n\r";
+		ByteArrayInputStream is = new ByteArrayInputStream(xml.getBytes());
+		NotifyXMLParser parser = new NotifyXMLParser(event, is);
+		parser.execute();
+		Enumeration<String> propertyNames = event.getPropertyNameList();
+		while( propertyNames.hasMoreElements() ) {
+			String propertyName = propertyNames.nextElement();
+			Logger.println(Logger.INFO, "[Notify Parser] property name:" + propertyName + " value:" + event.getPropertyValue(propertyName) );
+		}
 	}
 }

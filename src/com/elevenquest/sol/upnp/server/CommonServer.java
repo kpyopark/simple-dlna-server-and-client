@@ -63,6 +63,7 @@ public class CommonServer {
 					threadPool.execute(new Runnable() {
 						public void run() {
 							try {
+								receiver.initSocket();
 								while( !needStop ) {
 									try {
 										receiver.receiveData();
@@ -75,6 +76,8 @@ public class CommonServer {
 									if ( numberOfErrors > 3 )
 										needStop = true;
 								}
+								receiver.close();
+								receiver.clearHandler();
 							} catch ( Exception e ) {
 								Logger.println(Logger.ERROR, "There are some errors in Thread Pool.");
 								e.printStackTrace();
@@ -110,19 +113,16 @@ public class CommonServer {
 	
 	public void stopServer() {
 		needStop = true;
+		List<Runnable> unreleasedTasks = threadPool.shutdownNow();
 		threadPool.purge();
 		threadPool.shutdown();
-		/*
-		List<Runnable> unreleasedTasks = threadPool.shutdownNow();
 		for ( Runnable oneTask : unreleasedTasks ) {
 			try {
-				// TODO : How to kill an unreleased runnable thread. I don't know. 
 				System.out.println("Unreleased task:" + oneTask);
 			} catch ( Exception e ) {
 				e.printStackTrace();
 			}
 		}
-		*/
 		Logger.println(Logger.INFO, "Stop Server...." + threadPool.toString() + ":" + receiver + ":" + sender );
 	}
 

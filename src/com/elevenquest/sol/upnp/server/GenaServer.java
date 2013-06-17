@@ -3,6 +3,7 @@ package com.elevenquest.sol.upnp.server;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -270,24 +271,35 @@ public class GenaServer {
 					responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 					responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 				} else {
-					UPnPEventManager manager = UPnPEventManager.getUPnPEventManager();
+					UPnPDevice device = UPnPDeviceManager.getDefaultDeviceManager().getDevice(did);
 					EventNotify notify = new EventNotify(request);
 					NotifyXMLParser parser = new NotifyXMLParser(notify, request.getBodyInputStream());
 					parser.execute();
-					UPnPService service = manager.getActiveGenaService(sid);
-					if ( service != null ) {
-						if ( service.getDevice().getUuid().equals(did) ) {
-							UPnPStateVariable variable = service.getStateVariable(notify.getPropertyName());
-							variable.setValue(notify.getPropertyValue());
+					if ( device != null ) {
+						UPnPService service = device.getUPnPService(sid);
+						if ( service != null ) {
+							if ( service.getDevice().getUuid().equals(did) ) {
+								Enumeration<String> propertyNames = notify.getPropertyNameList();
+								while( propertyNames.hasMoreElements() ) {
+									String propertyName = propertyNames.nextElement();
+									Logger.println(Logger.DEBUG,"[GENA SERVER] notify.do [property]:" + propertyName + "] [value]:[" + notify.getPropertyValue(propertyName) + "]");
+									UPnPStateVariable variable = service.getStateVariable(propertyName);
+									if ( variable == null ) {
+										Logger.println(Logger.WARNING,"[GENA SERVER] There is no matching property[" + propertyName + "] in this service[" + sid + "] of device[" + did + "]");
+									} else {
+										variable.setValue(notify.getPropertyValue(propertyName));
+									}
+								}
+							} else {
+								Logger.println(Logger.WARNING, "[WEB SERVER] There is no service matched with device id[" + did +"] and service_id [" + sid + "]");
+								responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+								responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
+							}
 						} else {
-							Logger.println(Logger.WARNING, "[WEB SERVER] There is no service matched with device id[" + did +"] and service_id [" + sid + "]");
+							Logger.println(Logger.WARNING, "[WEB SERVER] There is no service to deal with service_id[" + sid + "] in this request.");
 							responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 							responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 						}
-					} else {
-						Logger.println(Logger.WARNING, "[WEB SERVER] There is no service to deal with service_id[" + sid + "] in this request.");
-						responseCode = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
-						responsePhrase = HttpResponse.HTTP_RESPONSE_REASON_PHRASE_401;
 					}
 				}
 				response.setStatusCode(responseCode);

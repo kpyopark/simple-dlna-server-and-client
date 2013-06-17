@@ -1,5 +1,8 @@
 package com.elevenquest.sol.upnp.gena;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
 import com.elevenquest.sol.upnp.network.HttpRequest;
@@ -7,18 +10,19 @@ import com.elevenquest.sol.upnp.network.HttpRequest;
 public class EventNotify extends HttpRequest {
 
 	UPnPDeviceManager manager = null;
-	
-	String propertyName = null;
-	String propertyValue = null;
+
+	Hashtable<String, String> propertyNameAndValue = null;
 	
 	public EventNotify() {
 		super();
 		manager = UPnPDeviceManager.getDefaultDeviceManager();
+		propertyNameAndValue = new Hashtable<String,String>();
 	}
 	
 	public EventNotify(HttpRequest request) {
 		super(request);
 		manager = UPnPDeviceManager.getDefaultDeviceManager();
+		propertyNameAndValue = new Hashtable<String,String>();
 	}
 	
 	public UPnPStateVariable getUPnPStateVariable() {
@@ -26,20 +30,16 @@ public class EventNotify extends HttpRequest {
 		
 	}
 
-	public String getPropertyName() {
-		return propertyName;
+	public Enumeration<String> getPropertyNameList() {
+		return propertyNameAndValue.keys();
 	}
 
-	public void setPropertyName(String propertyName) {
-		this.propertyName = propertyName;
+	public void setPropertyNameAndValue(String propertyName, String propertyValue) {
+		this.propertyNameAndValue.put(propertyName, propertyValue);
 	}
 
-	public String getPropertyValue() {
-		return propertyValue;
-	}
-
-	public void setPropertyValue(String propertyValue) {
-		this.propertyValue = propertyValue;
+	public String getPropertyValue(String propertyName) {
+		return this.propertyNameAndValue.get(propertyName);
 	}
 
 }

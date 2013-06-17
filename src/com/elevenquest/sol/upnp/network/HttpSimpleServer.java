@@ -51,6 +51,7 @@ public class HttpSimpleServer {
 		new Thread(new Runnable(){
 			public void run() {
 				needStop = false;
+				receiver.initSocket();
 				while( !needStop ) {
 					try {
 						final HttpRequest request = receiver.listen();
@@ -72,6 +73,8 @@ public class HttpSimpleServer {
 						e.printStackTrace();
 					}
 				}
+				receiver.close();
+				receiver.clearHandler();
 			}
 		}).start();
 	}

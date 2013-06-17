@@ -182,6 +182,7 @@ public class HttpParser {
 			isValidRequest = false;
 			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
 		}
+		request.setBodyArray(baseInfo.body);
 		return request;
 	}
 

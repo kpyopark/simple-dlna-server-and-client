@@ -14,6 +14,8 @@ public abstract class HttpRequestReceiver {
 		this.handler = null;
 	}
 	
+	abstract public void initSocket();
+	
 	/**
 	 * ������ network layer�� �ִ� �ڷḦ �޴� ��Ȱ�� �ϴ� �޽��.
 	 * ServerSocket�� ���, accept�� ȣ���ϴ� ��Ȱ.
@@ -42,10 +44,6 @@ public abstract class HttpRequestReceiver {
 		afterReceive();
 	}
 	
-	public void clear() {
-		clearHandler();
-	}
-	
 	/**
 	 * listen�� �ڷḦ ������ ó���ϴ� CommonHandler�� ȣ���Ѵ�.
 	 * ���������� ��ϵ�(addReceiveHandler) Handler�� ������ ȣ���� �� �ִ�. 
@@ -55,5 +53,7 @@ public abstract class HttpRequestReceiver {
 	public HttpResponse process(HttpRequest request) {
 		return handler.process(request);
 	}
+	
+	abstract public void close();
 
 }
