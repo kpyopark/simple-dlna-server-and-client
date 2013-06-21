@@ -120,7 +120,7 @@ public class DDSXMLParser {
 						/* depth */
 						imageInfo.setDepth(Integer.parseInt(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "depth")));
 						/* url */
-						imageInfo.setMimeType(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "url"));
+						imageInfo.setUrl(description.getDevice().getAbsoluteURL(XMLParserUtility.getFirstNodeValue(iconfstElmnt, "url")));
 						description.addImage(imageInfo);
 					}
 					

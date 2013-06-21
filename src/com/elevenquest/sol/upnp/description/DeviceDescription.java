@@ -8,6 +8,7 @@ import java.util.Vector;
 import com.elevenquest.sol.upnp.common.DefaultConfig;
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
+import com.elevenquest.sol.upnp.model.UPnPDeviceImage;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpRequest;
@@ -194,12 +195,18 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	public void addImage(ImageElementInDDS imageInfo) {
 		this.imageList.add(imageInfo);
 		this.imageListUpdated = true;
+		UPnPDeviceImage image = imageInfo.getDeviceImageStructure();
+		image.setDevice(this.device);
+		Logger.println(Logger.DEBUG, "[Device Description] image info:" + image.getUrl() );
+		this.device.addDeviceImage(image);
 	}
 	
+	/*
 	public void addImage(ArrayList<ImageElementInDDS> imageList) {
 		this.imageList.addAll(imageList);
 		this.imageListUpdated = true;
 	}
+	*/
 	
 	public void addService(ServiceElementInDDS serviceInfo) {
 		this.serviceList.add(serviceInfo);

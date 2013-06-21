@@ -5,7 +5,7 @@ import java.util.StringTokenizer;
 
 import com.elevenquest.sol.upnp.common.UPnPUtils;
 
-public class UPnPStateVariable {
+public class UPnPStateVariable extends UPnPBase {
 	boolean needToSendEvent;
 	boolean isMulticastEvent;
 	boolean isCSVFormat;
@@ -18,6 +18,7 @@ public class UPnPStateVariable {
 	UPnPAllowedValueRange valueRange;
 	ArrayList<Object> allowedValueList;
 	UPnPStateVariable relatedStateVariable;
+	UPnPService service = null;
 	
 	public UPnPStateVariable() {
 		allowedValueList = new ArrayList<Object>();
@@ -140,6 +141,14 @@ public class UPnPStateVariable {
 	
 	public void setAllowedValueList(ArrayList<Object> valueList) {
 		this.allowedValueList = valueList;
+	}
+	
+	public void setService(UPnPService service) {
+		this.service = service;
+	}
+	
+	public UPnPService getService() {
+		return this.service;
 	}
 	
 }

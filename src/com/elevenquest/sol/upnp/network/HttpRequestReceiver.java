@@ -51,7 +51,10 @@ public abstract class HttpRequestReceiver {
 	 * @param packet
 	 */
 	public HttpResponse process(HttpRequest request) {
-		return handler.process(request);
+		if ( handler != null )
+			return handler.process(request);
+		else
+			return null;
 	}
 	
 	abstract public void close();

@@ -31,66 +31,48 @@ public class UPnPBase {
 		Method[] methods = this.getClass().getDeclaredMethods();
 		for (int inx = 0; inx < methods.length; inx++) {
 			try {
-				//System.out.println("method:" + methods[inx].getName() + ":isAccessible:" + methods[inx].isAccessible());
-				if (!methods[inx].isAccessible()) {
-					String canonicalNameOfReturnType = methods[inx].getReturnType().getCanonicalName();
-					if ( ( canonicalNameOfReturnType.equals("java.util.Vector") ||
-							canonicalNameOfReturnType.equals("java.util.ArrayList") ||
-							canonicalNameOfReturnType.equals("java.util.Collection")
-							)
-							&& methods[inx].getName().indexOf("get") == 0 ) {
-						if ( Modifier.isPublic(methods[inx].getModifiers()) || Modifier.isProtected(methods[inx].getModifiers()) ) {
-							Class[] parameters = methods[inx].getParameterTypes();
-							if ( parameters != null && parameters.length > 0 ) {
-								// It need parameters. So it should be skipped.
-								sb.append(className).append(":").append(
-										methods[inx].getName()).append(":skipped.");
-							} else {
-								Collection<Object> vec = (Collection<Object>) methods[inx].invoke(this, null);
-								try {
-									sb.append(className).append(":").append(
-											methods[inx].getName()).append(":");
-									if ( vec == null ) {
-										sb.append("null");
-									} else {
-										for (Iterator<Object> iter = vec.iterator(); iter.hasNext() ; ) {
-											sb.append("[").append(toString(iter.next(),depth))
-													.append("]");
-										}
-									}
-								} catch (Exception e1) {
-									Logger.println(Logger.ERROR, e1.getMessage());
-								}
-							}
+				if ( !Modifier.isPublic(methods[inx].getModifiers()) && !Modifier.isProtected(methods[inx].getModifiers()) ) {
+					Logger.println(Logger.DEBUG, "method[" + methods[inx].getName() + "] is not public or protected.");
+					continue;
+				}
+				Class[] parameters = methods[inx].getParameterTypes();
+				if ( parameters != null && parameters.length > 0 ) {
+					// It need parameters. So it should be skipped.
+					sb.append(className).append(":").append(
+							methods[inx].getName()).append(":skipped.");
+					continue;
+				}
+				if ( methods[inx].getName().indexOf("get") != 0 ) {
+					continue;
+				}
+				String canonicalNameOfReturnType = methods[inx].getReturnType().getCanonicalName();
+				if ( ( canonicalNameOfReturnType.equals("java.util.Vector") ||
+						canonicalNameOfReturnType.equals("java.util.ArrayList") ||
+						canonicalNameOfReturnType.equals("java.util.Collection")
+						) ) {
+					Collection<Object> vec = (Collection<Object>) methods[inx].invoke(this, (Object[])null);
+					try {
+						sb.append(className).append(":").append(
+								methods[inx].getName()).append(":");
+						if ( vec == null ) {
+							sb.append("null");
 						} else {
-							Logger.println(Logger.DEBUG, "method[" + methods[inx].getName() + "] is not public or protected.");
-						}
-						//System.out.println("after appending:" + methods[inx].getName() );
-					} else if ( methods[inx].getName().indexOf("get") == 0 ) {
-						//System.out.println("before appending:" + methods[inx].getName() );
-						try {
-							Object rtnValue = methods[inx].invoke(this,	null);
-							if ( rtnValue instanceof UPnPDevice ) {
-								sb
-								.append(className)
-								.append(":")
-								.append(methods[inx].getName())
-								.append(":")
-								.append("UPnPDevice").append("\n");
-							} else {
-								sb
-										.append(className)
-										.append(":")
-										.append(methods[inx].getName())
-										.append(":")
-										.append(
-												( rtnValue != null) ? toString(rtnValue,depth)
-														: "null").append("\n");
+							for (Iterator<Object> iter = vec.iterator(); iter.hasNext() ; ) {
+								sb.append("[").append(toString(iter.next(),depth))
+										.append("]");
 							}
-						} catch (Exception e1) {
-							Logger.println(Logger.DEBUG, e1.getMessage());
 						}
-						//System.out.println("after appending:" + methods[inx].getName() );
+					} catch (Exception e1) {
+						e1.printStackTrace();
+						Logger.println(Logger.ERROR, e1.getMessage());
+					}
+				} else {
+					Object rtnValue = methods[inx].invoke(this,	(Object[])null);
+					if ( rtnValue instanceof UPnPDevice ) {
+						sb.append(className).append(":").append(methods[inx].getName()).append(":").append("UPnPDevice").append("\n");
+					} else {
+						sb.append(className).append(":").append(methods[inx].getName()).append(":").append(
+										( rtnValue != null) ? toString(rtnValue,depth) : "null").append("\n");
 					}
 				}
 			} catch (Exception e) {

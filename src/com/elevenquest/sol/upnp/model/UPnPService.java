@@ -119,6 +119,7 @@ public class UPnPService extends UPnPBase {
 	public void registerStateVariable(UPnPStateVariable variable) {
 		synchronized(variable) {
 			this.variableList.put(variable.getName(), variable);
+			variable.setService(this);
 		}
 	}
 	
@@ -190,7 +191,8 @@ public class UPnPService extends UPnPBase {
 	}
 	
 	public String toString() {
-		return getServiceId() + ":" + super.toString();
+		return getServiceId() + ":actions-" + ( this.getActionList() != null ? this.getActionList().size() : 0 ) + ":state varaible-" +
+			(this.getStateVariableList() != null ? this.getStateVariableList().size() : 0 );
 	}
 	
 	public String getDeliveryUrl() {

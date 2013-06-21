@@ -47,6 +47,7 @@ public class UPnPDevice extends UPnPBase implements IUPnPServiceStatusChangeList
 	boolean isProgressingToRetrieve = false;
 	NetworkInterface networkInterface = null; 
 	InetAddress localIP = null;
+	ArrayList<UPnPDeviceImage> imageList = null;
 	
 	public InetAddress getLocalIP() {
 		return localIP;
@@ -293,6 +294,20 @@ public class UPnPDevice extends UPnPBase implements IUPnPServiceStatusChangeList
 			}
 		}
 		service.removeServiceStatusChangeListener(this);
+	}
+	
+	public void addDeviceImage(UPnPDeviceImage image) {
+		if ( this.imageList == null )
+			this.imageList = new ArrayList<UPnPDeviceImage>();
+		if ( this.imageList.contains(image)) {
+			Logger.println(Logger.WARNING, "[UPNPDevice] The image description info[" + image.getUrl() + "] already exists in this device[" + this.getUuid() + "].");
+		} else {
+			this.imageList.add(image);
+		}
+	}
+	
+	public ArrayList<UPnPDeviceImage> getDeviceImageList() {
+		return this.imageList;
 	}
 	
 }

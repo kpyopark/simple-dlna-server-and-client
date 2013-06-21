@@ -1,5 +1,7 @@
 package com.elevenquest.sol.upnp.description;
 
+import com.elevenquest.sol.upnp.model.UPnPDeviceImage;
+
 public class ImageElementInDDS implements ICommonDescription {
 
 	static final String IMG_REPLACEABLE_PART_IMAGE_MIME_TYPE = "#MIME_TYPE#";
@@ -87,6 +89,17 @@ public class ImageElementInDDS implements ICommonDescription {
 
 	public void setDepth(int depth) {
 		this.depth = depth;
+	}
+	
+	public UPnPDeviceImage getDeviceImageStructure() {
+		UPnPDeviceImage image = new UPnPDeviceImage();
+		image.setColor(this.color);
+		image.setDepth(this.depth);
+		image.setHeight(this.height);
+		image.setMimeType(this.mimeType);
+		image.setUrl(this.url);
+		image.setWidth(this.width);
+		return image;
 	}
 
 }
