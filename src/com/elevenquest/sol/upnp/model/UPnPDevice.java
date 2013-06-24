@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -48,6 +49,22 @@ public class UPnPDevice extends UPnPBase implements IUPnPServiceStatusChangeList
 	NetworkInterface networkInterface = null; 
 	InetAddress localIP = null;
 	ArrayList<UPnPDeviceImage> imageList = null;
+
+	String configNumber;
+	String specMajor;
+	String specMinor;
+	String friendlyName;
+	String manufacturerName;
+	String manufacturerUrl;
+	String model;
+	String modelName;
+	String modelDescription;
+	String modelNumber;
+	String modelUrl;
+	String deviceType;
+	String presentationURL;
+	
+	HashMap<String, String> additionalHeaderValueList= null;
 	
 	public InetAddress getLocalIP() {
 		return localIP;
@@ -308,6 +325,119 @@ public class UPnPDevice extends UPnPBase implements IUPnPServiceStatusChangeList
 	
 	public ArrayList<UPnPDeviceImage> getDeviceImageList() {
 		return this.imageList;
+	}
+
+	public String getConfigNumber() {
+		return configNumber;
+	}
+
+	public void setConfigNumber(String configNumber) {
+		this.configNumber = configNumber;
+	}
+
+	public String getSpecMajor() {
+		return specMajor;
+	}
+
+	public void setSpecMajor(String specMajor) {
+		this.specMajor = specMajor;
+	}
+
+	public String getSpecMinor() {
+		return specMinor;
+	}
+
+	public void setSpecMinor(String specMinor) {
+		this.specMinor = specMinor;
+	}
+
+	public String getFriendlyName() {
+		return friendlyName;
+	}
+
+	public void setFriendlyName(String friendlyName) {
+		this.friendlyName = friendlyName;
+	}
+
+	public String getManufacturerName() {
+		return manufacturerName;
+	}
+
+	public void setManufacturerName(String manufacturerName) {
+		this.manufacturerName = manufacturerName;
+	}
+
+	public String getManufacturerUrl() {
+		return manufacturerUrl;
+	}
+
+	public void setManufacturerUrl(String manufacturerUrl) {
+		this.manufacturerUrl = manufacturerUrl;
+	}
+
+	public String getModel() {
+		return model;
+	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	public String getModelName() {
+		return modelName;
+	}
+
+	public void setModelName(String modelName) {
+		this.modelName = modelName;
+	}
+
+	public String getModelDescription() {
+		return modelDescription;
+	}
+
+	public void setModelDescription(String modelDescription) {
+		this.modelDescription = modelDescription;
+	}
+
+	public String getModelNumber() {
+		return modelNumber;
+	}
+
+	public void setModelNumber(String modelNumber) {
+		this.modelNumber = modelNumber;
+	}
+
+	public String getModelUrl() {
+		return modelUrl;
+	}
+
+	public void setModelUrl(String modelUrl) {
+		this.modelUrl = modelUrl;
+	}
+
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
+	public String getPresentationURL() {
+		return presentationURL;
+	}
+
+	public void setPresentationURL(String presentationURL) {
+		this.presentationURL = presentationURL;
+	}
+	
+	public void setAdditionalHeaderValue(String header, String value) {
+		if ( this.additionalHeaderValueList == null )
+			this.additionalHeaderValueList = new HashMap<String,String>();
+	}
+	
+	public String getAdditionalHeaderValue(String header) {
+		return this.additionalHeaderValueList.get(header);
 	}
 	
 }

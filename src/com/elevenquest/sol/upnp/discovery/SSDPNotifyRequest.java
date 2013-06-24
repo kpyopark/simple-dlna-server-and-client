@@ -56,13 +56,19 @@ public class SSDPNotifyRequest extends HttpRequest {
 	 */
 	public UPnPDevice getDeviceBaseInfo() {
 		UPnPDevice device = new UPnPDevice();
-
-		device.setUsn(this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_USN));
+		if ( this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_USN) == null ||
+				this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_USN).length() == 0 ) {
+			// To make anonymous USN value.
+			device.setUsn("usn:" + this.getHeaderValue("location"));
+		} else {
+			device.setUsn(this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_USN));
+		}
 		device.setHost(this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_POST));
 		device.setLocation(this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_LOCATION));
 		{
 			String cacheValue = this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_CACHECONTROL);
-			device.setCacheControl(Integer.parseInt(cacheValue.substring(cacheValue.indexOf("max-age=")+8).trim()));
+			if ( cacheValue != null)
+				device.setCacheControl(Integer.parseInt(cacheValue.substring(cacheValue.indexOf("max-age=")+8).trim()));
 		}
 		
 		device.setNts(this.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_NT_SUBTYPE));

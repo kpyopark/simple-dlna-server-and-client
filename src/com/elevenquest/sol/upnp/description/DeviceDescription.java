@@ -43,20 +43,6 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	
 	// THIS PART IS NOT USED FOR MAKING DESCRIPTIONS. 
 	// JUST FOR STORING THE PARSED DESCRIPTION DATA.
-	String configNumber;
-	String specMajor;
-	String specMinor;
-	String friendlyName;
-	String manufacturerName;
-	String manufacturerUrl;
-	String model;
-	String modelName;
-	String modelDescription;
-	String modelNumber;
-	String modelUrl;
-	String deviceType;
-	String presentationURL;
-	
 	String udn;
 	
 	// BELOW PART IS VARIALBES. SO YOU CAN SET THE VALUES INTO THAT BY USING CLASS CONSTRUCTORS.
@@ -147,17 +133,17 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 			String modelSerial,
 			String uuid,
 			String upc) {
-		 this.configNumber = configNumber;
-		 this.specMajor = specMajor;
-		 this.specMinor = specMinor;
-		 this.friendlyName = friendlyName;
-		 this.manufacturerName = manufacturerName;
-		 this.manufacturerUrl = manufacturerUrl;
-		 this.model = model;
-		 this.modelName = modelName;
-		 this.modelNumber = modelNumber;
-		 this.modelUrl = modelUrl;
 		 device = new UPnPDevice();
+		 this.device.setConfigNumber(configNumber);
+		 this.device.setSpecMajor(specMajor);
+		 this.device.setSpecMinor(specMinor);
+		 this.device.setFriendlyName(friendlyName);
+		 this.device.setManufacturerName(manufacturerName);
+		 this.device.setManufacturerUrl(manufacturerUrl);
+		 this.device.setModel(model);
+		 this.device.setModelName(modelName);
+		 this.device.setModelNumber(modelNumber);
+		 this.device.setModelUrl(modelUrl);
 		 this.device.setModelSerial(modelSerial);
 		 this.device.setUuid(uuid);
 		 this.device.setUpc(upc);	
@@ -250,83 +236,83 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	}
 
 	public String getConfigNumber() {
-		return configNumber;
+		return this.device.getConfigNumber();
 	}
 
 	public void setConfigNumber(String configNumber) {
-		this.configNumber = configNumber;
+		this.device.setConfigNumber(configNumber);
 	}
 
 	public String getSpecMajor() {
-		return specMajor;
+		return this.device.getSpecMajor();
 	}
 
 	public void setSpecMajor(String specMajor) {
-		this.specMajor = specMajor;
+		this.device.setSpecMajor(specMajor);
 	}
 
 	public String getSpecMinor() {
-		return specMinor;
+		return this.device.getSpecMinor();
 	}
 
 	public void setSpecMinor(String specMinor) {
-		this.specMinor = specMinor;
+		this.device.setSpecMinor(specMinor);
 	}
 
 	public String getFriendlyName() {
-		return friendlyName;
+		return this.device.getFriendlyName();
 	}
 
 	public void setFriendlyName(String friendlyName) {
-		this.friendlyName = friendlyName;
+		this.device.setFriendlyName(friendlyName);
 	}
 
 	public String getManufacturerName() {
-		return manufacturerName;
+		return this.device.getManufacturerName();
 	}
 
 	public void setManufacturerName(String manufacturerName) {
-		this.manufacturerName = manufacturerName;
+		this.device.setManufacturerName(manufacturerName);
 	}
 
 	public String getManufacturerUrl() {
-		return manufacturerUrl;
+		return this.device.getManufacturerUrl();
 	}
 
 	public void setManufacturerUrl(String manufacturerUrl) {
-		this.manufacturerUrl = manufacturerUrl;
+		this.device.setManufacturerUrl(manufacturerUrl);
 	}
 
 	public String getModel() {
-		return model;
+		return this.device.getModel();
 	}
 
 	public void setModel(String model) {
-		this.model = model;
+		this.device.setModel(model);
 	}
 
 	public String getModelName() {
-		return modelName;
+		return this.device.getModelName();
 	}
 
 	public void setModelName(String modelName) {
-		this.modelName = modelName;
+		this.device.setModelName(modelName);
 	}
 
 	public String getModelNumber() {
-		return modelNumber;
+		return this.device.getModelNumber();
 	}
 
 	public void setModelNumber(String modelNumber) {
-		this.modelNumber = modelNumber;
+		this.device.setModelNumber(modelNumber);
 	}
 
 	public String getModelUrl() {
-		return modelUrl;
+		return this.device.getModelUrl();
 	}
 
 	public void setModelUrl(String modelUrl) {
-		this.modelUrl = modelUrl;
+		this.device.setModelUrl(modelUrl);
 	}
 
 	public String getModelSerial() {
@@ -385,19 +371,19 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	}
 
 	public String getDeviceType() {
-		return deviceType;
+		return this.device.getDeviceType();
 	}
 
 	public void setDeviceType(String deviceType) {
-		this.deviceType = deviceType;
+		this.device.setDeviceType(deviceType);
 	}
 
 	public String getModelDescription() {
-		return modelDescription;
+		return this.device.getModelDescription();
 	}
 
 	public void setModelDescription(String modelDescription) {
-		this.modelDescription = modelDescription;
+		this.device.setModelDescription(modelDescription);
 	}
 
 	public String getUdn() {
@@ -409,11 +395,11 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	}
 
 	public String getPresentationURL() {
-		return presentationURL;
+		return this.device.getPresentationURL();
 	}
 
 	public void setPresentationURL(String presentationURL) {
-		this.presentationURL = presentationURL;
+		this.device.setPresentationURL(presentationURL);
 	}
 	
 	public String toString() {
@@ -430,21 +416,19 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 	}
 
 	public void PrintAllValue(){
-		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
-		if(this.specMajor!="") Logger.println(Logger.INFO, this.specMajor);
-		if(this.specMinor!="") Logger.println(Logger.INFO, this.specMinor);
-		if(this.friendlyName!="") Logger.println(Logger.INFO, this.friendlyName);
-		if(this.manufacturerName!="") Logger.println(Logger.INFO, this.manufacturerName);
-		if(this.manufacturerUrl!="") Logger.println(Logger.INFO, this.manufacturerUrl);
-		if(this.model!="") Logger.println(Logger.INFO, this.model);
-		if(this.modelName!="") Logger.println(Logger.INFO, this.modelName);
-		if(this.modelNumber!="") Logger.println(Logger.INFO, this.modelNumber);
-		if(this.modelUrl!="") Logger.println(Logger.INFO, this.modelUrl);
-		if(this.modelDescription!="") Logger.println(Logger.INFO, this.modelDescription);
-		if(this.deviceType!="")Logger.println(Logger.INFO, this.deviceType);
-		if(this.presentationURL!="") Logger.println(Logger.INFO, this.presentationURL);
-		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
-		if(this.configNumber!="") Logger.println(Logger.INFO, this.configNumber);
+		if(this.getConfigNumber() !="") Logger.println(Logger.INFO, getConfigNumber());
+		if(this.getSpecMajor() !="") Logger.println(Logger.INFO, getSpecMajor());
+		if(this.getSpecMinor() !="") Logger.println(Logger.INFO, getSpecMinor());
+		if(this.getFriendlyName() !="") Logger.println(Logger.INFO, getFriendlyName());
+		if(this.getManufacturerName() !="") Logger.println(Logger.INFO, getManufacturerName());
+		if(this.getManufacturerUrl() !="") Logger.println(Logger.INFO, getManufacturerUrl());
+		if(this.getModel() !="") Logger.println(Logger.INFO, getModel());
+		if(this.getModelName() !="") Logger.println(Logger.INFO, getModelName());
+		if(this.getModelNumber() !="") Logger.println(Logger.INFO, getModelNumber());
+		if(this.getModelUrl() !="") Logger.println(Logger.INFO, getModelUrl());
+		if(this.getModelDescription() !="") Logger.println(Logger.INFO, getModelDescription());
+		if(this.getDeviceType() !="")Logger.println(Logger.INFO, getDeviceType());
+		if(this.getPresentationURL() !="") Logger.println(Logger.INFO, getPresentationURL());
 	}
 
 	@Override
@@ -471,6 +455,7 @@ public class DeviceDescription implements com.elevenquest.sol.upnp.network.IHttp
 				ArrayList<String> headerNames = response.getHeaderNames();
 				for ( int cnt = 0 ; cnt < response.getHeaderCount(); cnt++ ) {
 					System.out.println( headerNames.get(cnt) + ":" + response.getHeaderValue(headerNames.get(cnt)));
+					this.device.setAdditionalHeaderValue(headerNames.get(cnt), response.getHeaderValue(headerNames.get(cnt)));
 				}
 				String trimmedContents = new String(response.getBodyArray()).trim();
 				ByteArrayInputStream ais = new ByteArrayInputStream(trimmedContents.getBytes());

@@ -23,6 +23,8 @@ public class SSDPReceiveHandler implements IHttpRequestHandler {
 			} else if (HttpHeaderName.ID_NT_SUBTYPE_SSDPUPDATE.equalsIgnoreCase(
 					message.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_NT_SUBTYPE))) {
 				manager.updateDevice(message.getDeviceBaseInfo().getUuid());
+			} else if (message.getHeaderValue(HttpHeaderName.ID_UPNP_HTTP_HEADER_ST) != null && message.getHeaderValue("location") != null ) {
+				manager.addDevice(message.getDeviceBaseInfo());
 			}
 		} catch ( Exception e ) {
 			e.printStackTrace();

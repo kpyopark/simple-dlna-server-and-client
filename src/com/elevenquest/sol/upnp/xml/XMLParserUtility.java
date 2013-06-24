@@ -8,7 +8,7 @@ import com.elevenquest.sol.upnp.common.Logger;
 
 public class XMLParserUtility {
 	
-	static String getFirstNodeValue(Element parentElement, String childTagName) {
+	public static String getFirstNodeValue(Element parentElement, String childTagName) {
 		NodeList childNodeList = parentElement.getElementsByTagName(childTagName);
 		if (childNodeList != null) {
 			switch ( childNodeList.getLength() ) {
@@ -30,6 +30,25 @@ public class XMLParserUtility {
 						return valueNode.item(0).getNodeValue();
 					}
 				}
+			}
+		} else {
+			Logger.println(Logger.WARNING, "There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
+		}
+		return null;
+	}
+	
+	public static String getFirstNodeAttibValue(Element parentElement, String childTagName, String attribName) {
+		NodeList childNodeList = parentElement.getElementsByTagName(childTagName);
+		if (childNodeList != null) {
+			switch ( childNodeList.getLength() ) {
+			case 0 :
+				Logger.println(Logger.WARNING, "There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
+				break;
+			default :
+				if ( childNodeList.getLength() > 1 )
+					Logger.println(Logger.INFO, "There are many childNodes [" + childNodeList.getLength() + "]");
+				Element childFirstElement = (Element)childNodeList.item(0);
+				return childFirstElement.getAttribute(attribName);
 			}
 		} else {
 			Logger.println(Logger.WARNING, "There is no matching child element[" + childTagName + "]" + " in parent element[" + parentElement.getTagName() + "]");
