@@ -37,6 +37,18 @@ public class HttpResponse {
 		processingException = null;
 	}
 	
+	public HttpResponse(HttpResponse org) {
+		headerNames = org.headerNames;
+		headerValues = org.headerValues;
+		headerCount = org.headerCount;
+		processingException = org.processingException;
+		streamBody = org.streamBody;
+		arrayBody = org.arrayBody;
+		httpVer = org.httpVer;
+		statusCode = org.statusCode;
+		reasonPhrase = org.reasonPhrase;
+	}
+	
 	public void addHeader(String headerName, String headerValue) {
 		headerNames.add(headerName);
 		headerValues.add(headerValue);

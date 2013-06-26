@@ -11,7 +11,7 @@ import java.net.SocketAddress;
 import com.elevenquest.sol.upnp.common.Logger;
 
 
-public class HttpUdpReceiver extends HttpRequestReceiver {
+public class HttpUdpReceiver extends HttpReceiver {
 	NetworkInterface intf;
 	int port;
 	InetAddress listenAddr = null;
@@ -44,8 +44,8 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 		}
 	}
 	
-	public HttpRequest listen() throws Exception {
-		HttpRequest request = null;
+	public HttpBaseStructure listen() throws Exception {
+		HttpBaseStructure requestOrResponse = null;
 		if ( serverSocket == null ) {
 			initSocket();
 		}
@@ -53,8 +53,8 @@ public class HttpUdpReceiver extends HttpRequestReceiver {
 		serverSocket.receive(packet);
 		Logger.println(Logger.DEBUG, "accept one packet.:" + Thread.currentThread() );
 		HttpParser parser = new HttpParser(packet.getData());
-		request = parser.parseHTTPRequest();
-		return request;
+		requestOrResponse = parser.parse();
+		return requestOrResponse;
 	}
 	
 	public void close() {

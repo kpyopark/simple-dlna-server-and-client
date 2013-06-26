@@ -1,8 +1,5 @@
 package com.elevenquest.sol.upnp.network;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -10,14 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.elevenquest.sol.upnp.common.Logger;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
-import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.HttpHeaderName;
-import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
-import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
-import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
-import com.elevenquest.sol.upnp.network.HttpRequestSender;
-import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
-import com.elevenquest.sol.upnp.network.HttpUdpSender;
 
 public class HttpSimpleServer {
 
@@ -26,7 +15,7 @@ public class HttpSimpleServer {
 	static int KEEP_ALIVE_TIME = 5;	// 5 sec.
 	static TimeUnit BASE_TIME_UNIT = TimeUnit.SECONDS;  
 
-	HttpRequestReceiver receiver = null;
+	HttpReceiver receiver = null;
 	BlockingQueue<Runnable> queue = null;
 	ThreadPoolExecutor threadPool = null;
 	
@@ -37,7 +26,7 @@ public class HttpSimpleServer {
 		threadPool = new ThreadPoolExecutor(CORE_INI_THREAD, CORE_MAX_THREAD, KEEP_ALIVE_TIME, BASE_TIME_UNIT, queue);
 	}
 	
-	public void setReceiver(HttpRequestReceiver receiver) {
+	public void setReceiver(HttpReceiver receiver) {
 		this.receiver = receiver;
 	}
 	
@@ -54,7 +43,7 @@ public class HttpSimpleServer {
 				receiver.initSocket();
 				while( !needStop ) {
 					try {
-						final HttpRequest request = receiver.listen();
+						final HttpBaseStructure request = receiver.listen();
 						new Thread(new Runnable() {
 							public void run() {
 								receiver.process(request);

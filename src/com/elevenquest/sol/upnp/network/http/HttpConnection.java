@@ -161,7 +161,9 @@ public class HttpConnection {
 			
 			is = this.clientSoc.getInputStream();
 			HttpParser parser = new HttpParser(is);
-			this.response = parser.parseHTTPResponse();
+			parser.parse();
+			if ( parser.isHTTPResponse() )
+				this.response = parser.getHTTPResponse();
 		} finally {
 			if ( bos != null ) try { bos.close(); } catch ( Exception e ) { e.printStackTrace(); }
 			if ( is != null ) try { is.close(); } catch ( Exception e ) { e.printStackTrace(); }

@@ -18,6 +18,7 @@ public class HttpHeaderName {
 	public final static String ID_UPNP_HTTP_HEADER_MAN = "MAN";
 	public final static String ID_UPNP_HTTP_HEADER_MX = "MX";
 	public final static String ID_UPNP_HTTP_HEADER_ST = "ST";
+	public final static String ID_UPNP_HTTP_HEADER_EXT = "EXT";
 	public final static String ID_UPNP_HTTP_HEADER_CONTENTLENGTH = "CONTENT-LENGTH";
 	public final static String ID_UPNP_HTTP_HEADER_TRANSFERENCODING = "TRANSFER-ENCODING";
 	public final static String ID_UPNP_HTTP_HEADER_CONTENTTYPE = "CONTENT-TYPE";

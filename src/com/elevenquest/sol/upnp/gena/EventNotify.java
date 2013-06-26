@@ -35,7 +35,10 @@ public class EventNotify extends HttpRequest {
 	}
 
 	public void setPropertyNameAndValue(String propertyName, String propertyValue) {
-		this.propertyNameAndValue.put(propertyName, propertyValue);
+		if ( propertyValue == null )
+			this.propertyNameAndValue.put(propertyName, "");
+		else
+			this.propertyNameAndValue.put(propertyName, propertyValue);
 	}
 
 	public String getPropertyValue(String propertyName) {

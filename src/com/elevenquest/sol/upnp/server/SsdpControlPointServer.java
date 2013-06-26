@@ -14,8 +14,10 @@ import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.network.HttpHeaderName;
+import com.elevenquest.sol.upnp.network.HttpReceiver;
 import com.elevenquest.sol.upnp.network.HttpSimpleServer;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
+import com.elevenquest.sol.upnp.network.IHttpReceiveHandler;
 import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
 import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
@@ -47,10 +49,10 @@ public class SsdpControlPointServer {
 		for ( InetAddress bindIp : ips ) {
 			try {
 				// 1. Next, create ssdp message receiver & handler instance.
-				HttpRequestReceiver receiver = new HttpUdpReceiver(ipAndNic.get(bindIp), UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS,
+				HttpReceiver receiver = new HttpUdpReceiver(ipAndNic.get(bindIp), UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS,
 						bindIp,
 						UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
-				IHttpRequestHandler handler = new SSDPReceiveHandler();
+				IHttpReceiveHandler handler = new SSDPReceiveHandler();
 				receiver.setReceiveHandler(handler);
 				// 2. Create Common server
 				HttpSimpleServer receiveServer = new HttpSimpleServer();

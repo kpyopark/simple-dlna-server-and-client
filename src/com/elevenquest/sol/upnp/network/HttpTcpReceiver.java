@@ -1,13 +1,8 @@
 package com.elevenquest.sol.upnp.network;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
-import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 
 import com.elevenquest.sol.upnp.common.Logger;
 
@@ -35,7 +30,7 @@ public class HttpTcpReceiver extends HttpRequestReceiver {
 	}
 	
 	public HttpRequest listen() throws Exception {
-		HttpParser reader = null;
+		HttpParser parser = null;
 		HttpRequest request = null;
 		Socket clientSoc = null;
 		try {
@@ -43,8 +38,11 @@ public class HttpTcpReceiver extends HttpRequestReceiver {
 				initSocket();
 			}
 			clientSoc = serverSoc.accept();
-			reader = new HttpParser(clientSoc.getInputStream());
-			request = reader.parseHTTPRequest();
+			parser = new HttpParser(clientSoc.getInputStream());
+			parser.parse();
+			if ( parser.isHTTPRequest() ) {
+				request = parser.getHTTPRequest();
+			}
 		} finally {
 			if ( clientSoc != null) try { clientSoc.close(); } catch( Exception e1 ) {
 				e1.printStackTrace();

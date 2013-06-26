@@ -21,6 +21,9 @@ public class HttpParser {
 	
 	InputStream inputStream = null;
 	int length = 0;
+	HttpBaseStructure baseInfo = null;
+	HttpRequest request = null;
+	HttpResponse response = null;
 	
 	public HttpParser(InputStream is) {
 		this.inputStream = is;
@@ -93,13 +96,84 @@ public class HttpParser {
 		if ( inputStream != null ) try { inputStream.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
 	}
 	
-	class HttpBaseStructure {
-		String startLine = null;
-		ArrayList<String> headerNames = new ArrayList<String>();
-		ArrayList<String> headerValues = new ArrayList<String>();
-		byte[] body = null;
+	public HttpBaseStructure parse() throws IOException {
+		baseInfo = parseHttpLines();
+		String startLine = baseInfo.startLine;
+		String firstToken, secondToken, thirdToken;
+		int startPosition = 0, lastPosition = 0, totalLength = startLine.length();
+		lastPosition = startLine.indexOf(' ', startPosition);
+		if ( lastPosition == -1 ) {
+			Logger.println(Logger.WARNING, "[HTTP Parser] This is not http start line.[" + baseInfo.startLine + "]");
+			this.close();
+			return baseInfo;
+		}
+		firstToken = startLine.substring(startPosition, (lastPosition - startPosition));
+		startPosition = lastPosition + 1;
+		if ( startPosition >= totalLength ) {
+			Logger.println(Logger.WARNING, "[HTTP Parser] This is not http start line.[" + baseInfo.startLine + "]");
+			this.close();
+			return baseInfo;
+		}
+		lastPosition = startLine.indexOf(' ',startPosition);
+		if ( lastPosition == -1 ) {
+			Logger.println(Logger.WARNING, "[HTTP Parser] This is not http start line.[" + baseInfo.startLine + "]");
+			this.close();
+			return baseInfo;
+		}
+		secondToken = startLine.substring(startPosition, lastPosition);
+		startPosition = lastPosition + 1;
+		if ( startPosition >= totalLength ) {
+			Logger.println(Logger.WARNING, "[HTTP Parser] This is not http start line.[" + baseInfo.startLine + "]");
+			this.close();
+			return baseInfo;
+		}
+		thirdToken = startLine.substring(startPosition);
+		
+		if ( firstToken.equalsIgnoreCase("HTTP/1.0") || firstToken.equalsIgnoreCase("HTTP/1.1") ) {
+			// It is supposed to be request data.
+			response = new HttpResponse();
+			request = null;
+			response.headerNames = baseInfo.headerNames;
+			response.headerValues = baseInfo.headerValues;
+			response.setHttpVer(firstToken);
+			response.setStatusCode(secondToken);
+			response.setReasonPhrase(thirdToken);
+			response.setBodyArray(baseInfo.body);
+			baseInfo.response = response;
+			baseInfo.request = null;
+		} else {
+			// It is supposed to be request data.
+			request = new HttpRequest();
+			response = null;
+			request.headerNames = baseInfo.headerNames;
+			request.headerValues = baseInfo.headerValues;
+			request.setCommand(firstToken);
+			request.setUrlPath(secondToken);
+			request.setHttpVer(thirdToken);
+			request.setBodyArray(baseInfo.body);
+			baseInfo.request = request;
+			baseInfo.response = null;
+		}
+		this.close();
+		return baseInfo;
 	}
 	
+	public boolean isHTTPRequest() {
+		return ( request != null ) ? true : false;
+	}
+
+	public HttpRequest getHTTPRequest() throws Exception {
+		return request;
+	}
+	
+	public boolean isHTTPResponse() {
+		return ( response != null ) ? true : false;
+	}
+
+	public HttpResponse getHTTPResponse() throws IOException {
+		return response;
+	}
+
 	protected HttpBaseStructure parseHttpLines() throws IOException {
 		HttpBaseStructure baseStruct = new HttpBaseStructure();
 		String aLine = "";
@@ -155,72 +229,5 @@ public class HttpParser {
 		}
 		return baseStruct;
 	}
-
-	public HttpRequest parseHTTPRequest() throws Exception {
-		
-		HttpRequest request = new HttpRequest();
-		HttpBaseStructure baseInfo = parseHttpLines();
-		request.headerNames = baseInfo.headerNames;
-		request.headerValues = baseInfo.headerValues;
-		StringTokenizer st = new StringTokenizer(baseInfo.startLine, " ");
-		boolean isValidRequest = true;
-		if ( isValidRequest && st.hasMoreTokens() )
-			request.setCommand(st.nextToken());
-		else {
-			isValidRequest = false;
-			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
-		}
-		if ( isValidRequest && st.hasMoreTokens() )
-			request.setUrlPath(st.nextToken());
-		else {
-			isValidRequest = false;
-			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
-		}
-		if ( isValidRequest && st.hasMoreTokens() )
-			request.setHttpVer(st.nextToken());
-		else {
-			isValidRequest = false;
-			Logger.println(Logger.ERROR, "In http request, there is no url path. command is " + request.getCommand() + "." );
-		}
-		request.setBodyArray(baseInfo.body);
-		return request;
-	}
-
-	public HttpResponse parseHTTPResponse() throws IOException {
-		
-		HttpResponse response = new HttpResponse();
-		HttpBaseStructure baseInfo = parseHttpLines();
-		response.headerNames = baseInfo.headerNames;
-		response.headerValues = baseInfo.headerValues;
-		StringTokenizer st = new StringTokenizer(baseInfo.startLine, " ");
-		boolean isValidResponse = true;
-		if ( isValidResponse && st.hasMoreTokens() )
-			response.setHttpVer(st.nextToken());
-		else {
-			isValidResponse = false;
-			Logger.println(Logger.ERROR, "In http response, there is no http version. status line is " + baseInfo.startLine + "." );
-		}
-		if ( isValidResponse && st.hasMoreTokens() ) {
-			String strStatusCode = st.nextToken();
-			try {
-				int statusCode = Integer.parseInt(strStatusCode);
-				response.setStatusCode(strStatusCode);
-			} catch (NumberFormatException nfe) {
-				isValidResponse = false;
-				Logger.println(Logger.ERROR, "In http response, there is invalid status code. status code is "+ strStatusCode + ".");
-			}
-		}
-		else {
-			isValidResponse = false;
-			Logger.println(Logger.ERROR, "In http response, there is no status code. status line is " + baseInfo.startLine + "." );
-		}
-		if ( isValidResponse && st.hasMoreTokens() )
-			response.setReasonPhrase(st.nextToken());
-		else {
-			isValidResponse = false;
-			Logger.println(Logger.ERROR, "In http response, there is status reason. status line is " + baseInfo.startLine + "." );
-		}
-		this.close();
-		return response;
-	}
+	
 }
