@@ -176,12 +176,12 @@ public class ContentDirectoryService extends UPnPService {
 		return getStateVariableSystemUpdateID();
 	}
 	
-	public ArrayList<ContentDirectoryItem> browse(String objectID, String browseFlag, String filter, int startingIndex, int requestCount, String sortCriteria) throws Exception {
+	public ArrayList<ContentDirectoryItem> browse(ContentDirectoryItem parent, String browseFlag, String filter, int startingIndex, int requestCount, String sortCriteria) throws Exception {
 		ArrayList<ContentDirectoryItem> resultRoot = null;
 		UPnPAction targetAction = this.getAction(ACTION_NAME_CDS_Browse);
 		if ( targetAction != null ) {
 			// 1. Parameter Settings.
-			targetAction.getInArgument(ACTION_ARG_NAME_ObjectID).setValue(objectID);
+			targetAction.getInArgument(ACTION_ARG_NAME_ObjectID).setValue(parent.getId());
 			targetAction.getInArgument(ACTION_ARG_NAME_BrowseFlag).setValue(browseFlag);
 			targetAction.getInArgument(ACTION_ARG_NAME_Filter).setValue(filter);
 			targetAction.getInArgument(ACTION_ARG_NAME_StartingIndex).setValue(startingIndex+"");
@@ -201,7 +201,7 @@ public class ContentDirectoryService extends UPnPService {
 			// TODO : UpdateID variable should be used. when ? idon't know.
 			String updateID = targetAction.getOutArgument(ACTION_ARG_NAME_UpdateID).getValue();
 			// 3. parse result XML into ContentDirectoryItems.
-			resultRoot = parseDIDLXML(result);
+			resultRoot = parseDIDLXML(parent, result);
 		} else {
 			Logger.println(Logger.WARNING, "There is no browse action in this device.");
 		}
@@ -279,7 +279,7 @@ public class ContentDirectoryService extends UPnPService {
 		teh = new TolerableErrorHandler();
 	}
 	
-	static private ArrayList<ContentDirectoryItem> parseDIDLXML(String didlXML) throws Exception {
+	static private ArrayList<ContentDirectoryItem> parseDIDLXML(ContentDirectoryItem parent, String didlXML) throws Exception {
 		ArrayList<ContentDirectoryItem> resultRoot = new ArrayList<ContentDirectoryItem>();
 		/* resul xml is such like this.
 			
@@ -360,6 +360,7 @@ public class ContentDirectoryService extends UPnPService {
 								}
 							}
 						}
+						aContainer.setParent(parent);
 						resultRoot.add(aContainer);
 					} else if ( item.getNodeName().equals("item") ) {
 						// Make a item node.
@@ -390,6 +391,7 @@ public class ContentDirectoryService extends UPnPService {
 								oneItem.setUpnpCreateClass(childElement.getFirstChild().getNodeValue());
 							}
 						}
+						oneItem.setParent(parent);
 						resultRoot.add(oneItem);
 					}
 				}
@@ -482,7 +484,9 @@ public class ContentDirectoryService extends UPnPService {
 
 
 		try {
-			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(sampleResultXML.toString());
+			ContentDirectoryItem parent = new ContentDirectoryItem();
+			parent.setId("0");
+			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(parent, sampleResultXML.toString());
 			for ( int inx = 0; inx < itemList.size() ; inx++ ) {
 				Logger.println(Logger.DEBUG, itemList.get(inx).toString());
 			}

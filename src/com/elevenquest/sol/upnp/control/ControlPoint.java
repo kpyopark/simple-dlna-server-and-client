@@ -72,7 +72,7 @@ public class ControlPoint {
 		}
 		System.out.println(padding + parent);
 		if ( parent.getType() == ContentDirectoryItem.CDS_TYPE_CONTAINER ) {
-			ArrayList<ContentDirectoryItem> items = cds.browse(parent.getId() , "BrowseDirectChildren", "*", 0, 0, "");
+			ArrayList<ContentDirectoryItem> items = cds.browse(parent , "BrowseDirectChildren", "*", 0, 0, "");
 			for ( ContentDirectoryItem child : items ) {
 				testBrowseRecursively(cds, child, depth+1);
 			}
@@ -91,8 +91,10 @@ public class ControlPoint {
 					//System.out.println( service );
 				if ( ( service = remoteDevice.getUPnPService(UPnPService.UPNP_SERVICE_ID_CDS) ) != null ) {
 					ContentDirectoryService cds = (ContentDirectoryService)service;
+					ContentDirectoryItem rootItem = new ContentDirectoryItem();
+					rootItem.setId("0");
 					try {
-						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 0, 0, "");
+						ArrayList<ContentDirectoryItem> list = cds.browse(rootItem, "BrowseMetadata", "*", 0, 0, "");
 						for ( ContentDirectoryItem item : list ) {
 							testBrowseRecursively(cds,item,0);
 						}
@@ -166,7 +168,7 @@ public class ControlPoint {
 			}
 			System.out.println(padding + parent);
 			if ( parent.getType() == ContentDirectoryItem.CDS_TYPE_CONTAINER ) {
-				ArrayList<ContentDirectoryItem> items = cds.browse(parent.getId() , "BrowseDirectChildren", "*", 0, 0, "");
+				ArrayList<ContentDirectoryItem> items = cds.browse(parent , "BrowseDirectChildren", "*", 0, 0, "");
 				for ( ContentDirectoryItem child : items ) {
 					testBrowseRecursively(cds, child, depth+1);
 				}
@@ -180,7 +182,9 @@ public class ControlPoint {
 				if ( serviceUpdated.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_CDS) ) {
 					ContentDirectoryService cds = (ContentDirectoryService)serviceUpdated;
 					try {
-						ArrayList<ContentDirectoryItem> list = cds.browse("0", "BrowseMetadata", "*", 0, 0, "");
+						ContentDirectoryItem rootItem = new ContentDirectoryItem();
+						rootItem.setId("0");
+						ArrayList<ContentDirectoryItem> list = cds.browse(rootItem, "BrowseMetadata", "*", 0, 0, "");
 						for ( ContentDirectoryItem item : list ) {
 							testBrowseRecursively(cds,item,0);
 						}

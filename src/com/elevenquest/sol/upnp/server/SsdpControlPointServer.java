@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 import com.elevenquest.sol.upnp.common.UPnPUtils;
@@ -13,15 +12,12 @@ import com.elevenquest.sol.upnp.discovery.SSDPReceiveHandler;
 import com.elevenquest.sol.upnp.discovery.SSDPSearchSendHandler;
 import com.elevenquest.sol.upnp.exception.AbnormalException;
 import com.elevenquest.sol.upnp.model.UPnPDevice;
-import com.elevenquest.sol.upnp.network.HttpHeaderName;
 import com.elevenquest.sol.upnp.network.HttpReceiver;
+import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpSimpleServer;
+import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
 import com.elevenquest.sol.upnp.network.IHttpReceiveHandler;
-import com.elevenquest.sol.upnp.network.IHttpRequestHandler;
-import com.elevenquest.sol.upnp.network.HttpRequestReceiver;
-import com.elevenquest.sol.upnp.network.HttpRequestSender;
-import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 
 public class SsdpControlPointServer {
@@ -30,7 +26,11 @@ public class SsdpControlPointServer {
 	ArrayList<CommonServer> senderServerList = null;
 	ControlPoint cp = null;
 
-	public void SsdpControlPointServer(ControlPoint cp) {
+	public SsdpControlPointServer() {
+		
+	}
+	
+	public SsdpControlPointServer(ControlPoint cp) {
 		this.cp = cp;
 	}
 	

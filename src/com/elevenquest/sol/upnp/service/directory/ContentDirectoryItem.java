@@ -25,7 +25,15 @@ public class ContentDirectoryItem {
 
 	static public int CDS_TYPE_CONTAINER = 1;		// Mapping to <container> element in DIDL-lite.
 	static public int CDS_TYPE_ITEM = 2;			// Mapping to <item> element in DIDL-Lite.
+	
+	ContentDirectoryItem parent = null;
 
+	public ContentDirectoryItem getParent() {
+		return parent;
+	}
+	public void setParent(ContentDirectoryItem parent) {
+		this.parent = parent;
+	}
 	public int getType() {
 		return type;
 	}

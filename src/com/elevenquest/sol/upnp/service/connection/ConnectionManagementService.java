@@ -50,19 +50,19 @@ public class ConnectionManagementService extends UPnPService {
 	static final String ACTION_NAME_CMS_GetCurrentConnectionIDs = "GetCurrentConnectionIDs";
 	static final String ACTION_NAME_CMS_GetCurrentConnectionInfo = "GetCurrentConnectionInfo";
 
-	private ArrayList<String> getStateVariableSourceProtocolInfo() {
+	public ArrayList<String> getStateVariableSourceProtocolInfo() {
 		UPnPStateVariable value = this.getStateVariable(SV_NAME_CMS_SourceProtocolInfo);
 		ArrayList<String> returnValue = ( value == null ) ? new ArrayList<String>() : UPnPStateVariable.getCSVStateVariableStrings((String)value.getValue());
 		return returnValue;
 	}
 	
-	private ArrayList<String> getStateVariableSinkProtocolInfo() {
+	public ArrayList<String> getStateVariableSinkProtocolInfo() {
 		UPnPStateVariable value = this.getStateVariable(SV_NAME_CMS_SinkProtocolInfo);
 		ArrayList<String> returnValue = ( value == null ) ? new ArrayList<String>() : UPnPStateVariable.getCSVStateVariableStrings((String)value.getValue());
 		return returnValue;
 	}
 
-	private ArrayList<Integer> getStateVariableCurrentConnectionIDs() {
+	public ArrayList<Integer> getStateVariableCurrentConnectionIDs() {
 		UPnPStateVariable value = this.getStateVariable(SV_NAME_CMS_CurrentConnectionIDs);
 		ArrayList<Integer> returnValue = ( value == null ) ? new ArrayList<Integer>() : UPnPStateVariable.getCSVStateVariableIntegers((String)value.getValue());
 		return returnValue;
