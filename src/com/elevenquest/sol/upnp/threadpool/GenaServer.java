@@ -1,4 +1,4 @@
-package com.elevenquest.sol.upnp.server;
+package com.elevenquest.sol.upnp.threadpool;
 
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -34,8 +34,8 @@ import com.elevenquest.sol.upnp.xml.NotifyXMLParser;
 
 public class GenaServer {
 	
-	ArrayList<CommonServer> receiveServerList = null;
-	ArrayList<CommonServer> senderServerList = null;
+	ArrayList<CommonThreadPool> receiveServerList = null;
+	ArrayList<CommonThreadPool> senderServerList = null;
 	
 	public void start() {
 		startReceiveServer();
@@ -315,7 +315,7 @@ public class GenaServer {
 	public void startReceiveServer() {
 		if ( receiveServerList != null ) 
 			stopReceiveServer();
-		receiveServerList = new ArrayList<CommonServer>();
+		receiveServerList = new ArrayList<CommonThreadPool>();
 		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
 		for ( NetworkInterface intf : interfaces ) {
 			try {
@@ -324,7 +324,7 @@ public class GenaServer {
 				IHttpRequestHandler handler = new CommonHttpRequestHandler();
 				receiver.setReceiveHandler(handler);
 				// 2. Create Common server
-				CommonServer receiveServer = new CommonServer();
+				CommonThreadPool receiveServer = new CommonThreadPool();
 				// 3. set receiver into server.
 				receiveServer.setReceiver(receiver);
 				// 4. start server.
@@ -342,7 +342,7 @@ public class GenaServer {
 	public void startSendServer() {
 		if ( senderServerList != null )
 			stopSendServer();
-		senderServerList = new ArrayList<CommonServer>();
+		senderServerList = new ArrayList<CommonThreadPool>();
 		
 	}
 	
@@ -353,13 +353,13 @@ public class GenaServer {
 	
 	public void stopReceiveServer() {
 		if ( receiveServerList != null )
-			for ( CommonServer server : receiveServerList ) server.stopServer();
+			for ( CommonThreadPool server : receiveServerList ) server.stopServer();
 		receiveServerList = null;
 	}
 	
 	public void stopSendServer() {
 		if ( senderServerList != null )
-			for ( CommonServer server : senderServerList ) server.stopServer();
+			for ( CommonThreadPool server : senderServerList ) server.stopServer();
 		senderServerList = null;
 	}
 	

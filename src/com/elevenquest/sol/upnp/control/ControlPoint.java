@@ -26,12 +26,12 @@ import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpTcpSender;
 import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
-import com.elevenquest.sol.upnp.server.CommonServer;
-import com.elevenquest.sol.upnp.server.GenaServer;
-import com.elevenquest.sol.upnp.server.SendEvent;
-import com.elevenquest.sol.upnp.server.SsdpControlPointServer;
 import com.elevenquest.sol.upnp.service.directory.ContentDirectoryItem;
 import com.elevenquest.sol.upnp.service.directory.ContentDirectoryService;
+import com.elevenquest.sol.upnp.threadpool.CommonThreadPool;
+import com.elevenquest.sol.upnp.threadpool.GenaServer;
+import com.elevenquest.sol.upnp.threadpool.SendEvent;
+import com.elevenquest.sol.upnp.threadpool.SsdpControlPointServer;
 
 /**
  * 
@@ -122,14 +122,14 @@ public class ControlPoint {
 			
 			device.setMulticastPort(UPnPDevice.DEFAULT_UPNP_MULTICAST_PORT);
 			device.setMultiCastAddress(UPnPDevice.DEFAULT_UPNP_MULTICAST_ADDRESS);
-			CommonServer sendServer = null;
+			CommonThreadPool sendServer = null;
 			// Sample Code for sender.
 			{
 				HttpRequestSender sender = new HttpUdpSender(intf, device.getMultiCastAddress(), device.getMulticastPort());
 				IHttpRequestSuplier handler = new SSDPSearchSendHandler(this);
 				sender.setSenderHandler(handler);
 				
-				sendServer = new CommonServer();
+				sendServer = new CommonThreadPool();
 				
 				sendServer.setSender(sender, new SendEvent(SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED, 500));
 				

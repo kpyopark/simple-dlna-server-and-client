@@ -1,4 +1,4 @@
-package com.elevenquest.sol.upnp.server;
+package com.elevenquest.sol.upnp.threadpool;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -23,7 +23,7 @@ import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 public class SsdpControlPointServer {
 	
 	ArrayList<HttpSimpleServer> receiveServerList = null;
-	ArrayList<CommonServer> senderServerList = null;
+	ArrayList<CommonThreadPool> senderServerList = null;
 	ControlPoint cp = null;
 
 	public SsdpControlPointServer() {
@@ -73,7 +73,7 @@ public class SsdpControlPointServer {
 	public void startSendServer() {
 		if ( senderServerList != null )
 			stopSendServer();
-		senderServerList = new ArrayList<CommonServer>();
+		senderServerList = new ArrayList<CommonThreadPool>();
 		ArrayList<NetworkInterface> interfaces = UPnPUtils.getAvailiableNetworkInterfaces();
 		for ( NetworkInterface intf : interfaces ) {
 			try {
@@ -83,7 +83,7 @@ public class SsdpControlPointServer {
 				IHttpRequestSuplier suplier = new SSDPSearchSendHandler(cp);
 				sender.setSenderHandler(suplier);
 				// 2. Create Common server
-				CommonServer sendServer = new CommonServer();
+				CommonThreadPool sendServer = new CommonThreadPool();
 				// 3. set sender into server.
 				sendServer.setSender(sender, new SendEvent(3000, SendEvent.SEND_EVENT_TYPE_TIME_UNLIMINITED));
 				// 4. start server.
@@ -112,7 +112,7 @@ public class SsdpControlPointServer {
 	
 	public void stopSendServer() {
 		if ( senderServerList != null )
-			for ( CommonServer server : senderServerList ) server.stopServer();
+			for ( CommonThreadPool server : senderServerList ) server.stopServer();
 		senderServerList = null;
 	}
 	

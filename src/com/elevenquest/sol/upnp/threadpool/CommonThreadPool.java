@@ -1,4 +1,4 @@
-package com.elevenquest.sol.upnp.server;
+package com.elevenquest.sol.upnp.threadpool;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -19,7 +19,7 @@ import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpUdpReceiver;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
 
-public class CommonServer {
+public class CommonThreadPool {
 
 	static int CORE_INI_THREAD = 5;
 	static int CORE_MAX_THREAD = 8;
@@ -35,7 +35,7 @@ public class CommonServer {
 	
 	boolean needStop = false;
 	
-	public CommonServer() {
+	public CommonThreadPool() {
 		queue = new ArrayBlockingQueue<Runnable>(CORE_MAX_THREAD);
 		threadPool = new ThreadPoolExecutor(CORE_INI_THREAD, CORE_MAX_THREAD, KEEP_ALIVE_TIME, BASE_TIME_UNIT, queue);
 	}

@@ -23,8 +23,8 @@ import com.elevenquest.sol.upnp.network.HttpHeaderName;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpTcpSender;
-import com.elevenquest.sol.upnp.server.CommonServer;
-import com.elevenquest.sol.upnp.server.SendEvent;
+import com.elevenquest.sol.upnp.threadpool.CommonThreadPool;
+import com.elevenquest.sol.upnp.threadpool.SendEvent;
 
 public class UPnPDeviceManager {
 	

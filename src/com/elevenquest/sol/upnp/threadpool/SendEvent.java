@@ -1,4 +1,4 @@
-package com.elevenquest.sol.upnp.server;
+package com.elevenquest.sol.upnp.threadpool;
 
 public class SendEvent {
 	
