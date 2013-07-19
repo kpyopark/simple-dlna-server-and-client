@@ -29,6 +29,7 @@ public class ContentDirectoryItem {
 	static public int CDS_TYPE_ITEM = 2;			// Mapping to <item> element in DIDL-Lite.
 	
 	ContentDirectoryItem parent = null;
+	ContentDirectoryService service = null;
 
 	public ContentDirectoryItem getParent() {
 		return parent;
@@ -132,6 +133,12 @@ public class ContentDirectoryItem {
 	}
 	public void setDesc(String desc) {
 		this.desc = desc;
+	}
+	public void setContentDirectoryService(ContentDirectoryService service) {
+		this.service = service;
+	}
+	public ContentDirectoryService getContentDirectoryService() {
+		return this.service;
 	}
 	
 	public String toString() {

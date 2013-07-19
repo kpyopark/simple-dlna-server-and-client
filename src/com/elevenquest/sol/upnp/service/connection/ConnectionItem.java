@@ -61,7 +61,7 @@ public class ConnectionItem {
 	}
 	public void setStatus(String status) {
 		this.status = status;
-	}	
+	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

@@ -279,7 +279,7 @@ public class ContentDirectoryService extends UPnPService {
 		teh = new TolerableErrorHandler();
 	}
 	
-	static private ArrayList<ContentDirectoryItem> parseDIDLXML(ContentDirectoryItem parent, String didlXML) throws Exception {
+	private ArrayList<ContentDirectoryItem> parseDIDLXML(ContentDirectoryItem parent, String didlXML) throws Exception {
 		ArrayList<ContentDirectoryItem> resultRoot = new ArrayList<ContentDirectoryItem>();
 		/* resul xml is such like this.
 			
@@ -330,6 +330,7 @@ public class ContentDirectoryService extends UPnPService {
 					if ( item.getNodeName().equals("container") ) {
 						// Make a container node.
 						ContentDirectoryItem aContainer = new ContentDirectoryItem();
+						aContainer.setContentDirectoryService(this);
 						// Setting element attributes into container.
 						aContainer.setType(ContentDirectoryItem.CDS_TYPE_CONTAINER);
 						aContainer.setId(item.getAttribute("id"));
@@ -365,6 +366,7 @@ public class ContentDirectoryService extends UPnPService {
 					} else if ( item.getNodeName().equals("item") ) {
 						// Make a item node.
 						ContentDirectoryItem oneItem = new ContentDirectoryItem();
+						oneItem.setContentDirectoryService(this);
 						oneItem.setType(ContentDirectoryItem.CDS_TYPE_ITEM);
 						oneItem.setId(item.getAttribute("id"));
 						oneItem.setParentId(item.getAttribute("parentID"));
@@ -485,8 +487,9 @@ public class ContentDirectoryService extends UPnPService {
 
 		try {
 			ContentDirectoryItem parent = new ContentDirectoryItem();
+			ContentDirectoryService service = new ContentDirectoryService(null);
 			parent.setId("0");
-			ArrayList<ContentDirectoryItem> itemList = parseDIDLXML(parent, sampleResultXML.toString());
+			ArrayList<ContentDirectoryItem> itemList = service.parseDIDLXML(parent, sampleResultXML.toString());
 			for ( int inx = 0; inx < itemList.size() ; inx++ ) {
 				Logger.println(Logger.DEBUG, itemList.get(inx).toString());
 			}
