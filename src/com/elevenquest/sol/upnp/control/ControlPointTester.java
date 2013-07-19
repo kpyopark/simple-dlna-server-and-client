@@ -1,5 +1,6 @@
 package com.elevenquest.sol.upnp.control;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -14,6 +15,10 @@ import com.elevenquest.sol.upnp.model.UPnPDeviceManager;
 import com.elevenquest.sol.upnp.model.UPnPEventManager;
 import com.elevenquest.sol.upnp.model.UPnPService;
 import com.elevenquest.sol.upnp.model.UPnPStateVariable;
+import com.elevenquest.sol.upnp.service.connection.ConnectionManagementService;
+import com.elevenquest.sol.upnp.service.directory.ContentDirectoryItem;
+import com.elevenquest.sol.upnp.service.directory.ContentDirectoryService;
+import com.elevenquest.sol.upnp.service.rederingcontrol.RenderingControlService;
 
 public class ControlPointTester {
 	public static void printUsage() {
@@ -30,6 +35,11 @@ public class ControlPointTester {
 		System.out.println("10. list up services");
 		System.out.println("11. execute a service");
 		System.out.println("12. activate GENA");
+		System.out.println("13. choose renderer service");
+		System.out.println("14. choose content directory service");
+		System.out.println("15. list up items");
+		System.out.println("16. play an item");
+		System.out.println("17. retrieve protocols from selected device.");
 	}
 	
 	/**
@@ -51,12 +61,16 @@ public class ControlPointTester {
 		try {
 			while( !isExit ) {
 				Scanner scanner = new Scanner(System.in);
+				String choiceString = null;
 				int choiceNumber = 0;
 				try {
-					choiceNumber = Integer.parseInt(scanner.nextLine());
+					
+					choiceString = scanner.nextLine();
+					choiceNumber = Integer.parseInt(choiceString);
 				} catch ( NumberFormatException nfe ) {
 					//nfe.printStackTrace();
-					continue;
+					if ( status != 16 )
+						continue;
 				}
 				switch (status) {
 				case 4 : // choose a device.
@@ -115,6 +129,54 @@ public class ControlPointTester {
 						UPnPEventManager.getUPnPEventManager().addServiceToBeRegistered(selServ);
 						UPnPEventManager.getUPnPEventManager().startGenaThread();
 						System.out.println("Activate GENA for the service[" + selServ.getServiceId() + "]");
+					}
+					status = 0;
+					break;
+				case 13 :
+					if ( selDev == null ) {
+						System.out.println("There is no selected device.");
+					} else {
+						if ( 0 <= choiceNumber && choiceNumber < selDev.getSerivces().size() ) {
+							UPnPService selectedOne = selDev.getSerivces().get(choiceNumber);
+							if ( selectedOne instanceof RenderingControlService ) {
+								cp.rcs = selectedOne;
+								System.out.println("select device is " + selDev + ". selected service is " + selectedOne );
+							} else {
+								System.out.println("selected device is " + selDev + ". selected service is not rendering service control. ignore your selection." );
+							}
+						} else {
+							System.out.println("error the service list size is " + selDev.getSerivces().size() );
+						}
+					}
+					status = 0;
+					break;					
+				case 14 :
+					if ( selDev == null ) {
+						System.out.println("There is no selected device.");
+					} else {
+						if ( 0 <= choiceNumber && choiceNumber < selDev.getSerivces().size() ) {
+							UPnPService selectedOne = selDev.getSerivces().get(choiceNumber);
+							if ( selectedOne instanceof ContentDirectoryService ) {
+								cp.cds = selectedOne;
+								System.out.println("select device is " + selDev + ". selected service is " + selectedOne );
+							} else {
+								System.out.println("selected device is " + selDev + ". selected service is not content directory service control. ignore your selection." );
+							}
+						} else {
+							System.out.println("error the service list size is " + selDev.getSerivces().size() );
+						}
+					}
+					status = 0;
+					break;
+				case 16 :
+					ArrayList<ContentDirectoryItem> lastDisplayedItemList = cp.lastDisplayedItem;
+					System.out.println("Your choice is " + choiceString);
+					for ( ContentDirectoryItem item : lastDisplayedItemList ) {
+						if ( item.getId().equals(choiceString) )
+						{
+							cp.playContentItem(item);
+							break;
+						}
 					}
 					status = 0;
 					break;
@@ -205,6 +267,61 @@ public class ControlPointTester {
 						System.out.println("choose sevice.");
 						status = 12;
 						break;
+					case 13 :
+						System.out.println("Choose a renderer service.");
+						status = 13;
+						break;
+					case 14 :
+						System.out.println("Choose a content directory service.");
+						status = 14;
+						break;
+					case 15 :
+						if ( cp.cds == null ) {
+							System.out.println("There is no selected device.");
+						} else {
+							System.out.println("--- content directory item ---");
+							try {
+								ContentDirectoryService cds = (ContentDirectoryService)cp.cds;
+								ContentDirectoryItem rootItem = new ContentDirectoryItem();
+								rootItem.setId("0");
+								ArrayList<ContentDirectoryItem> contentList = cds.browse(rootItem, "BrowseMetadata", "*", 0, 0, "");
+								for ( ContentDirectoryItem item : contentList ) {
+									cp.testBrowseRecursively(cds,item,0);
+								}
+							} catch ( Exception e1 ) {
+								e1.printStackTrace();
+							}
+						}
+						break;
+					case 16 :
+						if ( cp.cds == null || cp.rcs == null ) {
+							System.out.println("There is no selected rendering/content directory service.");
+						} else {
+							status = 16;
+						}
+						break;
+					case 17 :
+						if ( selDev == null ) {
+							System.out.println("There is no selected device.");
+						} else {
+							ConnectionManagementService cms = (ConnectionManagementService)selDev.getUPnPService(UPnPService.UPNP_SERVICE_ID_CMS);
+							if ( cms == null ) {
+								System.out.println("There is no connection management service.");
+							} else {
+								try {
+									ArrayList<String> protocols = cms.getSinkProtocolInfo();
+									for ( String protocol : protocols ) {
+										System.out.println("Sink Protocol:" + protocol);
+									}
+									protocols = cms.getSourceProtocolInfo();
+									for ( String protocol : protocols ) {
+										System.out.println("Source Protocol:" + protocol);
+									}
+								} catch ( Exception e1 ) {
+									e1.printStackTrace();
+								}
+							}
+						}
 					default :
 						break;
 					}

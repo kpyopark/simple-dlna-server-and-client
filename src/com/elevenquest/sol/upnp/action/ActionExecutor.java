@@ -91,6 +91,7 @@ public class ActionExecutor {
 			} catch (ActionError actionError) {
 				throw new ProcessableException(actionError.getMessage(), actionError);
 			} catch (Throwable unhandledError) {
+				unhandledError.printStackTrace();
 				throw new Exception(unhandledError.getMessage());
 			}
 		    
@@ -187,17 +188,21 @@ public class ActionExecutor {
 				actionResponseNode = doc.getElementsByTagNameNS("*",action.getActionName() + "Response");
 				if ( actionResponseNode != null ) {
 					actionResponseElement = (Element)actionResponseNode.item(0);
+					Logger.println(Logger.DEBUG, "[Action Executor] actionResponseElement:" + actionResponseElement.getNodeName());
 					NodeList outArgs = actionResponseElement.getChildNodes();
 					if ( outArgs != null ) {
 						for(int inx = 0 ; inx < outArgs.getLength() ; inx++ ) {
 							Node node = outArgs.item(inx);
 							if ( node.getNodeType() == Node.ELEMENT_NODE ) {
 								String argName = node.getNodeName();
-								String argValue = UPnPUtils.unescapeXML(node.getFirstChild().getNodeValue());
+								String argValue = ( node.getFirstChild() != null ) ? node.getFirstChild().getNodeValue() : ""; //UPnPUtils.unescapeXML(node.getFirstChild().getNodeValue());
 								UPnPStateVariable outArg = action.getOutArgument(argName);
 								outArg.setValue(argValue);
+								Logger.println(Logger.DEBUG, "[Action Executor] Response property:[" + outArg.getArgumentName() + "] Response value:[" + argValue + "]");
 							}
 						}
+					} else {
+						Logger.println(Logger.WARNING,"[Action Executor] There is no response element.");
 					}
 				} else {
 					throw new Exception("No action response[" + action.getActionName() + "Response" + "]");

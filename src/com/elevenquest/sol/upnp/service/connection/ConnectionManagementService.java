@@ -11,6 +11,9 @@ import com.elevenquest.sol.upnp.service.directory.ContentDirectoryItem;
 
 public class ConnectionManagementService extends UPnPService {
 
+	public static final String NAMESPACE_UPNP_ELEMENT = "urn:schemas-upnp-org:metadata-1-0/upnp/";
+	public static final String NAMESPACE_DC_ELEMENT = "http://purl.org/dc/elements/1.1/";
+	
 	public ConnectionManagementService(UPnPDevice device) {
 		super(device);
 		// TODO Auto-generated constructor stub
@@ -80,6 +83,10 @@ public class ConnectionManagementService extends UPnPService {
 		ActionExecutor executor = new ActionExecutor(targetAction);
 		executor.execute();
 		return getStateVariableSinkProtocolInfo();
+	}
+	
+	public boolean hasPrepareForConnectionAction() {
+		return this.getAction(ACTION_NAME_CMS_PrepareForConnection) != null;
 	}
 
 	public ConnectionItem prepareForConnection(String remoteProtocolInfo, String connectionManager, int peerConnectionID, String direction) throws Exception {
@@ -152,6 +159,10 @@ public class ConnectionManagementService extends UPnPService {
 			System.out.println("There is no prepareForConnection action in this device.");
 		}
 		return item;
+	}
+	
+	public String getPeerConnectionManagerID() {
+		return "uuid:" + this.getDevice().getUuid() + "/" + this.getServiceId();
 	}
 
 }

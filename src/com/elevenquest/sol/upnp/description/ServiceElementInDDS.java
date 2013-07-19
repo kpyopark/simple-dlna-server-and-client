@@ -2,7 +2,10 @@ package com.elevenquest.sol.upnp.description;
 
 import com.elevenquest.sol.upnp.model.UPnPDevice;
 import com.elevenquest.sol.upnp.model.UPnPService;
+import com.elevenquest.sol.upnp.service.avtransport.AVTransportService;
+import com.elevenquest.sol.upnp.service.connection.ConnectionManagementService;
 import com.elevenquest.sol.upnp.service.directory.ContentDirectoryService;
+import com.elevenquest.sol.upnp.service.rederingcontrol.RenderingControlService;
 
 public class ServiceElementInDDS implements ICommonDescription {
 	
@@ -81,7 +84,11 @@ public class ServiceElementInDDS implements ICommonDescription {
 		if ( this.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_CDS) ) {
 			service = new ContentDirectoryService(device);
 		} else if ( this.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_CMS) ) {
-			service = new UPnPService(device);
+			service = new ConnectionManagementService(device);
+		} else if ( this.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_RCS) ) {
+			service = new RenderingControlService(device);
+		} else if ( this.getServiceId().equals(UPnPService.UPNP_SERVICE_ID_AVT) ) {
+			service = new AVTransportService(device);
 		} else {
 			service = new UPnPService(device);
 		}

@@ -51,7 +51,7 @@ public class AVTransportService extends UPnPService {
 	static final String SV_NAME_ATS_A_ARG_TYPE_InstanceID = "A_ARG_TYPE_InstanceID";	// ui4
 
 	// List of parameters used in each UPnPAction.
-	static final String ACTION_ARG_NAME_InstanceID = "Source";						// A_ARG_TYPE_InstanceID
+	static final String ACTION_ARG_NAME_InstanceID = "InstanceID";						// A_ARG_TYPE_InstanceID
 	static final String ACTION_ARG_NAME_CurrentURI = "CurrentURI";					// AVTransportURI
 	static final String ACTION_ARG_NAME_CurrentURIMetaData = "CurrentURIMetaData";	// AVTransportURIMetaData
 	static final String ACTION_ARG_NAME_NextURI = "NextURI";	// NextAVTransportURI

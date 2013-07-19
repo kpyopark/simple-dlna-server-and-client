@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class ConnectionItem {
 	int connectionID = -1;
-	int AVTransportID = -1;
+	int AVTransportID = 0;
 	int rcsID = -1;
 	String protocolInfo;
 	String peerConnectionManager;

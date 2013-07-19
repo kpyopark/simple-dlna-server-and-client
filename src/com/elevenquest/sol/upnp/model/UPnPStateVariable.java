@@ -53,6 +53,8 @@ public class UPnPStateVariable extends UPnPBase {
 	}
 	public void setValue(String value) {
 		this.value = value;
+		if ( relatedStateVariable != null )
+			relatedStateVariable.setValue(value);
 	}
 	public Object getDefaultValue() {
 		return defaultValue;

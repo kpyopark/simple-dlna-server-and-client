@@ -17,6 +17,8 @@ public class UPnPService extends UPnPBase {
 	
 	public static String UPNP_SERVICE_ID_CDS = "urn:upnp-org:serviceId:ContentDirectory";
 	public static String UPNP_SERVICE_ID_CMS = "urn:upnp-org:serviceId:ConnectionManager";
+	public static String UPNP_SERVICE_ID_RCS = "urn:upnp-org:serviceId:RenderingControl";
+	public static String UPNP_SERVICE_ID_AVT = "urn:upnp-org:serviceId:AVTransport";
 	
 	String serviceType;
 	String serviceId;

@@ -1,12 +1,18 @@
 package com.elevenquest.sol.upnp.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -37,13 +43,54 @@ public class UPnPDeviceManager {
 		return singletone;
 	}
 	
+	private void storeCurrentDeviceList() {
+		FileOutputStream fos = null;
+		ObjectOutputStream oos = null;
+		try {
+			fos = new FileOutputStream("sample.bin", false);
+			oos = new ObjectOutputStream(fos);
+			oos.writeObject(deviceList);
+			oos.writeObject(deviceStatus);
+		} catch ( Exception e ) {
+			e.printStackTrace();
+			System.out.println("Error occured during storing current device list to file.");
+		} finally {
+			if ( oos != null )
+				try { oos.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
+		}
+	}
+	
+	private void loadPreviousDeviceList() {
+		FileInputStream fis = null;
+		ObjectInputStream ois = null;
+		try {
+			fis = new FileInputStream("sample.bin");
+			ois = new ObjectInputStream(fis);
+			Object oldDeviceList = ois.readObject();
+			if ( oldDeviceList instanceof HashMap ) {
+				deviceList = (HashMap<String, UPnPDevice>)oldDeviceList;
+			}
+			Object oldDeviceStatus = ois.readObject();
+			if ( oldDeviceStatus instanceof HashMap ) {
+				deviceStatus = (HashMap<String, Integer>)oldDeviceStatus;
+			}
+		} catch ( Exception e ) {
+			System.out.println("It Failed to load previous device list.");
+		} finally {
+			if ( ois != null )
+				try { ois.close(); } catch ( Exception e1 ) { e1.printStackTrace(); }
+		}
+	}
+	
 	// private attributes;
 	HashMap<String, UPnPDevice> deviceList = null;
 	HashMap<String, Integer> deviceStatus = null;
 	ArrayList<IUPnPDeviceListChangeListener> listenerList = null;
 	
 	private UPnPDeviceManager() {
-		deviceList = new HashMap<String,UPnPDevice>();
+		loadPreviousDeviceList();
+		if ( deviceList == null )
+			deviceList = new HashMap<String,UPnPDevice>();
 		listenerList = new ArrayList<IUPnPDeviceListChangeListener>();
 	}
 	
@@ -57,8 +104,9 @@ public class UPnPDeviceManager {
 				listener.updateDeviceList(value, device);
 			}
 		}
+		//storeCurrentDeviceList();
 	}
-	
+
 	public void addDeviceListChangeListener(IUPnPDeviceListChangeListener listener) {
 		if ( !this.listenerList.contains(listener) )
 			this.listenerList.add(listener);

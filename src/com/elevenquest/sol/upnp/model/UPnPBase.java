@@ -1,5 +1,6 @@
 package com.elevenquest.sol.upnp.model;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -7,7 +8,12 @@ import java.util.Iterator;
 
 import com.elevenquest.sol.upnp.common.Logger;
 
-public class UPnPBase {
+public class UPnPBase implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2267187930848008320L;
 
 	public String toString() {
 		return toString(1);

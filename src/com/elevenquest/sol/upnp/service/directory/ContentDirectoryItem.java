@@ -22,6 +22,8 @@ public class ContentDirectoryItem {
 	String resValue;
 	String refId;	// it might be used only in item element.
 	String resSize;
+	
+	String desc = ""; //"NOT_IMPLEMENTED";
 
 	static public int CDS_TYPE_CONTAINER = 1;		// Mapping to <container> element in DIDL-lite.
 	static public int CDS_TYPE_ITEM = 2;			// Mapping to <item> element in DIDL-Lite.
@@ -125,6 +127,12 @@ public class ContentDirectoryItem {
 	public void setDate(String date) {
 		this.date = date;
 	}
+	public String getDesc() {
+		return desc;
+	}
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -141,6 +149,7 @@ public class ContentDirectoryItem {
 		sb.append(this.getUpnpClassName()).append(":");
 		sb.append(this.getUpnpCreateClass()).append(":");
 		sb.append(this.getUpnpSearchClass()).append(":");
+		sb.append(this.getDesc()).append(":");
 		sb.append(this.getClass()).append(":");
 		sb.append("END");
 		return sb.toString();
