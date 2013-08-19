@@ -300,7 +300,7 @@ public class ContentDirectoryService extends UPnPService {
 
 			parser = factory.newDocumentBuilder();
 			parser.setErrorHandler(teh);
-			Logger.println(Logger.DEBUG, "DIDLXML1:" + didlXML);
+			//Logger.println(Logger.DEBUG, "DIDLXML1:" + didlXML);
 			try {
 				doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
 			} catch ( Exception e ) {
@@ -308,18 +308,18 @@ public class ContentDirectoryService extends UPnPService {
 				// We replace '&' with '&amp;'
 				didlXML.replaceAll("&", "&amp;");
 				try {
-					Logger.println(Logger.DEBUG, "DIDLXML1`:" + didlXML);
+					//Logger.println(Logger.DEBUG, "DIDLXML1`:" + didlXML);
 					doc = parser.parse(new ByteArrayInputStream(didlXML.getBytes("utf-8")));
 				} catch ( SAXParseException saxe2 ) {
 					saxe2.printStackTrace();
 				}
 			}
-			Logger.println(Logger.DEBUG, "DIDLXML2:" + didlXML);
+			//Logger.println(Logger.DEBUG, "DIDLXML2:" + ( ( didlXML != null && didlXML.length() > 2000 ) ? didlXML.substring(0,2000) : didlXML ));
 			documentElement = doc.getDocumentElement()/* <DIDL-Lite> tag */;
-			Logger.println(Logger.DEBUG, "DIDLXML3:" + didlXML);
+			//Logger.println(Logger.DEBUG, "DIDLXML3:" + didlXML);
 			resultItemList = documentElement.getChildNodes();
 			//NodeList title = doc.getElementsByTagNameNS("urn:schemas-upnp-org:metadata-1-0/upnp/", "searchClass");
-			Logger.println(Logger.DEBUG, "DIDLXML4:" + didlXML);
+			//Logger.println(Logger.DEBUG, "DIDLXML4:" + didlXML);
 			NodeList title = doc.getElementsByTagNameNS("*", "searchClass");
 			Logger.println(Logger.DEBUG, "title count:" + title.getLength() + ":value:" + ( title.getLength() > 0 ? title.item(0).getNodeValue() : "empty" ) );
 			
