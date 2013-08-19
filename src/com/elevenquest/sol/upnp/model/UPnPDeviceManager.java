@@ -49,8 +49,10 @@ public class UPnPDeviceManager {
 		try {
 			fos = new FileOutputStream("sample.bin", false);
 			oos = new ObjectOutputStream(fos);
-			oos.writeObject(deviceList);
-			oos.writeObject(deviceStatus);
+			for (String key : deviceList.keySet() )
+			{
+				oos.writeObject(deviceList.get(key).getLocation());
+			}
 		} catch ( Exception e ) {
 			e.printStackTrace();
 			System.out.println("Error occured during storing current device list to file.");
@@ -66,13 +68,13 @@ public class UPnPDeviceManager {
 		try {
 			fis = new FileInputStream("sample.bin");
 			ois = new ObjectInputStream(fis);
-			Object oldDeviceList = ois.readObject();
-			if ( oldDeviceList instanceof HashMap ) {
-				deviceList = (HashMap<String, UPnPDevice>)oldDeviceList;
-			}
-			Object oldDeviceStatus = ois.readObject();
-			if ( oldDeviceStatus instanceof HashMap ) {
-				deviceStatus = (HashMap<String, Integer>)oldDeviceStatus;
+			Object oldLocation = ois.readObject();
+			if ( oldLocation instanceof String ) {
+				String location = (String)oldLocation;
+				UPnPDevice newDevice = new UPnPDevice();
+				newDevice.setUsn(location);
+				newDevice.setLocation(location);
+				addDevice(newDevice);
 			}
 		} catch ( Exception e ) {
 			System.out.println("It Failed to load previous device list.");
@@ -104,7 +106,7 @@ public class UPnPDeviceManager {
 				listener.updateDeviceList(value, device);
 			}
 		}
-		//storeCurrentDeviceList();
+		storeCurrentDeviceList();
 	}
 
 	public void addDeviceListChangeListener(IUPnPDeviceListChangeListener listener) {
@@ -120,7 +122,13 @@ public class UPnPDeviceManager {
 		if ( this.deviceList.get(device.getUuid()) != null ) {
 			// If same UUID exists in local Device List.
 			// 1. Replace the device info.
-			Logger.println(Logger.WARNING, "Same UUID[" + device.getUuid() + "] is used.");
+			UPnPDevice oldDeviceInfo = this.deviceList.get(device.getUuid());
+			if ( !oldDeviceInfo.getLocation().equals(device.getLocation()) ) {
+				Logger.println(Logger.WARNING, "Same UUID[" + device.getUuid() + "] is used. but it's description location is different with old one. so it need to be updated.");
+				this.updateDevice(device.getUuid());
+			} else {
+				Logger.println(Logger.WARNING, "Same UUID[" + device.getUuid() + "] is used.");
+			}
 		} else {
 			Logger.println(Logger.INFO, "Add device UUID[" + device.getUuid() + "] is used.");
 			this.deviceList.put(device.getUuid(), device);
