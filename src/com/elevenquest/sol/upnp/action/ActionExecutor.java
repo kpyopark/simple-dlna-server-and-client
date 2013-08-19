@@ -182,7 +182,8 @@ public class ActionExecutor {
 						ioe.printStackTrace();
 					}
 					is = new ByteArrayInputStream(baos.toByteArray());
-					Logger.println(Logger.DEBUG, "xml text:" + new String(baos.toByteArray()));
+					String xmlText = new String(baos.toByteArray());
+					Logger.println(Logger.DEBUG, "xml text:" + ( ( xmlText.length() ) > 2000 ? xmlText.substring(0,2000) : xmlText ) );
 				}
 				doc = parser.parse(is);
 				actionResponseNode = doc.getElementsByTagNameNS("*",action.getActionName() + "Response");
@@ -198,7 +199,7 @@ public class ActionExecutor {
 								String argValue = ( node.getFirstChild() != null ) ? node.getFirstChild().getNodeValue() : ""; //UPnPUtils.unescapeXML(node.getFirstChild().getNodeValue());
 								UPnPStateVariable outArg = action.getOutArgument(argName);
 								outArg.setValue(argValue);
-								Logger.println(Logger.DEBUG, "[Action Executor] Response property:[" + outArg.getArgumentName() + "] Response value:[" + argValue + "]");
+								Logger.println(Logger.DEBUG, "[Action Executor] Response property:[" + outArg.getArgumentName() + "] Response value:[" + ( ( argValue != null && argValue.length() > 1000 ) ? argValue.substring(0,1000) : argValue )  + "]");
 							}
 						}
 					} else {
