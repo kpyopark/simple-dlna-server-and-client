@@ -19,6 +19,7 @@ import com.elevenquest.sol.upnp.network.HttpRequestSender;
 import com.elevenquest.sol.upnp.network.HttpUdpSender;
 import com.elevenquest.sol.upnp.network.IHttpRequestSuplier;
 import com.elevenquest.sol.upnp.service.avtransport.AVTransportService;
+import com.elevenquest.sol.upnp.service.avtransport.TransportInfoItem;
 import com.elevenquest.sol.upnp.service.connection.ConnectionItem;
 import com.elevenquest.sol.upnp.service.connection.ConnectionManagementService;
 import com.elevenquest.sol.upnp.service.directory.ContentDirectoryItem;
@@ -79,8 +80,12 @@ public class ControlPoint {
 		System.out.println(padding + parent);
 		if ( parent.getType() == ContentDirectoryItem.CDS_TYPE_CONTAINER ) {
 			ArrayList<ContentDirectoryItem> items = cds.browse(parent , "BrowseDirectChildren", "*", 0, 0, "");
-			for ( ContentDirectoryItem child : items ) {
-				testBrowseRecursively(cds, child, depth+1);
+			for ( int cnt = 0 ;  cnt < items.size() ; cnt++ ) {
+				if ( cnt > 20 ) {
+					System.out.println("There are too many childrens to show it.");
+				} else {
+					testBrowseRecursively(cds, items.get(cnt), depth+1);
+			}
 			}
 		}
 	}
@@ -293,7 +298,10 @@ public class ControlPoint {
 		}
 		
 		Logger.println(Logger.WARNING,"[Control Point] There is no protocol matched betweeen source and sink. source[" + sourceProtocol + "] sink[" + sinkProtocols + "]");
-		sinkProtocol = sinkProtocols.get(0);
+		//sinkProtocol = sinkProtocols.get(0);
+		
+		AVTransportService sinkTrans = (AVTransportService)sinkCms.getDevice().getUPnPService(UPnPService.UPNP_SERVICE_ID_AVT);
+		AVTransportService sourceTrans = (AVTransportService)sourceCms.getDevice().getUPnPService(UPnPService.UPNP_SERVICE_ID_AVT);
 		
 		Logger.println(Logger.DEBUG, "3. request for sink to prepare connection.");
 		if ( sinkCms.hasPrepareForConnectionAction() ) {
@@ -325,20 +333,23 @@ public class ControlPoint {
 		if ( sourceConnection == null )
 			sourceConnection = new ConnectionItem();
 		
-		AVTransportService sinkTrans = (AVTransportService)sinkCms.getDevice().getUPnPService(UPnPService.UPNP_SERVICE_ID_AVT);
-		AVTransportService sourceTrans = (AVTransportService)sourceCms.getDevice().getUPnPService(UPnPService.UPNP_SERVICE_ID_AVT);
+		if ( sinkTrans == null ) {
+			Logger.println(Logger.DEBUG, "No transport service in sink device.");
+			return false;
+		}
+
+		try {
+			sinkTrans.Stop(sinkConnection.getAVTransportID());
+		} catch ( Exception e ) {
+			Logger.println(Logger.WARNING, "To stop playing previous item failed.");
+		}
 		
 		Logger.println(Logger.DEBUG, "5. set uri to sink.");
-		if ( sinkTrans == null ) {
-			Logger.println(Logger.WARNING,"[Control Point] There is no transport service in renderer.");
+		try {
+			sinkTrans.SetAVTransportURI(sinkConnection.getAVTransportID(), item.getResValue(), item.getDesc());
+		} catch ( Exception e ) {
+			Logger.println(Logger.WARNING,"[Control Point] We couldn't set current uri[" + item.getResValue() + "] in sink(renderer).");
 			return false;
-		} else {
-			try {
-				sinkTrans.SetAVTransportURI(sinkConnection.getAVTransportID(), item.getResValue(), item.getDesc());
-			} catch ( Exception e ) {
-				Logger.println(Logger.WARNING,"[Control Point] We couldn't set current uri[" + item.getResValue() + "] in sink(renderer).");
-				return false;
-			}
 		}
 		
 		Logger.println(Logger.DEBUG, "6. set uri to source.");
@@ -351,6 +362,16 @@ public class ControlPoint {
 				Logger.println(Logger.WARNING,"[Control Point] We couldn't set current uri[" + item.getResValue() + "] in source(content server).");
 				return false;
 			}
+		}
+		TransportInfoItem transInfo = null;
+		try {
+			transInfo = sinkTrans.GetTransportInfo(sinkConnection.getAVTransportID());
+			Logger.println(Logger.DEBUG,"[Play Item] state : " + transInfo.getCurrentTransportState() );
+			Logger.println(Logger.DEBUG,"[Play Item] speed : " + transInfo.getCurrentSpeed() );
+			Logger.println(Logger.DEBUG,"[Play Item] status : " + transInfo.getCurrentTransportStatus() );
+		} catch ( Exception e ) {
+			Logger.println(Logger.WARNING,"[Control Point] We couldn't set current uri[" + item.getResValue() + "] in source(content server).");
+			return false;
 		}
 		
 		try {
